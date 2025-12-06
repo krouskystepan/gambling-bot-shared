@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose'
 import { TVipRoom } from '../types'
 
-const VipRoomSchema = new Schema<TVipRoom>(
+export const VipRoomSchema = new Schema<TVipRoom>(
   {
     userId: { type: String, required: true },
     guildId: { type: String, required: true },

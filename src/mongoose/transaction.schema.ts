@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose'
 import { TTransaction } from '../types'
 
-const TransactionSchema = new Schema<TTransaction>(
+export const TransactionSchema = new Schema<TTransaction>(
   {
     userId: { type: String, required: true },
     guildId: { type: String, required: true },

@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose'
 import { TPrediction } from '../types'
 
-const PredictionSchema = new Schema<TPrediction>(
+export const PredictionSchema = new Schema<TPrediction>(
   {
     predictionId: {
       type: String,

@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose'
 import { TUser } from '../types'
 
-const UserSchema = new Schema<TUser>(
+export const UserSchema = new Schema<TUser>(
   {
     userId: { type: String, required: true },
     guildId: { type: String, required: true },

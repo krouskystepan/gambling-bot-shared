@@ -1,5 +1,4 @@
 import {
-  defaultCasinoSettings,
   LOTTERY_NUM_TO_DRAW,
   LOTTERY_TOTAL_NUMBERS,
   MINI_NUMBERS,

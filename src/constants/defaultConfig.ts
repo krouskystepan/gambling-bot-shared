@@ -8,6 +8,18 @@ export const readableGameValueNames = [
   { name: 'Symbol Weights', value: 'symbolWeights' },
 ]
 
+export const readableGameNames = [
+  { name: 'Dice', value: 'dice' },
+  { name: 'Coin Flip', value: 'coinflip' },
+  { name: 'Slots', value: 'slots' },
+  { name: 'Lottery', value: 'lottery' },
+  { name: 'Roulette', value: 'roulette' },
+  { name: 'Rock Paper Scissors', value: 'rps' },
+  { name: 'Golden Jackpot', value: 'goldenJackpot' },
+  { name: 'Blackjack', value: 'blackjack' },
+  { name: 'Prediction', value: 'prediction' },
+]
+
 export const defaultCasinoSettings = {
   dice: {
     winMultiplier: 5,

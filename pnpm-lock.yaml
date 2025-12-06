@@ -9,14 +9,14 @@ importers:
   .:
     dependencies:
       mongoose:
-        specifier: ^8.0.0
+        specifier: ^8.20.2
         version: 8.20.2
       zod:
-        specifier: ^3.23.0
+        specifier: ^3.25.76
         version: 3.25.76
     devDependencies:
       typescript:
-        specifier: ^5.7.0
+        specifier: ^5.9.3
         version: 5.9.3
 
 packages:

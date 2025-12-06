@@ -4,15 +4,13 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
-  "publishConfig": {
-    "access": "public"
-  },
+  "type": "commonjs",
   "files": [
     "dist"
   ],
   "exports": {
     ".": {
-      "import": "./dist/index.js",
+      "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
     }
   },
@@ -21,10 +19,10 @@
     "release": "pnpm build && npm version patch && npm publish"
   },
   "dependencies": {
-    "mongoose": "^8.0.0",
-    "zod": "^3.23.0"
+    "mongoose": "^8.20.2",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
-    "typescript": "^5.7.0"
+    "typescript": "^5.9.3"
   }
 }

@@ -10,10 +10,6 @@ export const VipRoomSchema = new Schema<TVipRoom>(
       type: [String],
       default: [],
     },
-    maxMembers: {
-      type: Number,
-      default: 10,
-    },
     expiresAt: { type: Date, required: true },
   },
   { timestamps: true }

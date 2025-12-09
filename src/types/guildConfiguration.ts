@@ -22,6 +22,7 @@ export type TGuildConfiguration = {
     pricePerDay: number
     pricePerCreate: number
     pricePerAdditionalMember: number
+    maxMembers: number
   }
   bonusSettings: {
     rewardMode: RewardMode

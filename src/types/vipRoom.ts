@@ -4,7 +4,6 @@ export type TVipRoom = {
   channelId: string
   expiresAt: Date
   memberIds: string[]
-  maxMembers: number
   createdAt: Date
   updatedAt: Date
 }

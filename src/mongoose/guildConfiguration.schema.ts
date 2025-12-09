@@ -66,6 +66,10 @@ export const GuildConfigurationSchema = new Schema<TGuildConfiguration>({
       type: Number,
       default: 0,
     },
+    maxMembers: {
+      type: Number,
+      default: 2,
+    },
   },
   bonusSettings: {
     rewardMode: {

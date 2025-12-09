@@ -42,7 +42,11 @@ export const GuildConfigurationSchema = new Schema<TGuildConfiguration>({
     default: defaultCasinoSettings,
   },
   vipSettings: {
-    roleId: {
+    roleOwnerId: {
+      type: String,
+      default: '',
+    },
+    roleMemberId: {
       type: String,
       default: '',
     },
@@ -55,6 +59,10 @@ export const GuildConfigurationSchema = new Schema<TGuildConfiguration>({
       default: 0,
     },
     pricePerCreate: {
+      type: Number,
+      default: 0,
+    },
+    pricePerAdditionalMember: {
       type: Number,
       default: 0,
     },

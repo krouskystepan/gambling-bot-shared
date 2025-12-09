@@ -16,10 +16,12 @@ export type TGuildConfiguration = {
   managerRoleId: string
   casinoSettings: typeof defaultCasinoSettings
   vipSettings: {
-    roleId: string
+    roleOwnerId: string
+    roleMemberId: string
     categoryId: string
     pricePerDay: number
     pricePerCreate: number
+    pricePerAdditionalMember: number
   }
   bonusSettings: {
     rewardMode: RewardMode

@@ -50,7 +50,7 @@ export const calculateRTP = (
       for (const [symbol, weight] of Object.entries(symbolWeights)) {
         const probability = Math.pow(toNumber(weight) / totalWeight, 3)
         const combo = symbol + symbol + symbol
-        const multiplier = toNumber(multipliers[combo] ?? 0) // ← FIX
+        const multiplier = toNumber(multipliers[combo] ?? 0)
         rtp += probability * multiplier
       }
 

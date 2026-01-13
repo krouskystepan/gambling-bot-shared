@@ -7,3 +7,6 @@ export * from './vipRoom'
 export * from './prediction'
 export * from './transaction'
 export * from './guildConfiguration'
+
+// No db
+export * from './bonus'

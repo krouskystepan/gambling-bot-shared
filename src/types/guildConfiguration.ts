@@ -1,4 +1,5 @@
 import { defaultCasinoSettings } from '../constants'
+import { BonusSettings } from './bonus'
 
 export type RewardMode = 'linear' | 'exponential'
 
@@ -24,16 +25,5 @@ export type TGuildConfiguration = {
     pricePerAdditionalMember: number
     maxMembers: number
   }
-  bonusSettings: {
-    rewardMode: RewardMode
-    baseReward: number
-    streakIncrement?: number
-    streakMultiplier?: number
-    maxReward: number
-    resetOnMax: boolean
-    milestoneBonus: {
-      weekly: number
-      monthly: number
-    }
-  }
+  bonusSettings: BonusSettings
 }

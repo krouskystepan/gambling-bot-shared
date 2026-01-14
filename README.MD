@@ -22,5 +22,15 @@ The project is split into three repositories:
 - **Shared Package (this repository)**
 
   - Common types, database models, and business logic shared between the admin panel and the bot.
+  - 🔗 https://github.com/krouskystepan/gambling-bot-shared
 
-All architecture decisions, data flow, and detailed explanations are documented in the case study linked above.
+## Community
+
+This project has a public Discord server where users can explore the system,
+try the bot features, and follow development updates.
+
+👉 **Discord server:**  
+https://discord.gg/Y2mMQN5QVE
+
+All architecture decisions, data flow, and detailed explanations are documented
+in the case study linked above.

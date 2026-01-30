@@ -14,6 +14,10 @@ export type TGuildConfiguration = {
     actions: string
     logs: string
   }
+  raffleChannelIds: {
+    actions: string
+    logs: string
+  }
   managerRoleId: string
   casinoSettings: typeof defaultCasinoSettings
   vipSettings: {

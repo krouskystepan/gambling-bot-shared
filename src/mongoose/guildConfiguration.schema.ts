@@ -7,75 +7,85 @@ export const GuildConfigurationSchema = new Schema<TGuildConfiguration>({
     type: String,
     required: true,
     unique: true,
-    index: true,
+    index: true
   },
   atmChannelIds: {
     actions: {
       type: String,
-      default: '',
+      default: ''
     },
     logs: {
       type: String,
-      default: '',
-    },
+      default: ''
+    }
   },
   casinoChannelIds: {
     type: [String],
-    default: [],
+    default: []
   },
   predictionChannelIds: {
     actions: {
       type: String,
-      default: '',
+      default: ''
     },
     logs: {
       type: String,
-      default: '',
+      default: ''
+    }
+  },
+  raffleChannelIds: {
+    actions: {
+      type: String,
+      default: ''
     },
+    logs: {
+      type: String,
+      default: ''
+    }
   },
   managerRoleId: {
     type: String,
-    default: '',
+    default: ''
   },
   casinoSettings: {
     type: Schema.Types.Mixed,
-    default: defaultCasinoSettings,
+    default: defaultCasinoSettings
   },
   vipSettings: {
     roleOwnerId: {
       type: String,
-      default: '',
+      default: ''
     },
     roleMemberId: {
       type: String,
-      default: '',
+      default: ''
     },
     categoryId: {
       type: String,
-      default: '',
+      default: ''
     },
     pricePerDay: {
       type: Number,
-      default: 0,
+      default: 0
     },
     pricePerCreate: {
       type: Number,
-      default: 0,
+      default: 0
     },
     pricePerAdditionalMember: {
       type: Number,
-      default: 0,
+      default: 0
     },
     maxMembers: {
       type: Number,
-      default: 2,
-    },
+      default: 2
+    }
   },
   bonusSettings: {
     rewardMode: {
       type: String,
       enum: ['linear', 'exponential'],
-      default: 'linear',
+      default: 'linear'
     },
     baseReward: { type: Number, default: 0 },
     streakIncrement: { type: Number, default: 0 },
@@ -84,7 +94,7 @@ export const GuildConfigurationSchema = new Schema<TGuildConfiguration>({
     resetOnMax: { type: Boolean, default: false },
     milestoneBonus: {
       weekly: { type: Number, default: 0 },
-      monthly: { type: Number, default: 0 },
-    },
-  },
+      monthly: { type: Number, default: 0 }
+    }
+  }
 })

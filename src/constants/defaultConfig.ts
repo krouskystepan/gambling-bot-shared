@@ -17,7 +17,8 @@ export const readableGameNames = [
   { name: 'Rock Paper Scissors', value: 'rps' },
   { name: 'Golden Jackpot', value: 'goldenJackpot' },
   { name: 'Blackjack', value: 'blackjack' },
-  { name: 'Prediction', value: 'prediction' }
+  { name: 'Prediction', value: 'prediction' },
+  { name: 'Raffle', value: 'raffle' }
 ]
 
 export const defaultCasinoSettings = {

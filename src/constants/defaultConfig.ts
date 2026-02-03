@@ -18,7 +18,8 @@ export const readableGameNames = [
   { name: 'Golden Jackpot', value: 'goldenJackpot' },
   { name: 'Blackjack', value: 'blackjack' },
   { name: 'Prediction', value: 'prediction' },
-  { name: 'Raffle', value: 'raffle' }
+  { name: 'Raffle', value: 'raffle' },
+  { name: 'Plinko', value: 'plinko' }
 ]
 
 export const defaultCasinoSettings = {
@@ -94,5 +95,16 @@ export const defaultCasinoSettings = {
   },
   raffle: {
     casinoCut: 0.01
+  },
+  plinko: {
+    binMultipliers: {
+      0: 6,
+      1: 1.5,
+      2: 0.75,
+      3: 0.5,
+      4: 0.75,
+      5: 1.5,
+      6: 6
+    }
   }
 }

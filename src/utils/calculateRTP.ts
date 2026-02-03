@@ -1,7 +1,7 @@
 import {
   LOTTERY_NUM_TO_DRAW,
   LOTTERY_TOTAL_NUMBERS,
-  MINI_NUMBERS,
+  MINI_NUMBERS
 } from '../constants'
 import { TCasinoSettings } from '../types'
 
@@ -136,7 +136,7 @@ export const calculateRTP = (
         parity: parityRTP,
         range: rangeRTP,
         dozen: dozenRTP,
-        column: columnRTP,
+        column: columnRTP
       }
     }
 
@@ -152,10 +152,34 @@ export const calculateRTP = (
     }
 
     case 'blackjack':
-      return 99.4
-
     case 'prediction':
+    case 'raffle':
       return 0
+
+    case 'plinko': {
+      const { binMultipliers } = settings as TCasinoSettings['plinko']
+
+      const multipliers = binMultipliers as Record<number, number>
+
+      const bins = Object.keys(multipliers)
+        .map(Number)
+        .sort((a, b) => a - b)
+
+      const N = bins.length - 1 // rows
+      const p = 0.5
+
+      let rtp = 0
+
+      for (let k = 0; k <= N; k++) {
+        const probability =
+          combination(N, k) * Math.pow(p, k) * Math.pow(1 - p, N - k)
+
+        const multiplier = toNumber(multipliers[k] ?? 0)
+        rtp += probability * multiplier
+      }
+
+      return rtp * 100
+    }
 
     default:
       console.warn(`RTP for ${game} not implemented`)

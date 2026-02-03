@@ -105,6 +105,8 @@ export const defaultCasinoSettings = {
       4: 0.75,
       5: 1.5,
       6: 6
-    }
+    },
+    maxBet: 0,
+    minBet: 0
   }
 }

@@ -9,18 +9,28 @@ export const TransactionSchema = new Schema<TTransaction>(
     type: {
       type: String,
       required: true,
-      enum: ['deposit', 'withdraw', 'bet', 'win', 'refund', 'bonus', 'vip'],
+      enum: ['deposit', 'withdraw', 'bet', 'win', 'refund', 'bonus', 'vip']
     },
     source: {
       type: String,
       required: true,
-      enum: ['command', 'manual', 'web', 'system', 'casino'],
+      enum: ['command', 'manual', 'web', 'system', 'casino']
     },
     meta: { type: Schema.Types.Mixed, default: {} },
     betId: { type: String, default: null },
-    handledBy: { type: String, default: null },
+    handledBy: { type: String, default: null }
   },
   { timestamps: { createdAt: true, updatedAt: false } }
+)
+
+TransactionSchema.index(
+  { betId: 1, type: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      betId: { $exists: true, $ne: null }
+    }
+  }
 )
 
 // for pagination / sorting

@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
-  "type": "commonjs",
+  "type": "module",
   "files": [
     "dist"
   ],
@@ -23,9 +23,11 @@
     "release": "pnpm build && npm version patch && npm publish"
   },
   "peerDependencies": {
-    "mongoose": "^9.0.0"
+    "mongoose": "^9.0.0",
+    "discord.js": "^14.25.1"
   },
   "devDependencies": {
+    "discord.js": "^14.25.1",
     "mongoose": "^9.1.4",
     "typescript": "^5.9.3"
   },

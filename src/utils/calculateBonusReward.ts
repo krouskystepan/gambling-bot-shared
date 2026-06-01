@@ -13,6 +13,25 @@ export type CalculateBonusRewardResult = {
   isReset: boolean
 }
 
+const getCycleLength = (
+  rewardMode: BonusSettings['rewardMode'],
+  baseReward: number,
+  maxReward: number,
+  streakIncrement: number,
+  streakMultiplier: number
+): number => {
+  if (rewardMode === 'linear') {
+    return streakIncrement > 0
+      ? Math.floor((maxReward - baseReward) / streakIncrement) + 1
+      : 1
+  }
+
+  return streakMultiplier > 1
+    ? Math.floor(Math.log(maxReward / baseReward) / Math.log(streakMultiplier)) +
+        1
+    : 1
+}
+
 export const calculateBonusReward = ({
   streak,
   settings
@@ -34,30 +53,24 @@ export const calculateBonusReward = ({
 
   let isReset = false
 
-  if (maxReward > 0 && base > maxReward) {
-    if (resetOnMax) {
-      isReset = true
+  if (maxReward > 0 && resetOnMax && base > maxReward) {
+    const cycle = getCycleLength(
+      rewardMode,
+      baseReward,
+      maxReward,
+      streakIncrement,
+      streakMultiplier
+    )
+    const cycleStreak = ((streak - 1) % cycle) + 1
 
-      if (rewardMode === 'linear') {
-        const cycle =
-          streakIncrement > 0
-            ? Math.floor((maxReward - baseReward) / streakIncrement) + 1
-            : 1
-        const newStreak = ((streak - 1) % cycle) + 1
-        base = baseReward + (newStreak - 1) * streakIncrement
-      } else {
-        const cycle =
-          streakMultiplier > 1
-            ? Math.floor(
-                Math.log(maxReward / baseReward) / Math.log(streakMultiplier)
-              ) + 1
-            : 1
-        const newStreak = ((streak - 1) % cycle) + 1
-        base = baseReward * Math.pow(streakMultiplier, newStreak - 1)
-      }
-    } else {
-      base = maxReward
-    }
+    isReset = streak > cycle && cycleStreak === 1
+
+    base =
+      rewardMode === 'linear'
+        ? baseReward + (cycleStreak - 1) * streakIncrement
+        : baseReward * Math.pow(streakMultiplier, cycleStreak - 1)
+  } else if (maxReward > 0 && base > maxReward) {
+    base = maxReward
   }
 
   const weekly = streak % 7 === 0 ? milestoneBonus.weekly : 0

@@ -1,5 +1,7 @@
 import z from 'zod'
 
+import { normalizePlinkoBinMultipliers } from '../constants/plinkoConfig'
+
 const NO_CHANNEL = 'At least one channel must be selected.'
 
 export const atmChannelsFormSchema = z.object({
@@ -92,7 +94,9 @@ export const casinoSettingsSchema = z.object({
   }),
 
   plinko: z.object({
-    binMultipliers: z.record(z.string(), num),
+    binMultipliers: z
+      .record(z.string(), num)
+      .transform(normalizePlinkoBinMultipliers),
     minBet: num,
     maxBet: num
   })

@@ -98,15 +98,15 @@ export const defaultCasinoSettings = {
   },
   plinko: {
     binMultipliers: {
-      0: 8,
-      1: 6,
-      2: 1.5,
-      3: 0.75,
-      4: 0.5,
-      5: 0.75,
-      6: 1.5,
-      7: 6,
-      8: 8
+      1: 8,
+      2: 6,
+      3: 1.5,
+      4: 0.75,
+      5: 0.5,
+      6: 0.75,
+      7: 1.5,
+      8: 6,
+      9: 8
     },
     maxBet: 0,
     minBet: 0

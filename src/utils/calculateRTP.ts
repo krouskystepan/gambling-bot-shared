@@ -1,7 +1,10 @@
 import {
   LOTTERY_NUM_TO_DRAW,
   LOTTERY_TOTAL_NUMBERS,
-  MINI_NUMBERS
+  MINI_NUMBERS,
+  PLINKO_ROW_COUNT,
+  getPlinkoMultiplierAtPathIndex,
+  normalizePlinkoBinMultipliers
 } from '../constants'
 import { TCasinoSettings } from '../types'
 
@@ -158,14 +161,8 @@ export const calculateRTP = (
 
     case 'plinko': {
       const { binMultipliers } = settings as TCasinoSettings['plinko']
-
-      const multipliers = binMultipliers as Record<number, number>
-
-      const bins = Object.keys(multipliers)
-        .map(Number)
-        .sort((a, b) => a - b)
-
-      const N = bins.length - 1 // rows
+      const multipliers = normalizePlinkoBinMultipliers(binMultipliers)
+      const N = PLINKO_ROW_COUNT
       const p = 0.5
 
       let rtp = 0
@@ -174,8 +171,7 @@ export const calculateRTP = (
         const probability =
           combination(N, k) * Math.pow(p, k) * Math.pow(1 - p, N - k)
 
-        const multiplier = toNumber(multipliers[k] ?? 0)
-        rtp += probability * multiplier
+        rtp += probability * getPlinkoMultiplierAtPathIndex(multipliers, k)
       }
 
       return rtp * 100

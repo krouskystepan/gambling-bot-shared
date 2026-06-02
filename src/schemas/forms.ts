@@ -129,14 +129,18 @@ export const bonusFormSchema = z.object({
   rewardMode: z.enum(['linear', 'exponential']),
   baseReward: bonusAmountSchema,
   streakIncrement: bonusAmountSchema.optional(),
-  streakMultiplier: z
+  streakMultiplier: z.preprocess((val) => {
+    if (val === '' || val === undefined || val === null) return undefined
+    if (typeof val === 'string') return Number(val)
+    return val
+  }, z
     .number()
     .min(0, 'Must be ≥ 0')
     .max(
       BONUS_MAX_STREAK_MULTIPLIER,
       `Must be ≤ ${BONUS_MAX_STREAK_MULTIPLIER}`
     )
-    .optional(),
+    .optional()),
   maxReward: bonusAmountSchema,
   resetOnMax: z.boolean(),
   milestoneBonus: z.object({

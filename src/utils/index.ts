@@ -1,5 +1,6 @@
 export * from './calculateRTP'
 export * from './calculateBonusReward'
+export * from './normalizeBonusSettings'
 export * from './generateBonusPreview'
 export * from './formatters'
 export * from './generateId'

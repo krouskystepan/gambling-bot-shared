@@ -1,5 +1,9 @@
 import z from 'zod'
 
+import {
+  BONUS_MAX_AMOUNT,
+  BONUS_MAX_STREAK_MULTIPLIER
+} from '../constants/bonusLimits'
 import { normalizePlinkoBinMultipliers } from '../constants/plinkoConfig'
 
 const NO_CHANNEL = 'At least one channel must be selected.'
@@ -116,15 +120,27 @@ export const managerRoleFormSchema = z.object({
   managerRoleId: z.string().min(1, 'Select a manager role')
 })
 
+const bonusAmountSchema = z
+  .number()
+  .min(0, 'Must be ≥ 0')
+  .max(BONUS_MAX_AMOUNT, `Must be ≤ ${BONUS_MAX_AMOUNT.toLocaleString()}`)
+
 export const bonusFormSchema = z.object({
   rewardMode: z.enum(['linear', 'exponential']),
-  baseReward: z.number().min(0),
-  streakIncrement: z.number().min(0).optional(),
-  streakMultiplier: z.number().min(0).optional(),
-  maxReward: z.number().min(0),
+  baseReward: bonusAmountSchema,
+  streakIncrement: bonusAmountSchema.optional(),
+  streakMultiplier: z
+    .number()
+    .min(0, 'Must be ≥ 0')
+    .max(
+      BONUS_MAX_STREAK_MULTIPLIER,
+      `Must be ≤ ${BONUS_MAX_STREAK_MULTIPLIER}`
+    )
+    .optional(),
+  maxReward: bonusAmountSchema,
   resetOnMax: z.boolean(),
   milestoneBonus: z.object({
-    weekly: z.number().min(0),
-    monthly: z.number().min(0)
+    weekly: bonusAmountSchema,
+    monthly: bonusAmountSchema
   })
 })

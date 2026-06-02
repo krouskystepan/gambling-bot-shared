@@ -1,3 +1,4 @@
+export * from './bonusLimits'
 export * from './defaultConfig'
 export * from './maxSimulations'
 export * from './lotteryConfig'

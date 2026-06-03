@@ -36,7 +36,14 @@ export const channelsFormSchema = z.object({
   raffle: raffleChannelsFormSchema
 })
 
-const num = z.number()
+const num = z
+  .union([z.number(), z.string()])
+  .transform((val) => {
+    if (val === '' || val === undefined || val === null) return 0
+    const parsed = typeof val === 'string' ? Number(val) : val
+    return Number.isNaN(parsed) ? 0 : parsed
+  })
+  .pipe(z.number())
 
 export const casinoSettingsSchema = z.object({
   dice: z.object({
@@ -125,22 +132,30 @@ const bonusAmountSchema = z
   .min(0, 'Must be ≥ 0')
   .max(BONUS_MAX_AMOUNT, `Must be ≤ ${BONUS_MAX_AMOUNT.toLocaleString()}`)
 
+const bonusMultiplierSchema = z
+  .number()
+  .min(0, 'Must be ≥ 0')
+  .max(
+    BONUS_MAX_STREAK_MULTIPLIER,
+    `Must be ≤ ${BONUS_MAX_STREAK_MULTIPLIER}`
+  )
+  .optional()
+
+const bonusMultiplierInputSchema = z
+  .union([z.number(), z.string()])
+  .optional()
+  .transform((val) => {
+    if (val === '' || val === undefined || val === null) return undefined
+    const num = typeof val === 'string' ? Number(val) : val
+    return Number.isNaN(num) ? undefined : num
+  })
+  .pipe(bonusMultiplierSchema)
+
 export const bonusFormSchema = z.object({
   rewardMode: z.enum(['linear', 'exponential']),
   baseReward: bonusAmountSchema,
   streakIncrement: bonusAmountSchema.optional(),
-  streakMultiplier: z.preprocess((val) => {
-    if (val === '' || val === undefined || val === null) return undefined
-    if (typeof val === 'string') return Number(val)
-    return val
-  }, z
-    .number()
-    .min(0, 'Must be ≥ 0')
-    .max(
-      BONUS_MAX_STREAK_MULTIPLIER,
-      `Must be ≤ ${BONUS_MAX_STREAK_MULTIPLIER}`
-    )
-    .optional()),
+  streakMultiplier: bonusMultiplierInputSchema,
   maxReward: bonusAmountSchema,
   resetOnMax: z.boolean(),
   milestoneBonus: z.object({

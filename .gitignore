@@ -1,5 +1,6 @@
 node_modules/
 dist/
 build/
+.cursor/
 .env
 .DS_Store

@@ -115,6 +115,11 @@ export const GuildConfigurationSchema = new Schema<TGuildConfiguration>({
     currencySymbol: {
       type: String,
       default: defaultGlobalSettings.currencySymbol
+    },
+    currencyPlacement: {
+      type: String,
+      enum: ['prefix', 'suffix'],
+      default: defaultGlobalSettings.currencyPlacement
     }
   }
 })

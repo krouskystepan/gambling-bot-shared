@@ -1,4 +1,8 @@
-import type { GlobalSettings } from '../constants/defaultGlobalSettings'
+import {
+  type CurrencyPlacement,
+  type GlobalSettings,
+  defaultGlobalSettings
+} from '../constants/defaultGlobalSettings'
 import type { TGuildConfiguration } from '../types/guildConfiguration'
 
 export type GlobalFeature =
@@ -54,6 +58,21 @@ export function isGlobalFeatureDisabled(
   }
 }
 
+export const getCurrencyPlacement = (
+  globalSettings?: Partial<GlobalSettings> | null
+): CurrencyPlacement =>
+  globalSettings?.currencyPlacement === 'suffix' ? 'suffix' : 'prefix'
+
 export const getCurrencySymbol = (
   globalSettings?: Partial<GlobalSettings> | null
 ): string => globalSettings?.currencySymbol?.trim() || '$'
+
+export const getCurrencyCode = (
+  globalSettings?: Partial<GlobalSettings> | null
+): string => {
+  const raw =
+    typeof globalSettings?.currencyCode === 'string'
+      ? globalSettings.currencyCode.trim().toUpperCase()
+      : ''
+  return /^[A-Z]{3}$/.test(raw) ? raw : defaultGlobalSettings.currencyCode
+}

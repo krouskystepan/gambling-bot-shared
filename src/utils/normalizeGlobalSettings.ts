@@ -1,5 +1,6 @@
 import {
   COMMON_TIMEZONES,
+  type CurrencyPlacement,
   type GlobalSettings,
   defaultGlobalSettings
 } from '../constants'
@@ -21,6 +22,9 @@ const trimCurrencySymbol = (value: unknown): string => {
   const raw = typeof value === 'string' ? value.trim() : ''
   return raw.length > 0 ? raw.slice(0, 8) : defaultGlobalSettings.currencySymbol
 }
+
+const normalizeCurrencyPlacement = (value: unknown): CurrencyPlacement =>
+  value === 'suffix' ? 'suffix' : 'prefix'
 
 const normalizeTimezone = (value: unknown): string => {
   const raw = typeof value === 'string' ? value.trim() : ''
@@ -86,5 +90,6 @@ export const normalizeGlobalSettings = (
   ),
   timezone: normalizeTimezone(settings?.timezone),
   currencyCode: trimCurrencyCode(settings?.currencyCode),
-  currencySymbol: trimCurrencySymbol(settings?.currencySymbol)
+  currencySymbol: trimCurrencySymbol(settings?.currencySymbol),
+  currencyPlacement: normalizeCurrencyPlacement(settings?.currencyPlacement)
 })

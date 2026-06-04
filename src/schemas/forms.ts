@@ -171,7 +171,8 @@ export const globalSettingsFormSchema = z.object({
     .trim()
     .toUpperCase()
     .regex(/^[A-Z]{3}$/, 'Use a 3-letter ISO 4217 code (e.g. USD, CZK).'),
-  currencySymbol: z.string().trim().min(1).max(8)
+  currencySymbol: z.string().trim().min(1).max(8),
+  currencyPlacement: z.enum(['prefix', 'suffix'])
 })
 
 export const bonusFormSchema = z.object({

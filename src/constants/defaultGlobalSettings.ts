@@ -1,3 +1,5 @@
+export type CurrencyPlacement = 'prefix' | 'suffix'
+
 export type GlobalSettings = {
   disableRegistrations: boolean
   disableDeposits: boolean
@@ -14,6 +16,8 @@ export type GlobalSettings = {
   timezone: string
   currencyCode: string
   currencySymbol: string
+  /** prefix: symbol before amount ($ 1.5k). suffix: ISO code after amount (1.5k CZK). */
+  currencyPlacement: CurrencyPlacement
 }
 
 export const defaultGlobalSettings: GlobalSettings = {
@@ -31,5 +35,6 @@ export const defaultGlobalSettings: GlobalSettings = {
   maintenanceMode: false,
   timezone: 'UTC',
   currencyCode: 'USD',
-  currencySymbol: '$'
+  currencySymbol: '$',
+  currencyPlacement: 'prefix'
 }

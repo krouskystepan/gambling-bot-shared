@@ -1,3 +1,7 @@
+import type { GlobalSettings } from '../constants/defaultGlobalSettings'
+
+import { getCurrencySymbol } from './globalSettings'
+
 export const formatNumberToReadableString = (number: number): string => {
   const absNumber = Math.abs(number)
 
@@ -40,6 +44,19 @@ export const parseReadableStringToNumber = (readableString: string): number => {
 export const formatNumberWithSpaces = (num: number): string => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 }
+
+/** Compact amount with guild currency symbol (v1: symbol only, not Intl). */
+export const formatMoney = (
+  amount: number,
+  globalSettings?: Partial<GlobalSettings> | null
+): string => `${getCurrencySymbol(globalSettings)}${formatNumberToReadableString(amount)}`
+
+/** Full-precision amount with guild currency symbol. */
+export const formatMoneyExact = (
+  amount: number,
+  globalSettings?: Partial<GlobalSettings> | null
+): string =>
+  `${getCurrencySymbol(globalSettings)}${formatNumberWithSpaces(amount)}`
 
 export const formatNumberToPercentage = (num: number): string => {
   return (num * 100).toFixed(2) + '%'

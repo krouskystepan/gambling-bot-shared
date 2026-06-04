@@ -8,10 +8,16 @@ importers:
 
   .:
     dependencies:
+      luxon:
+        specifier: ^3.7.2
+        version: 3.7.2
       zod:
         specifier: ^4.3.6
         version: 4.4.3
     devDependencies:
+      '@types/luxon':
+        specifier: ^3.7.1
+        version: 3.7.1
       mongoose:
         specifier: ^9.1.4
         version: 9.1.4
@@ -23,6 +29,9 @@ packages:
 
   '@mongodb-js/saslprep@1.4.4':
     resolution: {integrity: sha512-p7X/ytJDIdwUfFL/CLOhKgdfJe1Fa8uw9seJYvdOmnP9JBWGWHW69HkOixXS6Wy9yvGf1MbhcS6lVmrhy4jm2g==}
+
+  '@types/luxon@3.7.1':
+    resolution: {integrity: sha512-H3iskjFIAn5SlJU7OuxUmTEpebK6TKB8rxZShDslBMZJ5u9S//KM1sbdAisiSrqwLQncVjnpi2OK2J51h+4lsg==}
 
   '@types/webidl-conversions@7.0.3':
     resolution: {integrity: sha512-CiJJvcRtIgzadHCYXw7dqEnMNRjhGZlYK05Mj9OyktqV8uVT8fD2BFOB7S1uwBE3Kj2Z+4UyPmFw/Ixgw/LAlA==}
@@ -37,6 +46,10 @@ packages:
   kareem@3.0.0:
     resolution: {integrity: sha512-RKhaOBSPN8L7y4yAgNhDT2602G5FD6QbOIISbjN9D6mjHPeqeg7K+EB5IGSU5o81/X2Gzm3ICnAvQW3x3OP8HA==}
     engines: {node: '>=18.0.0'}
+
+  luxon@3.7.2:
+    resolution: {integrity: sha512-vtEhXh/gNjI9Yg1u4jX/0YVPMvxzHuGgCm6tC5kZyb08yjGWGnqAjGJvcXbqQR2P3MyMEFnRbpcdFS6PBcLqew==}
+    engines: {node: '>=12'}
 
   memory-pager@1.5.0:
     resolution: {integrity: sha512-ZS4Bp4r/Zoeq6+NLJpP+0Zzm0pR8whtGPf1XExKLJBAczGMnSi3It14OiNCStjQjM6NU1okjQGSxgEZN8eBYKg==}
@@ -123,6 +136,8 @@ snapshots:
     dependencies:
       sparse-bitfield: 3.0.3
 
+  '@types/luxon@3.7.1': {}
+
   '@types/webidl-conversions@7.0.3': {}
 
   '@types/whatwg-url@13.0.0':
@@ -132,6 +147,8 @@ snapshots:
   bson@7.1.1: {}
 
   kareem@3.0.0: {}
+
+  luxon@3.7.2: {}
 
   memory-pager@1.5.0: {}
 

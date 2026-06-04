@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose'
-import { defaultCasinoSettings } from '../constants'
+import { defaultCasinoSettings, defaultGlobalSettings } from '../constants'
 import { TGuildConfiguration } from '../types'
 
 export const GuildConfigurationSchema = new Schema<TGuildConfiguration>({
@@ -95,6 +95,26 @@ export const GuildConfigurationSchema = new Schema<TGuildConfiguration>({
     milestoneBonus: {
       weekly: { type: Number, default: 0 },
       monthly: { type: Number, default: 0 }
+    }
+  },
+  globalSettings: {
+    disableRegistrations: { type: Boolean, default: false },
+    disableDeposits: { type: Boolean, default: false },
+    disableWithdrawals: { type: Boolean, default: false },
+    disableCasinoGames: { type: Boolean, default: false },
+    disableCasinoGamesForMods: { type: Boolean, default: false },
+    disablePredictions: { type: Boolean, default: false },
+    disablePredictionManagement: { type: Boolean, default: false },
+    disableRaffles: { type: Boolean, default: false },
+    disableRaffleManagement: { type: Boolean, default: false },
+    disableDailyBonus: { type: Boolean, default: false },
+    disableVip: { type: Boolean, default: false },
+    maintenanceMode: { type: Boolean, default: false },
+    timezone: { type: String, default: defaultGlobalSettings.timezone },
+    currencyCode: { type: String, default: defaultGlobalSettings.currencyCode },
+    currencySymbol: {
+      type: String,
+      default: defaultGlobalSettings.currencySymbol
     }
   }
 })

@@ -1,5 +1,6 @@
 import z from 'zod'
 
+import { COMMON_TIMEZONES } from '../constants/commonTimezones'
 import {
   BONUS_MAX_AMOUNT,
   BONUS_MAX_STREAK_MULTIPLIER
@@ -150,6 +151,28 @@ const bonusMultiplierInputSchema = z
     return Number.isNaN(num) ? undefined : num
   })
   .pipe(bonusMultiplierSchema)
+
+export const globalSettingsFormSchema = z.object({
+  disableRegistrations: z.boolean(),
+  disableDeposits: z.boolean(),
+  disableWithdrawals: z.boolean(),
+  disableCasinoGames: z.boolean(),
+  disableCasinoGamesForMods: z.boolean(),
+  disablePredictions: z.boolean(),
+  disablePredictionManagement: z.boolean(),
+  disableRaffles: z.boolean(),
+  disableRaffleManagement: z.boolean(),
+  disableDailyBonus: z.boolean(),
+  disableVip: z.boolean(),
+  maintenanceMode: z.boolean(),
+  timezone: z.enum(COMMON_TIMEZONES),
+  currencyCode: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^[A-Z]{3}$/, 'Use a 3-letter ISO 4217 code (e.g. USD, CZK).'),
+  currencySymbol: z.string().trim().min(1).max(8)
+})
 
 export const bonusFormSchema = z.object({
   rewardMode: z.enum(['linear', 'exponential']),

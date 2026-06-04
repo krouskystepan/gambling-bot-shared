@@ -1,4 +1,5 @@
 import { defaultCasinoSettings } from '../constants'
+import type { GlobalSettings } from '../constants/defaultGlobalSettings'
 import { BonusSettings } from './bonus'
 
 export type RewardMode = 'linear' | 'exponential'
@@ -30,4 +31,7 @@ export type TGuildConfiguration = {
     maxMembers: number
   }
   bonusSettings: BonusSettings
+  globalSettings?: GlobalSettings
 }
+
+export type { GlobalSettings } from '../constants/defaultGlobalSettings'

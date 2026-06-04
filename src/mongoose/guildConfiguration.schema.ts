@@ -111,7 +111,6 @@ export const GuildConfigurationSchema = new Schema<TGuildConfiguration>({
     disableVip: { type: Boolean, default: false },
     maintenanceMode: { type: Boolean, default: false },
     timezone: { type: String, default: defaultGlobalSettings.timezone },
-    currencyCode: { type: String, default: defaultGlobalSettings.currencyCode },
     currencySymbol: {
       type: String,
       default: defaultGlobalSettings.currencySymbol

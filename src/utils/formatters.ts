@@ -1,10 +1,6 @@
 import type { GlobalSettings } from '../constants/defaultGlobalSettings'
 
-import {
-  getCurrencyCode,
-  getCurrencyPlacement,
-  getCurrencySymbol
-} from './globalSettings'
+import { getCurrencyPlacement, getCurrencySymbol } from './globalSettings'
 
 const formatAmountWithCurrency = (
   amount: number,
@@ -14,11 +10,13 @@ const formatAmountWithCurrency = (
   const negative = amount < 0
   const sign = negative ? '-' : ''
 
+  const symbol = getCurrencySymbol(globalSettings)
+
   if (getCurrencyPlacement(globalSettings) === 'suffix') {
-    return `${sign}${formattedAbsAmount} ${getCurrencyCode(globalSettings)}`
+    return `${sign}${formattedAbsAmount}${symbol}`
   }
 
-  return `${sign}${getCurrencySymbol(globalSettings)} ${formattedAbsAmount}`
+  return `${sign}${symbol}${formattedAbsAmount}`
 }
 
 export const formatNumberToReadableString = (number: number): string => {
@@ -64,7 +62,7 @@ export const formatNumberWithSpaces = (num: number): string => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 }
 
-/** Compact amount with guild currency (prefix: symbol, suffix: ISO code). */
+/** Compact amount with guild currency (prefix or suffix symbol). */
 export const formatMoney = (
   amount: number,
   globalSettings?: Partial<GlobalSettings> | null
@@ -75,7 +73,7 @@ export const formatMoney = (
     globalSettings
   )
 
-/** Full-precision amount with guild currency (prefix: symbol, suffix: ISO code). */
+/** Full-precision amount with guild currency (prefix or suffix symbol). */
 export const formatMoneyExact = (
   amount: number,
   globalSettings?: Partial<GlobalSettings> | null

@@ -136,10 +136,7 @@ const bonusAmountSchema = z
 const bonusMultiplierSchema = z
   .number()
   .min(0, 'Must be ≥ 0')
-  .max(
-    BONUS_MAX_STREAK_MULTIPLIER,
-    `Must be ≤ ${BONUS_MAX_STREAK_MULTIPLIER}`
-  )
+  .max(BONUS_MAX_STREAK_MULTIPLIER, `Must be ≤ ${BONUS_MAX_STREAK_MULTIPLIER}`)
   .optional()
 
 const bonusMultiplierInputSchema = z
@@ -166,12 +163,12 @@ export const globalSettingsFormSchema = z.object({
   disableVip: z.boolean(),
   maintenanceMode: z.boolean(),
   timezone: z.enum(COMMON_TIMEZONES),
-  currencyCode: z
+  currencySymbol: z
     .string()
-    .trim()
-    .toUpperCase()
-    .regex(/^[A-Z]{3}$/, 'Use a 3-letter ISO 4217 code (e.g. USD, CZK).'),
-  currencySymbol: z.string().trim().min(1).max(8),
+    .max(8)
+    .refine((value) => value.trim().length > 0, {
+      message: 'Currency symbol is required'
+    }),
   currencyPlacement: z.enum(['prefix', 'suffix'])
 })
 

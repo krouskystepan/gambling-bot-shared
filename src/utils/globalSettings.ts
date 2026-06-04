@@ -65,14 +65,10 @@ export const getCurrencyPlacement = (
 
 export const getCurrencySymbol = (
   globalSettings?: Partial<GlobalSettings> | null
-): string => globalSettings?.currencySymbol?.trim() || '$'
-
-export const getCurrencyCode = (
-  globalSettings?: Partial<GlobalSettings> | null
 ): string => {
-  const raw =
-    typeof globalSettings?.currencyCode === 'string'
-      ? globalSettings.currencyCode.trim().toUpperCase()
-      : ''
-  return /^[A-Z]{3}$/.test(raw) ? raw : defaultGlobalSettings.currencyCode
+  const symbol = globalSettings?.currencySymbol
+  if (symbol == null || symbol.trim().length === 0) {
+    return defaultGlobalSettings.currencySymbol
+  }
+  return symbol
 }

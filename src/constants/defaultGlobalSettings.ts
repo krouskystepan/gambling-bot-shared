@@ -14,9 +14,8 @@ export type GlobalSettings = {
   disableVip: boolean
   maintenanceMode: boolean
   timezone: string
-  currencyCode: string
   currencySymbol: string
-  /** prefix: symbol before amount ($ 1.5k). suffix: ISO code after amount (1.5k CZK). */
+  /** prefix: symbol before amount ($1.5k). suffix: symbol after amount (1.5kCZK). Spacing is part of currencySymbol. */
   currencyPlacement: CurrencyPlacement
 }
 
@@ -34,7 +33,6 @@ export const defaultGlobalSettings: GlobalSettings = {
   disableVip: false,
   maintenanceMode: false,
   timezone: 'UTC',
-  currencyCode: 'USD',
   currencySymbol: '$',
   currencyPlacement: 'prefix'
 }

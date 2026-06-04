@@ -12,15 +12,11 @@ const coerceBool = (value: unknown, fallback: boolean): boolean => {
   return fallback
 }
 
-const trimCurrencyCode = (value: unknown): string => {
-  const raw = typeof value === 'string' ? value.trim().toUpperCase() : ''
-  const code = raw.slice(0, 3)
-  return /^[A-Z]{3}$/.test(code) ? code : defaultGlobalSettings.currencyCode
-}
-
-const trimCurrencySymbol = (value: unknown): string => {
-  const raw = typeof value === 'string' ? value.trim() : ''
-  return raw.length > 0 ? raw.slice(0, 8) : defaultGlobalSettings.currencySymbol
+const normalizeCurrencySymbol = (value: unknown): string => {
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    return defaultGlobalSettings.currencySymbol
+  }
+  return value.slice(0, 8)
 }
 
 const normalizeCurrencyPlacement = (value: unknown): CurrencyPlacement =>
@@ -89,7 +85,6 @@ export const normalizeGlobalSettings = (
     defaultGlobalSettings.maintenanceMode
   ),
   timezone: normalizeTimezone(settings?.timezone),
-  currencyCode: trimCurrencyCode(settings?.currencyCode),
-  currencySymbol: trimCurrencySymbol(settings?.currencySymbol),
+  currencySymbol: normalizeCurrencySymbol(settings?.currencySymbol),
   currencyPlacement: normalizeCurrencyPlacement(settings?.currencyPlacement)
 })

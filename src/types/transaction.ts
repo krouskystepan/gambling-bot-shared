@@ -4,7 +4,7 @@ export type TTransaction = {
   amount: number
   type: 'deposit' | 'withdraw' | 'bet' | 'win' | 'refund' | 'bonus' | 'vip'
   source: 'command' | 'manual' | 'web' | 'system' | 'casino'
-  meta?: Record<string, any>
+  meta?: Record<string, unknown>
   betId?: string
   handledBy?: string
   createdAt: Date

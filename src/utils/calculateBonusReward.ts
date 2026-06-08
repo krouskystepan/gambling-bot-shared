@@ -27,8 +27,9 @@ const getCycleLength = (
   }
 
   return streakMultiplier > 1
-    ? Math.floor(Math.log(maxReward / baseReward) / Math.log(streakMultiplier)) +
-        1
+    ? Math.floor(
+        Math.log(maxReward / baseReward) / Math.log(streakMultiplier)
+      ) + 1
     : 1
 }
 

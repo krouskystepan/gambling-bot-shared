@@ -1,4 +1,7 @@
-import { BONUS_MAX_AMOUNT, BONUS_MAX_STREAK_MULTIPLIER } from '../constants/bonusLimits'
+import {
+  BONUS_MAX_AMOUNT,
+  BONUS_MAX_STREAK_MULTIPLIER
+} from '../constants/bonusLimits'
 import type { BonusSettings } from '../types'
 
 const clampAmount = (value: number): number =>

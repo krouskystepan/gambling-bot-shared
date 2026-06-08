@@ -34,4 +34,8 @@ in the case study linked above.
 
 ## Local development
 
-See [LOCAL_DEVELOPMENT.md](./LOCAL_DEVELOPMENT.md) for the local linking workflow, debugging commands, and release process.
+See [docs/LOCAL_DEVELOPMENT.md](./docs/LOCAL_DEVELOPMENT.md) for the local linking workflow, debugging commands, and release process.
+
+## GitHub / CI
+
+See [docs/GITHUB_SETUP.md](./docs/GITHUB_SETUP.md) for CI workflows and branch protection on `main`.

@@ -25,6 +25,12 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "format:fix": "prettier --write \"src/**/*.ts\"",
+    "lint:check": "eslint src --max-warnings 0",
+    "lint:fix": "eslint src --fix --max-warnings 0",
+    "type:check": "tsc --noEmit",
+    "check": "pnpm format:check && pnpm lint:check && pnpm type:check",
     "prepublishOnly": "pnpm build",
     "prepare": "bash scripts/setup-git-hooks.sh",
     "link-local": "bash scripts/link-local.sh",
@@ -38,12 +44,18 @@
     "mongoose": "^9.0.0"
   },
   "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/luxon": "^3.7.1",
+    "@typescript-eslint/eslint-plugin": "^8.59.4",
+    "@typescript-eslint/parser": "^8.59.4",
+    "eslint": "^10.4.0",
     "mongoose": "^9.1.4",
+    "prettier": "^3.8.3",
     "typescript": "^5.9.3"
   },
   "dependencies": {
     "luxon": "^3.7.2",
     "zod": "^4.3.6"
-  }
+  },
+  "packageManager": "pnpm@10.28.0"
 }

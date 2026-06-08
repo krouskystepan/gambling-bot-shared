@@ -17,5 +17,5 @@ export const MINI_NUMBERS: Record<string, 'red' | 'black' | 'green'> = {
   '11': 'black',
   '13': 'black',
   '15': 'black',
-  '17': 'black',
+  '17': 'black'
 }

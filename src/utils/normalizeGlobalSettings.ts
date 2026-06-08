@@ -24,10 +24,7 @@ const normalizeCurrencyPlacement = (value: unknown): CurrencyPlacement =>
 
 const normalizeTimezone = (value: unknown): string => {
   const raw = typeof value === 'string' ? value.trim() : ''
-  if (
-    raw.length > 0 &&
-    (COMMON_TIMEZONES as readonly string[]).includes(raw)
-  ) {
+  if (raw.length > 0 && (COMMON_TIMEZONES as readonly string[]).includes(raw)) {
     return raw
   }
   return defaultGlobalSettings.timezone

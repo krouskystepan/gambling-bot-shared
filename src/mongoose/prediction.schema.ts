@@ -1,27 +1,28 @@
 import { Schema } from 'mongoose'
+
 import { TPrediction } from '../types'
 
 export const PredictionSchema = new Schema<TPrediction>(
   {
     predictionId: {
       type: String,
-      required: true,
+      required: true
     },
     guildId: {
       type: String,
-      required: true,
+      required: true
     },
     channelId: {
       type: String,
-      required: true,
+      required: true
     },
     creatorId: {
       type: String,
-      required: true,
+      required: true
     },
     title: {
       type: String,
-      required: true,
+      required: true
     },
     choices: [
       {
@@ -30,21 +31,21 @@ export const PredictionSchema = new Schema<TPrediction>(
         bets: [
           {
             userId: { type: String, required: true },
-            amount: { type: Number, required: true },
-          },
-        ],
-      },
+            amount: { type: Number, required: true }
+          }
+        ]
+      }
     ],
     status: {
       type: String,
       enum: ['active', 'ended', 'paid', 'canceled'],
-      default: 'active',
+      default: 'active'
     },
     autolock: {
       type: Date,
       required: false,
-      default: null,
-    },
+      default: null
+    }
   },
   { timestamps: true }
 )

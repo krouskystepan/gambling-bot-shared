@@ -1,4 +1,5 @@
 import { Schema } from 'mongoose'
+
 import { TVipRoom } from '../types'
 
 export const VipRoomSchema = new Schema<TVipRoom>(
@@ -8,9 +9,9 @@ export const VipRoomSchema = new Schema<TVipRoom>(
     channelId: { type: String, required: true },
     memberIds: {
       type: [String],
-      default: [],
+      default: []
     },
-    expiresAt: { type: Date, required: true },
+    expiresAt: { type: Date, required: true }
   },
   { timestamps: true }
 )

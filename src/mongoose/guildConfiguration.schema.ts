@@ -1,4 +1,5 @@
 import { Schema } from 'mongoose'
+
 import { defaultCasinoSettings, defaultGlobalSettings } from '../constants'
 import { TGuildConfiguration } from '../types'
 

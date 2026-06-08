@@ -1,4 +1,5 @@
 import { Schema } from 'mongoose'
+
 import { TTransaction } from '../types'
 
 export const TransactionSchema = new Schema<TTransaction>(

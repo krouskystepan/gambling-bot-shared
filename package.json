@@ -1,6 +1,6 @@
 {
   "name": "gambling-bot-shared",
-  "version": "0.1.50",
+  "version": "0.1.51",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
@@ -24,9 +24,15 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
     "prepublishOnly": "pnpm build",
+    "prepare": "bash scripts/setup-git-hooks.sh",
+    "link-local": "bash scripts/link-local.sh",
+    "unlink-local": "bash scripts/unlink-local.sh",
+    "link-status": "bash scripts/shared-link-status.sh",
+    "release": "bash scripts/release.sh",
     "publish-and-bump-projects": "bash scripts/publish-to-npm.sh",
-    "release": "npm version patch && npm publish"
+    "publish-to-npm": "bash scripts/publish-to-npm.sh"
   },
   "peerDependencies": {
     "mongoose": "^9.0.0"

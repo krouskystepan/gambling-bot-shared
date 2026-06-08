@@ -36,6 +36,7 @@
     "link-local": "bash scripts/link-local.sh",
     "unlink-local": "bash scripts/unlink-local.sh",
     "link-status": "bash scripts/shared-link-status.sh",
+    "setup-workspace": "bash scripts/setup-workspace.sh",
     "release": "bash scripts/release.sh",
     "publish-and-bump-projects": "bash scripts/publish-to-npm.sh",
     "publish-to-npm": "bash scripts/publish-to-npm.sh"

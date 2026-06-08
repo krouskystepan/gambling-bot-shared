@@ -34,6 +34,12 @@ in the case study linked above.
 
 ## Local development
 
+Bootstrap all three repos in one step:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/krouskystepan/gambling-bot-shared/main/scripts/setup-workspace.sh | bash
+```
+
 See [docs/LOCAL_DEVELOPMENT.md](./docs/LOCAL_DEVELOPMENT.md) for the local linking workflow, debugging commands, and release process.
 
 ## GitHub / CI

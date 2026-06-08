@@ -1,5 +1,30 @@
 # Local development
 
+## Bootstrap the whole workspace
+
+From GitHub (clones all three repos as siblings, installs deps, builds shared, links consumers):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/krouskystepan/gambling-bot-shared/main/scripts/setup-workspace.sh | bash
+```
+
+Custom directory:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/krouskystepan/gambling-bot-shared/main/scripts/setup-workspace.sh | bash -s -- ~/Code/gambling_bot
+```
+
+When you already have `gambling-bot-shared` checked out:
+
+```bash
+pnpm setup-workspace
+# or: bash scripts/setup-workspace.sh ~/Code/gambling_bot
+```
+
+Defaults: `~/gambling_bot`, branch `main`, owner `krouskystepan`. Override with `WORKSPACE_DIR`, `GITHUB_BRANCH`, or `GITHUB_OWNER`.
+
+## Layout
+
 The three repos are expected as siblings in the same parent folder:
 
 ```

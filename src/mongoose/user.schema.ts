@@ -1,4 +1,5 @@
 import { Schema } from 'mongoose'
+
 import { TUser } from '../types'
 
 export const UserSchema = new Schema<TUser>(

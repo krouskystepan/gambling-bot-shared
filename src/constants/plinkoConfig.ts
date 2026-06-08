@@ -94,6 +94,9 @@ export const formatPlinkoBinMultipliersForDisplay = (
 ): Record<string, number> => {
   const normalized = normalizePlinkoBinMultipliers(binMultipliers)
   return Object.fromEntries(
-    PLINKO_EDITABLE_BINS.map((bin) => [String(bin), plinkoBinAt(normalized, bin)])
+    PLINKO_EDITABLE_BINS.map((bin) => [
+      String(bin),
+      plinkoBinAt(normalized, bin)
+    ])
   )
 }

@@ -1,5 +1,4 @@
 import type { GlobalSettings } from '../constants/defaultGlobalSettings'
-
 import { getCurrencyPlacement, getCurrencySymbol } from './globalSettings'
 
 const formatAmountWithCurrency = (

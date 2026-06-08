@@ -1,10 +1,10 @@
 import z from 'zod'
 
-import { COMMON_TIMEZONES } from '../constants/commonTimezones'
 import {
   BONUS_MAX_AMOUNT,
   BONUS_MAX_STREAK_MULTIPLIER
 } from '../constants/bonusLimits'
+import { COMMON_TIMEZONES } from '../constants/commonTimezones'
 import { normalizePlinkoBinMultipliers } from '../constants/plinkoConfig'
 
 const NO_CHANNEL = 'At least one channel must be selected.'

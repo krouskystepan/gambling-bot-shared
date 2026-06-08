@@ -14,13 +14,6 @@ Custom directory:
 curl -fsSL https://raw.githubusercontent.com/krouskystepan/gambling-bot-shared/main/scripts/setup-workspace.sh | bash -s -- ~/Code/gambling_bot
 ```
 
-If the curl URL returns 404, the script is not on `main` yet. Clone shared and run it directly:
-
-```bash
-git clone --depth 1 https://github.com/krouskystepan/gambling-bot-shared.git /tmp/gambling-bot-shared
-bash /tmp/gambling-bot-shared/scripts/setup-workspace.sh ~/Code/gambling_bot
-```
-
 When you already have `gambling-bot-shared` checked out:
 
 ```bash

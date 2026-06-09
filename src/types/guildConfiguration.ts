@@ -11,6 +11,7 @@ export type TGuildConfiguration = {
     logs: string
   }
   casinoChannelIds: string[]
+  winAnnouncementsChannelId: string
   predictionChannelIds: {
     actions: string
     logs: string

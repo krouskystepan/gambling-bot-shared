@@ -26,9 +26,33 @@ is_admin_app() {
   [ "$(basename "$1")" = "gambling-bot-admin" ]
 }
 
+LOCAL_SHARED_MARKER=".local-shared-source"
+
 is_app_linked_to_local() {
   local app_dir="$1"
   local shared_dir="$2"
+  local admin_copy_mode="${3:-}"
+  if [ "$admin_copy_mode" = "1" ]; then
+    node -e "
+      const fs = require('fs');
+      const path = require('path');
+      const app = process.argv[1];
+      const shared = process.argv[2];
+      const marker = process.argv[3];
+      const nm = path.join(app, 'node_modules', 'gambling-bot-shared');
+      try {
+        const sharedReal = fs.realpathSync(shared);
+        const markerPath = path.join(nm, marker);
+        if (!fs.existsSync(markerPath)) process.exit(1);
+        const source = fs.readFileSync(markerPath, 'utf8').trim();
+        process.exit(source === sharedReal ? 0 : 1);
+      } catch {
+        process.exit(1);
+      }
+    " "$app_dir" "$shared_dir" "$LOCAL_SHARED_MARKER"
+    return
+  fi
+
   node -e "
     const fs = require('fs');
     const path = require('path');
@@ -45,40 +69,25 @@ is_app_linked_to_local() {
   " "$app_dir" "$shared_dir"
 }
 
-is_admin_using_injected_shared() {
+app_uses_local_shared() {
   local app_dir="$1"
   local shared_dir="$2"
-  node -e "
-    const fs = require('fs');
-    const path = require('path');
-    const app = process.argv[1];
-    const shared = process.argv[2];
-    const nm = path.join(app, 'node_modules', 'gambling-bot-shared');
-    try {
-      const resolved = fs.realpathSync(nm);
-      const appModules = fs.realpathSync(path.join(app, 'node_modules'));
-      if (!resolved.startsWith(appModules + path.sep)) process.exit(1);
-
-      const installedPkg = JSON.parse(
-        fs.readFileSync(path.join(nm, 'package.json'), 'utf8')
-      );
-      const sharedPkg = JSON.parse(
-        fs.readFileSync(path.join(shared, 'package.json'), 'utf8')
-      );
-      process.exit(installedPkg.version === sharedPkg.version ? 0 : 1);
-    } catch {
-      process.exit(1);
-    }
-  " "$app_dir" "$shared_dir"
+  if is_admin_app "$app_dir"; then
+    is_app_linked_to_local "$app_dir" "$shared_dir" 1
+  else
+    is_app_linked_to_local "$app_dir" "$shared_dir"
+  fi
 }
 
-admin_shared_needs_refresh() {
+sync_admin_shared_copy() {
   local app_dir="$1"
-  local shared_dir="$2"
-  local installed_index="$app_dir/node_modules/gambling-bot-shared/dist/index.js"
-  local shared_index="$shared_dir/dist/index.js"
+  local nm="$app_dir/node_modules/gambling-bot-shared"
 
-  [ ! -f "$installed_index" ] || [ "$shared_index" -nt "$installed_index" ]
+  ensure_shared_built
+  mkdir -p "$nm"
+  rsync -a --delete "$SHARED/dist/" "$nm/dist/"
+  cp "$SHARED/package.json" "$nm/package.json"
+  printf '%s\n' "$SHARED" >"$nm/$LOCAL_SHARED_MARKER"
 }
 
 ensure_shared_built() {
@@ -88,54 +97,73 @@ ensure_shared_built() {
   fi
 }
 
-sync_admin_injected_shared() {
+package_json_has_link_override() {
   local app_dir="$1"
-
-  ensure_shared_built
-
-  if is_admin_using_injected_shared "$app_dir" "$SHARED" \
-    && ! admin_shared_needs_refresh "$app_dir" "$SHARED"; then
-    info "gambling-bot-admin: injected local shared is up to date"
-    return 0
-  fi
-
-  info "gambling-bot-admin: refreshing injected local shared"
-  (cd "$app_dir" && CI=true pnpm install --prefer-offline)
-}
-
-link_app_to_shared() {
-  local app_dir="$1"
-  local app_name
-  app_name="$(basename "$app_dir")"
-
-  if is_admin_app "$app_dir"; then
-    sync_admin_injected_shared "$app_dir"
-    return 0
-  fi
-
-  if is_app_linked_to_local "$app_dir" "$SHARED"; then
-    info "$app_name: already linked to local shared"
-    return 0
-  fi
-
-  ensure_shared_built
-  info "Linking $app_name → $SHARED"
-  (cd "$app_dir" && CI=true pnpm link "$SHARED")
+  node -e "
+    const pkg = require(process.argv[1]);
+    const override = pkg.pnpm?.overrides?.['gambling-bot-shared'] ?? '';
+    process.exit(/link:/.test(String(override)) ? 0 : 1);
+  " "$app_dir/package.json" 2>/dev/null
 }
 
 restore_link_pollution_from_git() {
   local app_dir="$1"
+  local restore_files=()
 
   if ! git -C "$app_dir" rev-parse --git-dir >/dev/null 2>&1; then
     return 0
   fi
 
   if [ -f "$app_dir/pnpm-lock.yaml" ] && grep -qE 'gambling-bot-shared.*link:' "$app_dir/pnpm-lock.yaml"; then
-    git -C "$app_dir" checkout HEAD -- pnpm-lock.yaml
+    restore_files+=("pnpm-lock.yaml")
   fi
 
   if [ -f "$app_dir/pnpm-workspace.yaml" ] && grep -qE 'gambling-bot-shared:\s*link:' "$app_dir/pnpm-workspace.yaml"; then
-    git -C "$app_dir" checkout HEAD -- pnpm-workspace.yaml
+    restore_files+=("pnpm-workspace.yaml")
+  fi
+
+  if [ -f "$app_dir/package.json" ] && package_json_has_link_override "$app_dir"; then
+    restore_files+=("package.json")
+  fi
+
+  if [ "${#restore_files[@]}" -eq 0 ]; then
+    return 0
+  fi
+
+  info "Restoring production-safe package files after local link"
+  git -C "$app_dir" checkout HEAD -- "${restore_files[@]}"
+}
+
+link_app_to_shared() {
+  local app_dir="$1"
+  local app_name
+  app_name="$(basename "$app_dir")"
+  local nm="$app_dir/node_modules/gambling-bot-shared"
+
+  restore_link_pollution_from_git "$app_dir"
+
+  if app_uses_local_shared "$app_dir" "$SHARED"; then
+    if is_admin_app "$app_dir"; then
+      sync_admin_shared_copy "$app_dir"
+      info "$app_name: synced local shared copy"
+    else
+      info "$app_name: already linked to local shared"
+    fi
+    return 0
+  fi
+
+  info "Linking $app_name → $SHARED"
+  mkdir -p "$app_dir/node_modules"
+  rm -rf "$nm"
+
+  if is_admin_app "$app_dir"; then
+    sync_admin_shared_copy "$app_dir"
+  else
+    ln -s "$SHARED" "$nm"
+  fi
+
+  if ! app_uses_local_shared "$app_dir" "$SHARED"; then
+    die "Failed to link $app_name to local shared"
   fi
 }
 
@@ -150,9 +178,7 @@ unlink_app_from_shared() {
   fi
 
   info "Unlinking $app_name from local shared"
-  set +e
-  (cd "$app_dir" && CI=true pnpm unlink gambling-bot-shared)
-  set -e
+  rm -rf "$app_dir/node_modules/gambling-bot-shared"
 
   restore_link_pollution_from_git "$app_dir"
 
@@ -184,17 +210,12 @@ report_app_link_status() {
     return
   fi
 
-  if is_admin_app "$app_dir"; then
-    if is_admin_using_injected_shared "$app_dir" "$SHARED"; then
-      echo "$app_name: local injected ($SHARED)"
+  if app_uses_local_shared "$app_dir" "$SHARED"; then
+    if is_admin_app "$app_dir"; then
+      echo "$app_name: local copy ($SHARED)"
     else
-      echo "$app_name: registry (injected local shared missing or stale)"
+      echo "$app_name: local ($SHARED)"
     fi
-    return
-  fi
-
-  if is_app_linked_to_local "$app_dir" "$SHARED"; then
-    echo "$app_name: local ($SHARED)"
   else
     local resolved
     resolved="$(node -e "

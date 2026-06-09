@@ -18,6 +18,7 @@ Local git cannot enforce this for the remote. Your machine can still commit to a
 | `gambling-bot-discord` | `.github/workflows/ci.yml` | Coverage, format, lint, types, build, tests |
 | `gambling-bot-admin` | `.github/workflows/ci.yml` | Format, lint, types, build |
 | `gambling-bot-shared` | `.github/workflows/ci.yml` | Format, lint, types, build |
+| `gambling-bot-shared` | `.github/workflows/release.yml` | Publish to npm on push to `main` (when version is new) |
 
 The required status check name on GitHub is **`Checks`** (the job name in each workflow).
 

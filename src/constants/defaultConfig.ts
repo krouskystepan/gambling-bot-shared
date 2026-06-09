@@ -5,7 +5,18 @@ export const readableGameValueNames = [
   { name: 'Win Multipliers (x)', value: 'winMultipliers' },
   { name: 'Casino House Cut (%)', value: 'casinoCut' },
   { name: 'One-In Chance (e.g. 1 in 10,000)', value: 'oneInChance' },
-  { name: 'Symbol Weights', value: 'symbolWeights' }
+  { name: 'Symbol Weights', value: 'symbolWeights' },
+  { name: 'Plinko Minimum Multiplier', value: 'plinkoMinMultiplier' },
+  {
+    name: 'Golden Jackpot Minimum Multiplier',
+    value: 'goldenJackpotMinMultiplier'
+  },
+  { name: 'Slots Minimum Multiplier', value: 'slotsMinMultiplier' },
+  { name: 'Dice Minimum Multiplier', value: 'diceMinMultiplier' },
+  { name: 'Coin Flip Minimum Multiplier', value: 'coinflipMinMultiplier' },
+  { name: 'Lottery Minimum Multiplier', value: 'lotteryMinMultiplier' },
+  { name: 'Roulette Minimum Multiplier', value: 'rouletteMinMultiplier' },
+  { name: 'Blackjack Minimum Multiplier', value: 'blackjackMinMultiplier' }
 ]
 
 export const readableGameNames = [
@@ -19,7 +30,8 @@ export const readableGameNames = [
   { name: 'Blackjack', value: 'blackjack' },
   { name: 'Prediction', value: 'prediction' },
   { name: 'Raffle', value: 'raffle' },
-  { name: 'Plinko', value: 'plinko' }
+  { name: 'Plinko', value: 'plinko' },
+  { name: 'Win Announcements', value: 'winAnnouncements' }
 ]
 
 export const defaultCasinoSettings = {
@@ -110,5 +122,15 @@ export const defaultCasinoSettings = {
     },
     maxBet: 0,
     minBet: 0
+  },
+  winAnnouncements: {
+    plinkoMinMultiplier: 6,
+    goldenJackpotMinMultiplier: 1,
+    slotsMinMultiplier: 100,
+    lotteryMinMultiplier: 40,
+    rouletteMinMultiplier: 18,
+    blackjackMinMultiplier: 2.5,
+    diceMinMultiplier: 0,
+    coinflipMinMultiplier: 0
   }
 }

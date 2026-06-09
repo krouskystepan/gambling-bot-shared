@@ -7,27 +7,24 @@ import {
 import { COMMON_TIMEZONES } from '../constants/commonTimezones'
 import { normalizePlinkoBinMultipliers } from '../constants/plinkoConfig'
 
-const NO_CHANNEL = 'At least one channel must be selected.'
-
 export const atmChannelsFormSchema = z.object({
-  actions: z.string().min(1, { message: NO_CHANNEL }),
-  logs: z.string().min(1, { message: NO_CHANNEL })
+  actions: z.string(),
+  logs: z.string()
 })
 
 export const casinoChannelsFormSchema = z.object({
-  casinoChannelIds: z
-    .array(z.string().min(1, { message: NO_CHANNEL }))
-    .min(1, { message: NO_CHANNEL })
+  casinoChannelIds: z.array(z.string()),
+  winAnnouncementsChannelId: z.string()
 })
 
 export const predictionChannelsFormSchema = z.object({
-  actions: z.string().min(1, { message: NO_CHANNEL }),
-  logs: z.string().min(1, { message: NO_CHANNEL })
+  actions: z.string(),
+  logs: z.string()
 })
 
 export const raffleChannelsFormSchema = z.object({
-  actions: z.string().min(1, { message: NO_CHANNEL }),
-  logs: z.string().min(1, { message: NO_CHANNEL })
+  actions: z.string(),
+  logs: z.string()
 })
 
 export const channelsFormSchema = z.object({
@@ -111,21 +108,32 @@ export const casinoSettingsSchema = z.object({
       .transform(normalizePlinkoBinMultipliers),
     minBet: num,
     maxBet: num
+  }),
+
+  winAnnouncements: z.object({
+    plinkoMinMultiplier: num,
+    goldenJackpotMinMultiplier: num,
+    slotsMinMultiplier: num,
+    lotteryMinMultiplier: num,
+    rouletteMinMultiplier: num,
+    blackjackMinMultiplier: num,
+    diceMinMultiplier: num,
+    coinflipMinMultiplier: num
   })
 })
 
 export const vipSettingsFormSchema = z.object({
-  roleOwnerId: z.string().min(1, 'Select a Owner VIP role'),
-  roleMemberId: z.string().min(1, 'Select a Member VIP role'),
+  roleOwnerId: z.string(),
+  roleMemberId: z.string(),
   pricePerDay: z.number().min(0, 'Must be ≥ 0'),
   pricePerCreate: z.number().min(0, 'Must be ≥ 0'),
   pricePerAdditionalMember: z.number().min(0, 'Must be ≥ 0'),
   maxMembers: z.number().min(0, 'Must be ≥ 0'),
-  categoryId: z.string().min(1, 'Select a category')
+  categoryId: z.string()
 })
 
 export const managerRoleFormSchema = z.object({
-  managerRoleId: z.string().min(1, 'Select a manager role')
+  managerRoleId: z.string()
 })
 
 const bonusAmountSchema = z

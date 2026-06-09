@@ -24,6 +24,10 @@ export const GuildConfigurationSchema = new Schema<TGuildConfiguration>({
     type: [String],
     default: []
   },
+  winAnnouncementsChannelId: {
+    type: String,
+    default: ''
+  },
   predictionChannelIds: {
     actions: {
       type: String,

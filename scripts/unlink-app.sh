@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Auto-link local shared when a consumer runs pnpm dev (predev hook).
-# No-op on CI, single-repo clones, or when already linked.
+# Restore the current consumer to registry gambling-bot-shared (node_modules only).
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -23,17 +22,4 @@ uses_shared="$(node -e "
   }
 " "$APP_DIR/package.json")" || exit 0
 
-if [ ! -f "$SHARED/package.json" ]; then
-  exit 0
-fi
-
-if app_uses_local_shared "$APP_DIR" "$SHARED"; then
-  if is_admin_app "$APP_DIR"; then
-    sync_admin_shared_copy "$APP_DIR"
-  else
-    ensure_shared_built
-  fi
-  exit 0
-fi
-
-link_app_to_shared "$APP_DIR"
+unlink_app_from_shared "$APP_DIR"

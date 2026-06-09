@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Bootstrap the full gambling-bot workspace (shared + discord + admin).
 #
-# Run from GitHub (creates ~/gambling_bot by default):
-#   curl -fsSL https://raw.githubusercontent.com/krouskystepan/gambling-bot-shared/main/scripts/setup-workspace.sh | bash
+# Run from GitHub (creates repos in the current directory):
+#   cd ~/my-workspace && curl -fsSL https://raw.githubusercontent.com/krouskystepan/gambling-bot-shared/main/scripts/setup-workspace.sh | bash
 #
 # Custom directory:
 #   curl -fsSL .../setup-workspace.sh | bash -s -- ~/Code/gambling_bot
@@ -128,7 +128,7 @@ EOF
 
 # --- curl / pipe bootstrap: clone shared, then re-exec from checkout ---
 if ! script_is_checkout; then
-  WORKSPACE="${1:-${WORKSPACE_DIR:-$HOME/gambling_bot}}"
+  WORKSPACE="${1:-${WORKSPACE_DIR:-$(pwd)}}"
   SHARED="$WORKSPACE/$SHARED_NAME"
 
   mkdir -p "$WORKSPACE"

@@ -17,6 +17,7 @@ jobs:
       CI: true
     permissions:
       contents: read
+      id-token: write
 
     steps:
       - name: Checkout
@@ -32,6 +33,9 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
           registry-url: https://registry.npmjs.org
+
+      - name: Ensure npm supports trusted publishing
+        run: npm install -g npm@latest
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -61,5 +65,3 @@ jobs:
       - name: Publish to npm
         if: steps.npm.outputs.skip != 'true'
         run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

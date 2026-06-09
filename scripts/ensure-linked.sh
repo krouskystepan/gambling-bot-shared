@@ -27,6 +27,11 @@ if [ ! -f "$SHARED/package.json" ]; then
   exit 0
 fi
 
+if is_admin_app "$APP_DIR"; then
+  sync_admin_injected_shared "$APP_DIR"
+  exit 0
+fi
+
 if is_app_linked_to_local "$APP_DIR" "$SHARED"; then
   exit 0
 fi

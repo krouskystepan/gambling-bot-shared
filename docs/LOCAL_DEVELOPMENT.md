@@ -8,6 +8,13 @@ From GitHub (clones all three repos as siblings, installs deps, builds shared, l
 curl -fsSL https://raw.githubusercontent.com/krouskystepan/gambling-bot-shared/main/scripts/setup-workspace.sh | bash
 ```
 
+Run from the folder where you want the three repos as siblings (defaults to the current directory):
+
+```bash
+cd ~/Code/gambling_bot
+curl -fsSL https://raw.githubusercontent.com/krouskystepan/gambling-bot-shared/main/scripts/setup-workspace.sh | bash
+```
+
 Custom directory:
 
 ```bash
@@ -21,7 +28,7 @@ pnpm setup-workspace
 # or: bash scripts/setup-workspace.sh ~/Code/gambling_bot
 ```
 
-Defaults: `~/gambling_bot`, branch `main`, owner `krouskystepan`. Override with `WORKSPACE_DIR`, `GITHUB_BRANCH`, or `GITHUB_OWNER`.
+Defaults: current directory, branch `main`, owner `krouskystepan`. Override with `WORKSPACE_DIR`, `GITHUB_BRANCH`, or `GITHUB_OWNER`.
 
 ## Layout
 

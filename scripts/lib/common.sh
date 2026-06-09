@@ -22,6 +22,10 @@ read_version() {
   node -p "require('$SHARED/package.json').version"
 }
 
+is_admin_app() {
+  [ "$(basename "$1")" = "gambling-bot-admin" ]
+}
+
 is_app_linked_to_local() {
   local app_dir="$1"
   local shared_dir="$2"
@@ -41,6 +45,42 @@ is_app_linked_to_local() {
   " "$app_dir" "$shared_dir"
 }
 
+is_admin_using_injected_shared() {
+  local app_dir="$1"
+  local shared_dir="$2"
+  node -e "
+    const fs = require('fs');
+    const path = require('path');
+    const app = process.argv[1];
+    const shared = process.argv[2];
+    const nm = path.join(app, 'node_modules', 'gambling-bot-shared');
+    try {
+      const resolved = fs.realpathSync(nm);
+      const appModules = fs.realpathSync(path.join(app, 'node_modules'));
+      if (!resolved.startsWith(appModules + path.sep)) process.exit(1);
+
+      const installedPkg = JSON.parse(
+        fs.readFileSync(path.join(nm, 'package.json'), 'utf8')
+      );
+      const sharedPkg = JSON.parse(
+        fs.readFileSync(path.join(shared, 'package.json'), 'utf8')
+      );
+      process.exit(installedPkg.version === sharedPkg.version ? 0 : 1);
+    } catch {
+      process.exit(1);
+    }
+  " "$app_dir" "$shared_dir"
+}
+
+admin_shared_needs_refresh() {
+  local app_dir="$1"
+  local shared_dir="$2"
+  local installed_index="$app_dir/node_modules/gambling-bot-shared/dist/index.js"
+  local shared_index="$shared_dir/dist/index.js"
+
+  [ ! -f "$installed_index" ] || [ "$shared_index" -nt "$installed_index" ]
+}
+
 ensure_shared_built() {
   if [ ! -f "$SHARED/dist/index.js" ]; then
     info "Building gambling-bot-shared (dist/ missing)"
@@ -48,10 +88,30 @@ ensure_shared_built() {
   fi
 }
 
+sync_admin_injected_shared() {
+  local app_dir="$1"
+
+  ensure_shared_built
+
+  if is_admin_using_injected_shared "$app_dir" "$SHARED" \
+    && ! admin_shared_needs_refresh "$app_dir" "$SHARED"; then
+    info "gambling-bot-admin: injected local shared is up to date"
+    return 0
+  fi
+
+  info "gambling-bot-admin: refreshing injected local shared"
+  (cd "$app_dir" && CI=true pnpm install --prefer-offline)
+}
+
 link_app_to_shared() {
   local app_dir="$1"
   local app_name
   app_name="$(basename "$app_dir")"
+
+  if is_admin_app "$app_dir"; then
+    sync_admin_injected_shared "$app_dir"
+    return 0
+  fi
 
   if is_app_linked_to_local "$app_dir" "$SHARED"; then
     info "$app_name: already linked to local shared"
@@ -121,6 +181,15 @@ report_app_link_status() {
 
   if [ ! -d "$app_dir/node_modules/gambling-bot-shared" ]; then
     echo "$app_name: not installed"
+    return
+  fi
+
+  if is_admin_app "$app_dir"; then
+    if is_admin_using_injected_shared "$app_dir" "$SHARED"; then
+      echo "$app_name: local injected ($SHARED)"
+    else
+      echo "$app_name: registry (injected local shared missing or stale)"
+    fi
     return
   fi
 

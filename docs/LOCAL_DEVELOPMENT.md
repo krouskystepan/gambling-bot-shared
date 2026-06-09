@@ -69,27 +69,19 @@ pnpm shared:unlink
 
 ## Release shared to npm
 
-```bash
-pnpm release              # patch bump + publish
-pnpm release minor        # minor bump
-pnpm release --no-bump    # publish current version without bumping
-```
+Publishing is automatic when a version bump merges to `main` (see `.github/workflows/release.yml`).
 
-The release script (shared repo only):
-
-1. Builds `dist/`
-2. Bumps version in `package.json` (unless `--no-bump`)
-3. Publishes to npm
-4. Prints a suggested `git commit` for this repo
-
-It does not touch discord or admin. Uncommitted files in other repos are fine.
-
-## Sync consumers after release
-
-When you are ready to point discord and admin at the new npm version:
+1. Bump the version locally:
 
 ```bash
-pnpm publish-and-bump-projects   # publish (if needed) + sync discord/admin lockfiles
-# or, if already on npm:
-bash scripts/publish-to-npm.sh --sync-only
+pnpm bump              # patch (default)
+pnpm bump minor
+pnpm bump major
 ```
+
+2. Commit `package.json`, open a PR, and merge to `main`.
+3. GitHub Actions runs checks, builds, and publishes to npm if that version is not on the registry yet.
+
+Requires an `NPM_TOKEN` repository secret (npm automation token).
+
+After CI publishes, bump `gambling-bot-shared` in discord and admin in separate PRs when you are ready to consume the new version.

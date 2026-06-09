@@ -40,7 +40,7 @@ Bootstrap all three repos in one step:
 curl -fsSL https://raw.githubusercontent.com/krouskystepan/gambling-bot-shared/main/scripts/setup-workspace.sh | bash
 ```
 
-See [docs/LOCAL_DEVELOPMENT.md](./docs/LOCAL_DEVELOPMENT.md) for the local linking workflow, debugging commands, and release process.
+See [docs/LOCAL_DEVELOPMENT.md](./docs/LOCAL_DEVELOPMENT.md) for the local linking workflow, debugging commands, and CI release process.
 
 ## GitHub / CI
 

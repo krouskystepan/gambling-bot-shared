@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Shared helpers for local linking and release scripts.
+# Shared helpers for local linking scripts.
 
 RED=$'\033[0;31m'
 GREEN=$'\033[0;32m'

@@ -1,5 +1,5 @@
-import type { GlobalSettings } from '../constants/defaultGlobalSettings'
 import { readableGameNames } from '../constants/defaultConfig'
+import type { GlobalSettings } from '../constants/defaultGlobalSettings'
 import { getCurrencyPlacement, getCurrencySymbol } from './globalSettings'
 
 const formatAmountWithCurrency = (

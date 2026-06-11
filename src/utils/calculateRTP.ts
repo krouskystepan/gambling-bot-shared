@@ -178,7 +178,9 @@ export const calculateRTP = (
     }
 
     default:
-      console.warn(`RTP for ${game} not implemented`)
+      if (game !== 'winAnnouncements') {
+        console.warn(`RTP for ${game} not implemented`)
+      }
       return 0
   }
 }

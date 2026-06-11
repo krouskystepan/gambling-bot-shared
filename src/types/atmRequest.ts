@@ -10,9 +10,12 @@ export type TAtmRequest = {
   status: 'pending' | 'approved' | 'rejected'
   handledBy?: string
   handledAt?: Date
+  notes?: string
 
-  logChannelId: string
-  logMessageId: string
+  logChannelId?: string
+  logMessageId?: string
+
+  meta?: Record<string, unknown>
 
   createdAt: Date
   updatedAt: Date

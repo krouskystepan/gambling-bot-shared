@@ -13,7 +13,7 @@ export type CalculateBonusRewardResult = {
   isReset: boolean
 }
 
-const getCycleLength = (
+export const getBonusCycleLength = (
   rewardMode: BonusSettings['rewardMode'],
   baseReward: number,
   maxReward: number,
@@ -55,7 +55,7 @@ export const calculateBonusReward = ({
   let isReset = false
 
   if (maxReward > 0 && resetOnMax && base > maxReward) {
-    const cycle = getCycleLength(
+    const cycle = getBonusCycleLength(
       rewardMode,
       baseReward,
       maxReward,

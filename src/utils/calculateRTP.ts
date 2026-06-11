@@ -154,9 +154,13 @@ export const calculateRTP = (
       return (toNumber(winMultiplier) / toNumber(oneInChance)) * 100
     }
 
+    case 'raffle': {
+      const { casinoCut } = settings as TCasinoSettings['raffle']
+      return (1 - toNumber(casinoCut)) * 100
+    }
+
     case 'blackjack':
     case 'prediction':
-    case 'raffle':
       return 0
 
     case 'plinko': {
@@ -178,7 +182,9 @@ export const calculateRTP = (
     }
 
     default:
-      console.warn(`RTP for ${game} not implemented`)
+      if (game !== 'winAnnouncements') {
+        console.warn(`RTP for ${game} not implemented`)
+      }
       return 0
   }
 }

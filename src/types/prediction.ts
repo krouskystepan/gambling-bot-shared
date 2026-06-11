@@ -4,6 +4,7 @@ export type TPredictionOption = {
   bets: {
     userId: string
     amount: number
+    betId: string
   }[]
 }
 
@@ -14,7 +15,7 @@ export type TPrediction = {
   creatorId: string
   title: string
   choices: TPredictionOption[]
-  status: 'active' | 'ended' | 'paid' | 'canceled'
+  status: 'active' | 'ended' | 'paying' | 'paid' | 'canceled'
   autolock?: Date | null
   createdAt: Date
   updatedAt: Date

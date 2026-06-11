@@ -20,6 +20,19 @@ export const getStreakAfterClaim = (
   return 1
 }
 
+export const getEffectiveStreak = (
+  lastClaim: Date | null,
+  now: Date,
+  storedStreak: number
+): number => {
+  if (!lastClaim) return 0
+
+  const diff = now.getTime() - lastClaim.getTime()
+  if (diff >= 2 * DAY_MS) return 0
+
+  return storedStreak
+}
+
 export const getStreakDisplay = (
   lastClaim: Date | null,
   now: Date,

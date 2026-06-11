@@ -1,3 +1,4 @@
+import { readableGameNames } from '../constants/defaultConfig'
 import type { GlobalSettings } from '../constants/defaultGlobalSettings'
 import { getCurrencyPlacement, getCurrencySymbol } from './globalSettings'
 
@@ -94,3 +95,12 @@ export const getReadableName = (
   const found = map.find((item) => item.value === key)
   return found ? found.name : key
 }
+
+export const formatCasinoGameLabel = (gameId: string): string =>
+  getReadableName(gameId, readableGameNames).toUpperCase()
+
+export const formatTransactionSourceLabel = (source: string): string =>
+  source.toUpperCase()
+
+export const formatTransactionTypeLabel = (type: string): string =>
+  type.toUpperCase()

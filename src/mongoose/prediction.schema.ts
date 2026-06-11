@@ -31,14 +31,15 @@ export const PredictionSchema = new Schema<TPrediction>(
         bets: [
           {
             userId: { type: String, required: true },
-            amount: { type: Number, required: true }
+            amount: { type: Number, required: true },
+            betId: { type: String, required: true }
           }
         ]
       }
     ],
     status: {
       type: String,
-      enum: ['active', 'ended', 'paid', 'canceled'],
+      enum: ['active', 'ended', 'paying', 'paid', 'canceled'],
       default: 'active'
     },
     autolock: {

@@ -21,9 +21,14 @@ export const AtmRequestSchema = new Schema<TAtmRequest>(
     },
     handledBy: { type: String },
     handledAt: { type: Date },
+    notes: { type: String },
 
     logChannelId: { type: String },
-    logMessageId: { type: String }
+    logMessageId: { type: String },
+
+    meta: { type: Schema.Types.Mixed }
   },
   { timestamps: true }
 )
+
+AtmRequestSchema.index({ guildId: 1, status: 1, createdAt: -1 })

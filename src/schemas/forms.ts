@@ -180,6 +180,13 @@ export const globalSettingsFormSchema = z.object({
   currencyPlacement: z.enum(['prefix', 'suffix'])
 })
 
+export const raffleCreateFormSchema = z.object({
+  ticketPrice: z.string().min(1),
+  maxTickets: z.number().int().min(1).max(100),
+  drawTime: z.string().min(1),
+  interval: z.string().min(2)
+})
+
 export const bonusFormSchema = z.object({
   rewardMode: z.enum(['linear', 'exponential']),
   baseReward: bonusAmountSchema,

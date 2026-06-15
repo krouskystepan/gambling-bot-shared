@@ -1,3 +1,10 @@
+export type TRaffleStatus = 'active' | 'canceled'
+
+export type TRaffleParticipant = {
+  userId: string
+  tickets: number
+}
+
 export type TRaffle = {
   drawId: string
   raffleId: string
@@ -12,12 +19,9 @@ export type TRaffle = {
   lastDrawAt?: Date
   drawIntervalMs: number
 
-  status: 'active' | 'canceled'
+  status: TRaffleStatus
 
-  participants: {
-    userId: string
-    tickets: number
-  }[]
+  participants: TRaffleParticipant[]
 
   createdAt: Date
   updatedAt: Date

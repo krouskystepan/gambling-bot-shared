@@ -42,6 +42,10 @@ curl -fsSL https://raw.githubusercontent.com/krouskystepan/gambling-bot-shared/m
 
 See [docs/LOCAL_DEVELOPMENT.md](./docs/LOCAL_DEVELOPMENT.md) for the local linking workflow, debugging commands, and CI release process.
 
+## Package imports
+
+Domain subpath exports only — see [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for the domain map.
+
 ## GitHub / CI
 
 See [docs/GITHUB_SETUP.md](./docs/GITHUB_SETUP.md) for CI workflows and branch protection on `main`.

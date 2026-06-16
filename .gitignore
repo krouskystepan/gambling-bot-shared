@@ -1,6 +1,7 @@
 node_modules/
 dist/
 build/
+coverage/
 .cursor/
 .env
 .DS_Store

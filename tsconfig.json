@@ -6,7 +6,22 @@
     "outDir": "dist",
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "gambling-bot-shared/common": ["src/common/index.ts"],
+      "gambling-bot-shared/casino": ["src/casino/index.ts"],
+      "gambling-bot-shared/predictions": ["src/predictions/index.ts"],
+      "gambling-bot-shared/bonus": ["src/bonus/index.ts"],
+      "gambling-bot-shared/guild": ["src/guild/index.ts"],
+      "gambling-bot-shared/transactions": ["src/transactions/index.ts"],
+      "gambling-bot-shared/raffle": ["src/raffle/index.ts"],
+      "gambling-bot-shared/blackjack": ["src/blackjack/index.ts"],
+      "gambling-bot-shared/user": ["src/user/index.ts"],
+      "gambling-bot-shared/atm": ["src/atm/index.ts"],
+      "gambling-bot-shared/vip": ["src/vip/index.ts"],
+      "gambling-bot-shared/mongoose": ["src/mongoose/index.ts"]
+    }
   },
-  "include": ["src"]
+  "include": ["src", "test"]
 }

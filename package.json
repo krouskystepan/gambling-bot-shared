@@ -24,6 +24,10 @@
     "./schemas": {
       "types": "./dist/schemas/index.d.ts",
       "default": "./dist/schemas/index.js"
+    },
+    "./services": {
+      "types": "./dist/services/index.d.ts",
+      "default": "./dist/services/index.js"
     }
   },
   "scripts": {

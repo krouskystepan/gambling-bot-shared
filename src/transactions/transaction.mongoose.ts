@@ -18,18 +18,18 @@ export const TransactionSchema = new Schema<TTransaction>(
       enum: ['command', 'manual', 'web', 'system', 'casino']
     },
     meta: { type: Schema.Types.Mixed, default: {} },
-    betId: { type: String, default: null },
+    referenceId: { type: String, default: null },
     handledBy: { type: String, default: null }
   },
   { timestamps: { createdAt: true, updatedAt: false } }
 )
 
 TransactionSchema.index(
-  { betId: 1, type: 1 },
+  { referenceId: 1, type: 1 },
   {
     unique: true,
     partialFilterExpression: {
-      betId: { $exists: true, $ne: null }
+      referenceId: { $exists: true, $ne: null }
     }
   }
 )
@@ -44,5 +44,5 @@ TransactionSchema.index({ guildId: 1, source: 1, createdAt: -1 })
 TransactionSchema.index({ guildId: 1, userId: 1, createdAt: -1 })
 // admin search
 TransactionSchema.index({ guildId: 1, handledBy: 1, createdAt: -1 })
-// for bet lookups
-TransactionSchema.index({ guildId: 1, betId: 1 })
+// reference ID lookups
+TransactionSchema.index({ guildId: 1, referenceId: 1 })

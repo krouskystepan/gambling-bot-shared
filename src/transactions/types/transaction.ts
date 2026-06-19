@@ -11,7 +11,7 @@ export type TTransaction = {
   type: 'deposit' | 'withdraw' | 'bet' | 'win' | 'refund' | 'bonus' | 'vip'
   source: 'command' | 'manual' | 'web' | 'system' | 'casino'
   meta?: TransactionMeta
-  betId?: string
+  referenceId?: string
   handledBy?: string
   createdAt: Date
 }

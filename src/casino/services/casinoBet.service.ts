@@ -52,7 +52,7 @@ export function createCasinoBetService({
               amount,
               type: 'refund',
               source: 'casino',
-              betId,
+              referenceId: betId,
               meta: { game }
             }
           ],
@@ -101,7 +101,7 @@ export function createCasinoBetService({
         if (winnings > 0) {
           const winExists = await transactionModel
             .exists({
-              betId,
+              referenceId: betId,
               type: 'win'
             })
             .session(session)
@@ -117,7 +117,7 @@ export function createCasinoBetService({
                   amount: winnings,
                   type: 'win',
                   source: 'casino',
-                  betId,
+                  referenceId: betId,
                   meta: { game }
                 }
               ],
@@ -172,7 +172,7 @@ export function createCasinoBetService({
               amount,
               type: 'refund',
               source: 'casino',
-              betId: raffleId,
+              referenceId: raffleId,
               meta: { game }
             }
           ],
@@ -217,7 +217,7 @@ export function createCasinoBetService({
               amount,
               type: 'win',
               source: 'casino',
-              betId: raffleId,
+              referenceId: raffleId,
               meta: { game }
             }
           ],

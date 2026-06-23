@@ -1,6 +1,6 @@
 {
   "name": "gambling-bot-shared",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "license": "MIT",
   "type": "commonjs",
   "repository": {
@@ -58,6 +58,10 @@
     "./mongoose": {
       "types": "./dist/mongoose/index.d.ts",
       "default": "./dist/mongoose/index.js"
+    },
+    "./dev": {
+      "types": "./dist/dev/index.d.ts",
+      "default": "./dist/dev/index.js"
     }
   },
   "scripts": {

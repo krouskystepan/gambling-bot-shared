@@ -21,6 +21,7 @@ export type TGuildConfiguration = {
     logs: string
   }
   managerRoleId: string
+  bannedRoleId: string
   casinoSettings: typeof defaultCasinoSettings
   vipSettings: {
     roleOwnerId: string

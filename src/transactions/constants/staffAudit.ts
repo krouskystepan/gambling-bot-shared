@@ -7,7 +7,10 @@ export const STAFF_ADMIN_ACTIONS = {
   PREDICTION_END: 'prediction-end',
   PREDICTION_PAYOUT: 'prediction-payout',
   PREDICTION_CANCEL: 'prediction-cancel',
-  ATM_REJECT: 'atm-reject'
+  ATM_REJECT: 'atm-reject',
+  USER_BAN: 'user-ban',
+  USER_UNBAN: 'user-unban',
+  USER_NOTE: 'user-note'
 } as const
 
 export type StaffAdminAction =
@@ -18,7 +21,8 @@ export const STAFF_ACTION_CATEGORIES = [
   'atm',
   'vip',
   'raffle',
-  'prediction'
+  'prediction',
+  'user'
 ] as const
 
 export type StaffActionCategory = (typeof STAFF_ACTION_CATEGORIES)[number]

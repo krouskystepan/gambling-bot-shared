@@ -76,6 +76,41 @@ describe('runMonteCarloSimulation', () => {
     expect(result.empiricalRtp).toBe(0)
   })
 
+  it('uses numeric multiplier values via toNumber', async () => {
+    const random = vi.spyOn(Math, 'random').mockReturnValue(0)
+
+    const result = await runMonteCarloSimulation(
+      'dice',
+      {
+        ...defaultCasinoSettings,
+        dice: { ...defaultCasinoSettings.dice, winMultiplier: 4 }
+      },
+      1
+    )
+
+    expect(result.empiricalRtp).toBe(400)
+    random.mockRestore()
+  })
+
+  it('parses valid string multiplier values via toNumber', async () => {
+    const random = vi.spyOn(Math, 'random').mockReturnValue(0)
+
+    const result = await runMonteCarloSimulation(
+      'dice',
+      {
+        ...defaultCasinoSettings,
+        dice: {
+          ...defaultCasinoSettings.dice,
+          winMultiplier: '4' as unknown as number
+        }
+      },
+      1
+    )
+
+    expect(result.empiricalRtp).toBe(400)
+    random.mockRestore()
+  })
+
   it('covers coinflip win and loss branches', async () => {
     const random = vi.spyOn(Math, 'random')
     random

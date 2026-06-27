@@ -51,8 +51,7 @@ describe('runMonteCarloSimulation', () => {
     const winProbability = 1 / 6
     const multiplierVariance =
       winProbability * (1 - winProbability) * multiplier ** 2
-    const rtpStandardError =
-      Math.sqrt(multiplierVariance / iterations) * 100
+    const rtpStandardError = Math.sqrt(multiplierVariance / iterations) * 100
 
     expect(result.theoreticalRtp).toBeGreaterThan(0)
     expect(result.empiricalRtp).toBeGreaterThan(0)

@@ -38,17 +38,25 @@ describe('yieldToEventLoop', () => {
 
 describe('runMonteCarloSimulation', () => {
   it('returns empirical RTP close to theory for dice', async () => {
+    const iterations = 25_000
     const progress: number[] = []
     const result = await runMonteCarloSimulation(
       'dice',
       defaultCasinoSettings,
-      5_000,
+      iterations,
       (completed, total) => progress.push(completed / total)
     )
 
+    const multiplier = defaultCasinoSettings.dice.winMultiplier
+    const winProbability = 1 / 6
+    const multiplierVariance =
+      winProbability * (1 - winProbability) * multiplier ** 2
+    const rtpStandardError =
+      Math.sqrt(multiplierVariance / iterations) * 100
+
     expect(result.theoreticalRtp).toBeGreaterThan(0)
     expect(result.empiricalRtp).toBeGreaterThan(0)
-    expect(Math.abs(result.delta ?? 0)).toBeLessThan(5)
+    expect(Math.abs(result.delta ?? 0)).toBeLessThan(rtpStandardError * 5)
     expect(progress.length).toBeGreaterThan(0)
   })
 

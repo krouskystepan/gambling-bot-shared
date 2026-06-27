@@ -66,6 +66,15 @@ describe('ban history helpers', () => {
     expect(history[0]?.unbannedAt).toBeNull()
   })
 
+  it('omits reason when not provided', () => {
+    const history = startBanHistoryEntry({
+      history: [],
+      bannedBy: 'mod-1'
+    })
+
+    expect(history[0]?.reason).toBeUndefined()
+  })
+
   it('closes the latest open ban history entry', () => {
     const history = startBanHistoryEntry({
       history: [],
@@ -79,5 +88,24 @@ describe('ban history helpers', () => {
 
     expect(closed[0]?.unbannedBy).toBe('mod-2')
     expect(closed[0]?.unbannedAt).toBeInstanceOf(Date)
+  })
+
+  it('returns history unchanged when no open ban exists', () => {
+    const closedHistory = startBanHistoryEntry({
+      history: [],
+      bannedBy: 'mod-1'
+    })
+    const closed = closeLatestBanHistoryEntry({
+      history: closedHistory,
+      unbannedBy: 'mod-2'
+    })
+
+    const unchanged = closeLatestBanHistoryEntry({
+      history: closed,
+      unbannedBy: 'mod-3'
+    })
+
+    expect(unchanged).toBe(closed)
+    expect(unchanged[0]?.unbannedBy).toBe('mod-2')
   })
 })

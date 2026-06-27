@@ -53,6 +53,10 @@ export const GuildConfigurationSchema = new Schema<TGuildConfiguration>({
     type: String,
     default: ''
   },
+  bannedRoleId: {
+    type: String,
+    default: ''
+  },
   casinoSettings: {
     type: Schema.Types.Mixed,
     default: defaultCasinoSettings

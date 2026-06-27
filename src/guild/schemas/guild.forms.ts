@@ -14,7 +14,8 @@ export const channelsFormSchema = z.object({
 })
 
 export const managerRoleFormSchema = z.object({
-  managerRoleId: z.string()
+  managerRoleId: z.string(),
+  bannedRoleId: z.string()
 })
 
 export const globalSettingsFormSchema = z.object({

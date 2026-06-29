@@ -10,7 +10,7 @@ export const STAFF_ADMIN_ACTIONS = {
   ATM_REJECT: 'atm-reject',
   USER_BAN: 'user-ban',
   USER_UNBAN: 'user-unban',
-  USER_NOTE: 'user-note',
+  USER_NOTE_CREATE: 'user-note-create',
   USER_NOTE_UPDATE: 'user-note-update',
   USER_NOTE_DELETE: 'user-note-delete'
 } as const

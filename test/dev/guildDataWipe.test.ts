@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  type GuildDataWipeModels,
   formatGuildDataWipeSummary,
   normalizeGuildWipeEntities,
-  runGuildDataWipe,
-  type GuildDataWipeModels
+  runGuildDataWipe
 } from '../../src/dev/guildDataWipe'
 
 function createMockModels(
@@ -27,7 +27,7 @@ function createMockModels(
         deleteMany: async () => ({ deletedCount: counts[key] ?? 0 })
       }
     ])
-  ) as GuildDataWipeModels
+  ) as unknown as GuildDataWipeModels
 }
 
 describe('normalizeGuildWipeEntities', () => {
@@ -47,6 +47,20 @@ describe('normalizeGuildWipeEntities', () => {
     expect(
       normalizeGuildWipeEntities(['users', 'transactions', 'users', 'atm'])
     ).toEqual(['transactions', 'atm', 'users'])
+  })
+
+  it('treats mixed all selections as a full wipe', () => {
+    expect(
+      normalizeGuildWipeEntities(['users', 'all', 'transactions'])
+    ).toEqual([
+      'transactions',
+      'atm',
+      'raffles',
+      'predictions',
+      'vip',
+      'blackjack',
+      'users'
+    ])
   })
 })
 
@@ -78,6 +92,19 @@ describe('runGuildDataWipe', () => {
       transactions: 3,
       users: 2
     })
+  })
+
+  it('treats missing deletedCount as zero', async () => {
+    const models = createMockModels()
+    models.transactions.deleteMany = async () => ({})
+
+    const summary = await runGuildDataWipe({
+      guildId: 'guild-1',
+      entities: ['transactions'],
+      models
+    })
+
+    expect(summary.deleted).toEqual({ transactions: 0 })
   })
 
   it('wipes all collections in dependency-safe order', async () => {
@@ -127,5 +154,15 @@ describe('formatGuildDataWipeSummary', () => {
         deleted: { users: 0 }
       })
     ).toBe('Nothing to remove — guild operational data was already empty.')
+  })
+
+  it('falls back to the raw key for unknown deletion buckets', () => {
+    const text = formatGuildDataWipeSummary({
+      entities: ['users'],
+      deleted: { mysteryBucket: 4 }
+    })
+
+    expect(text).toContain('mysteryBucket')
+    expect(text).toContain('4')
   })
 })

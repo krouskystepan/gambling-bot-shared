@@ -15,7 +15,9 @@ export type GuildDataWipeDeleteResult = {
 }
 
 export type GuildDataWipeModel = {
-  deleteMany: (filter: { guildId: string }) => Promise<GuildDataWipeDeleteResult>
+  deleteMany: (filter: {
+    guildId: string
+  }) => Promise<GuildDataWipeDeleteResult>
 }
 
 export type GuildDataWipeModels = {
@@ -73,24 +75,24 @@ const WIPE_LABELS: Record<keyof GuildDataWipeModels, string> = {
   users: 'Users'
 }
 
-async function countDeleted(result: GuildDataWipeDeleteResult): Promise<number> {
+async function countDeleted(
+  result: GuildDataWipeDeleteResult
+): Promise<number> {
   return result.deletedCount ?? 0
 }
 
 export function normalizeGuildWipeEntities(
   entities: GuildWipeEntity[]
 ): Exclude<GuildWipeEntity, 'all'>[] {
-  if (entities.includes('all')) {
+  const withoutAll = entities.filter(
+    (entity): entity is Exclude<GuildWipeEntity, 'all'> => entity !== 'all'
+  )
+
+  if (withoutAll.length !== entities.length) {
     return [...WIPE_ENTITY_ORDER]
   }
 
-  const selected = new Set<Exclude<GuildWipeEntity, 'all'>>()
-
-  for (const entity of entities) {
-    if (entity !== 'all') {
-      selected.add(entity)
-    }
-  }
+  const selected = new Set(withoutAll)
 
   return WIPE_ENTITY_ORDER.filter((entity) => selected.has(entity))
 }
@@ -110,8 +112,7 @@ function buildWipeTargets(
         key,
         label: WIPE_LABELS[key],
         entity,
-        run: async () =>
-          countDeleted(await models[key].deleteMany({ guildId }))
+        run: async () => countDeleted(await models[key].deleteMany({ guildId }))
       }
     }
   )
@@ -140,7 +141,9 @@ export async function runGuildDataWipe({
   }
 }
 
-export function formatGuildDataWipeSummary(summary: GuildDataWipeSummary): string {
+export function formatGuildDataWipeSummary(
+  summary: GuildDataWipeSummary
+): string {
   const lines = Object.entries(summary.deleted)
     .filter(([, count]) => count > 0)
     .map(

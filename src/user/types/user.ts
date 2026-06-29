@@ -1,15 +1,8 @@
 export type TUserStaffNote = {
+  noteId: string
   text: string
   authorId: string
   createdAt: Date
-}
-
-export type TUserBanHistoryEntry = {
-  bannedAt: Date
-  bannedBy: string
-  unbannedAt: Date | null
-  unbannedBy: string | null
-  reason?: string
 }
 
 export type TUser = {
@@ -23,7 +16,6 @@ export type TUser = {
   banned: boolean
   bannedAt: Date | null
   bannedBy: string | null
-  banHistory: TUserBanHistoryEntry[]
   staffNotes: TUserStaffNote[]
   createdAt: Date
   updatedAt: Date

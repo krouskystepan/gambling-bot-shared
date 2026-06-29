@@ -173,7 +173,7 @@ unlink_app_from_shared() {
   app_name="$(basename "$app_dir")"
 
   if ! [ -d "$app_dir/node_modules" ]; then
-    warn "$app_name: node_modules missing — skipping unlink"
+    warn "$app_name: node_modules missing - skipping unlink"
     return 0
   fi
 
@@ -188,7 +188,7 @@ unlink_app_from_shared() {
   set -e
 
   if [ "$install_status" -ne 0 ]; then
-    warn "$app_name: frozen install failed — retrying with lockfile refresh"
+    warn "$app_name: frozen install failed - retrying with lockfile refresh"
     (cd "$app_dir" && CI=true pnpm install --no-frozen-lockfile)
   fi
 

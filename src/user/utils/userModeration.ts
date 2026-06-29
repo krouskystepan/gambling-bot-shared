@@ -1,4 +1,5 @@
-import type { TUser, TUserBanHistoryEntry, TUserStaffNote } from '../types/user'
+import { generateId } from '../../common/generateId'
+import type { TUser, TUserStaffNote } from '../types/user'
 
 export const USER_BANNED_ERROR = 'USER_BANNED'
 
@@ -15,6 +16,47 @@ export function normalizeStaffNote(text: string): string | null {
   return trimmed.slice(0, 500)
 }
 
+export function createStaffNoteEntry(
+  text: string,
+  authorId: string
+): TUserStaffNote | null {
+  const normalized = normalizeStaffNote(text)
+  if (!normalized) return null
+
+  return {
+    noteId: generateId(),
+    text: normalized,
+    authorId,
+    createdAt: new Date()
+  }
+}
+
+type StaffNoteLike = {
+  noteId?: string
+  text: string
+  authorId: string
+  createdAt?: Date | string
+}
+
+export function normalizeStaffNotes(notes: StaffNoteLike[]): TUserStaffNote[] {
+  return notes.flatMap((note) => {
+    const text = normalizeStaffNote(note.text)
+    if (!text || !note.authorId) return []
+
+    return [
+      {
+        noteId:
+          typeof note.noteId === 'string' && note.noteId.length > 0
+            ? note.noteId
+            : generateId(),
+        text,
+        authorId: note.authorId,
+        createdAt: note.createdAt ? new Date(note.createdAt) : new Date()
+      }
+    ]
+  })
+}
+
 export function appendStaffNote(
   notes: TUserStaffNote[],
   entry: TUserStaffNote,
@@ -23,44 +65,26 @@ export function appendStaffNote(
   return [entry, ...notes].slice(0, maxNotes)
 }
 
-export function startBanHistoryEntry({
-  history,
-  bannedBy,
-  reason,
-  maxEntries = 50
-}: {
-  history: TUserBanHistoryEntry[]
-  bannedBy: string
-  reason?: string
-  maxEntries?: number
-}): TUserBanHistoryEntry[] {
-  const entry: TUserBanHistoryEntry = {
-    bannedAt: new Date(),
-    bannedBy,
-    unbannedAt: null,
-    unbannedBy: null,
-    ...(reason ? { reason } : {})
-  }
+export function updateStaffNote(
+  notes: TUserStaffNote[],
+  noteId: string,
+  text: string
+): TUserStaffNote[] | null {
+  const normalized = normalizeStaffNote(text)
+  if (!normalized) return null
 
-  return [entry, ...history].slice(0, maxEntries)
+  const index = notes.findIndex((note) => note.noteId === noteId)
+  if (index === -1) return null
+
+  const updated = [...notes]
+  updated[index] = { ...updated[index], text: normalized }
+  return updated
 }
 
-export function closeLatestBanHistoryEntry({
-  history,
-  unbannedBy
-}: {
-  history: TUserBanHistoryEntry[]
-  unbannedBy: string
-}): TUserBanHistoryEntry[] {
-  const openIndex = history.findIndex((entry) => entry.unbannedAt === null)
-  if (openIndex === -1) return history
-
-  const updated = [...history]
-  updated[openIndex] = {
-    ...updated[openIndex],
-    unbannedAt: new Date(),
-    unbannedBy
-  }
-
-  return updated
+export function removeStaffNote(
+  notes: TUserStaffNote[],
+  noteId: string
+): TUserStaffNote[] | null {
+  const next = notes.filter((note) => note.noteId !== noteId)
+  return next.length === notes.length ? null : next
 }

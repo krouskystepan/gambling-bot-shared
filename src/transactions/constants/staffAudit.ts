@@ -10,7 +10,9 @@ export const STAFF_ADMIN_ACTIONS = {
   ATM_REJECT: 'atm-reject',
   USER_BAN: 'user-ban',
   USER_UNBAN: 'user-unban',
-  USER_NOTE: 'user-note'
+  USER_NOTE: 'user-note',
+  USER_NOTE_UPDATE: 'user-note-update',
+  USER_NOTE_DELETE: 'user-note-delete'
 } as const
 
 export type StaffAdminAction =
@@ -22,6 +24,8 @@ export const STAFF_ACTION_CATEGORIES = [
   'vip',
   'raffle',
   'prediction',
+  'ban',
+  'unban',
   'user'
 ] as const
 

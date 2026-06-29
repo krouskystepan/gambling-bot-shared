@@ -27,6 +27,7 @@ export type GuildDataWipeModels = {
   predictions: GuildDataWipeModel
   vipRooms: GuildDataWipeModel
   blackjackGames: GuildDataWipeModel
+  userBans: GuildDataWipeModel
   users: GuildDataWipeModel
 }
 
@@ -72,6 +73,7 @@ const WIPE_LABELS: Record<keyof GuildDataWipeModels, string> = {
   predictions: 'Predictions',
   vipRooms: 'VIP rooms',
   blackjackGames: 'Blackjack games',
+  userBans: 'User bans',
   users: 'Users'
 }
 
@@ -104,16 +106,29 @@ function buildWipeTargets(
 ): WipeTarget[] {
   const selected = new Set(entities)
 
-  return WIPE_ENTITY_ORDER.filter((entity) => selected.has(entity)).map(
+  return WIPE_ENTITY_ORDER.filter((entity) => selected.has(entity)).flatMap(
     (entity) => {
-      const key = ENTITY_TO_MODEL_KEY[entity]
+      const targets: WipeTarget[] = []
 
-      return {
+      if (entity === 'users') {
+        targets.push({
+          key: 'userBans',
+          label: WIPE_LABELS.userBans,
+          entity,
+          run: async () =>
+            countDeleted(await models.userBans.deleteMany({ guildId }))
+        })
+      }
+
+      const key = ENTITY_TO_MODEL_KEY[entity]
+      targets.push({
         key,
         label: WIPE_LABELS[key],
         entity,
         run: async () => countDeleted(await models[key].deleteMany({ guildId }))
-      }
+      })
+
+      return targets
     }
   )
 }
@@ -152,7 +167,7 @@ export function formatGuildDataWipeSummary(
     )
 
   if (lines.length === 0) {
-    return 'Nothing to remove — guild operational data was already empty.'
+    return 'Nothing to remove - guild operational data was already empty.'
   }
 
   return lines.join('\n')

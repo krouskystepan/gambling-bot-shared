@@ -44,7 +44,7 @@ See [docs/LOCAL_DEVELOPMENT.md](./docs/LOCAL_DEVELOPMENT.md) for the local linki
 
 ## Package imports
 
-Domain subpath exports only — see [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for the domain map.
+Domain subpath exports only - see [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for the domain map.
 
 ## GitHub / CI
 

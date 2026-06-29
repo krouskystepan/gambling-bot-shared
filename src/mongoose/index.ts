@@ -1,4 +1,5 @@
 export { UserSchema } from '../user/user.mongoose'
+export { UserBanSchema } from '../user/userBan.mongoose'
 export { VipRoomSchema } from '../vip/vipRoom.mongoose'
 export { PredictionSchema } from '../predictions/prediction.mongoose'
 export { TransactionSchema } from '../transactions/transaction.mongoose'

@@ -1,4 +1,5 @@
 export * from './devAccess'
 export * from './bonusStressTest'
 export * from './casinoMonteCarlo'
+export * from './guildDataWipe'
 export * from './yieldToEventLoop'

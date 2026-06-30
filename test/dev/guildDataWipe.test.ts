@@ -17,6 +17,7 @@ function createMockModels(
     'predictions',
     'vipRooms',
     'blackjackGames',
+    'userBans',
     'users'
   ]
 
@@ -80,6 +81,10 @@ describe('runGuildDataWipe', () => {
       deleted.push('users')
       return { deletedCount: 2 }
     }
+    models.userBans.deleteMany = async () => {
+      deleted.push('userBans')
+      return { deletedCount: 1 }
+    }
 
     const summary = await runGuildDataWipe({
       guildId: 'guild-1',
@@ -87,9 +92,10 @@ describe('runGuildDataWipe', () => {
       models
     })
 
-    expect(deleted).toEqual(['transactions', 'users'])
+    expect(deleted).toEqual(['transactions', 'userBans', 'users'])
     expect(summary.deleted).toEqual({
       transactions: 3,
+      userBans: 1,
       users: 2
     })
   })
@@ -131,6 +137,7 @@ describe('runGuildDataWipe', () => {
       'predictions',
       'vipRooms',
       'blackjackGames',
+      'userBans',
       'users'
     ])
   })
@@ -153,7 +160,7 @@ describe('formatGuildDataWipeSummary', () => {
         entities: ['users'],
         deleted: { users: 0 }
       })
-    ).toBe('Nothing to remove — guild operational data was already empty.')
+    ).toBe('Nothing to remove - guild operational data was already empty.')
   })
 
   it('falls back to the raw key for unknown deletion buckets', () => {

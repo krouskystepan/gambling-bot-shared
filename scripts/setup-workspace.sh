@@ -62,7 +62,7 @@ clone_or_update() {
   if [ -d "$dir/.git" ]; then
     info "Updating $name"
     if ! git -C "$dir" pull --ff-only origin "$GITHUB_BRANCH"; then
-      warn "$name: could not fast-forward — leaving existing checkout as-is"
+      warn "$name: could not fast-forward - leaving existing checkout as-is"
     fi
     return 0
   fi
@@ -82,7 +82,7 @@ install_repo() {
 
   info "Installing dependencies in $name"
   if ! (cd "$dir" && CI=true pnpm install --frozen-lockfile); then
-    warn "$name: frozen install failed — refreshing lockfile"
+    warn "$name: frozen install failed - refreshing lockfile"
     (cd "$dir" && CI=true pnpm install --no-frozen-lockfile)
   fi
 }
@@ -102,7 +102,7 @@ DISCORD_BOT_TOKEN=
 NEXTAUTH_SECRET=
 NEXTAUTH_URL=http://localhost:3000
 EOF
-    info "Created $ADMIN/.env template — fill in values before running admin"
+    info "Created $ADMIN/.env template - fill in values before running admin"
   fi
 }
 

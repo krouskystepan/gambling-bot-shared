@@ -38,5 +38,5 @@ commit_msg="chore: release gambling-bot-shared@$version"
 echo
 info "Bumped to gambling-bot-shared@$version"
 echo
-info "Commit and merge to main — CI will publish to npm:"
+info "Commit and merge to main - CI will publish to npm:"
 echo "  git add package.json && git commit -m \"$commit_msg\""

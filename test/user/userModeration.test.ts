@@ -1,9 +1,11 @@
 import {
   appendStaffNote,
-  closeLatestBanHistoryEntry,
+  createStaffNoteEntry,
   isUserBanned,
   normalizeStaffNote,
-  startBanHistoryEntry
+  normalizeStaffNotes,
+  removeStaffNote,
+  updateStaffNote
 } from 'gambling-bot-shared/user'
 import { describe, expect, it } from 'vitest'
 
@@ -35,12 +37,14 @@ describe('normalizeStaffNote', () => {
 describe('appendStaffNote', () => {
   it('prepends newest notes and caps list size', () => {
     const existing = Array.from({ length: 50 }, (_, index) => ({
+      noteId: `note-${index}`,
       text: `note-${index}`,
       authorId: 'mod-1',
       createdAt: new Date()
     }))
 
     const next = appendStaffNote(existing, {
+      noteId: 'note-new',
       text: 'newest',
       authorId: 'mod-2',
       createdAt: new Date()
@@ -52,60 +56,94 @@ describe('appendStaffNote', () => {
   })
 })
 
-describe('ban history helpers', () => {
-  it('starts a new open ban history entry', () => {
-    const history = startBanHistoryEntry({
-      history: [],
-      bannedBy: 'mod-1',
-      reason: 'abuse'
-    })
+describe('staff note CRUD helpers', () => {
+  it('creates note entries with ids', () => {
+    const note = createStaffNoteEntry('  hello  ', 'mod-1')
 
-    expect(history).toHaveLength(1)
-    expect(history[0]?.bannedBy).toBe('mod-1')
-    expect(history[0]?.reason).toBe('abuse')
-    expect(history[0]?.unbannedAt).toBeNull()
+    expect(note?.text).toBe('hello')
+    expect(note?.authorId).toBe('mod-1')
+    expect(note?.noteId).toBeTruthy()
   })
 
-  it('omits reason when not provided', () => {
-    const history = startBanHistoryEntry({
-      history: [],
-      bannedBy: 'mod-1'
-    })
-
-    expect(history[0]?.reason).toBeUndefined()
+  it('rejects empty create requests', () => {
+    expect(createStaffNoteEntry('   ', 'mod-1')).toBeNull()
   })
 
-  it('closes the latest open ban history entry', () => {
-    const history = startBanHistoryEntry({
-      history: [],
-      bannedBy: 'mod-1'
-    })
+  it('normalizes stored notes and assigns ids when missing', () => {
+    const notes = normalizeStaffNotes([
+      {
+        text: ' hello ',
+        authorId: 'mod-1',
+        createdAt: new Date('2026-06-29T12:00:00.000Z')
+      },
+      {
+        noteId: 'note-1',
+        text: 'kept',
+        authorId: 'mod-2',
+        createdAt: new Date('2026-06-29T13:00:00.000Z')
+      },
+      {
+        text: '   ',
+        authorId: 'mod-3'
+      },
+      {
+        text: 'no author',
+        authorId: ''
+      }
+    ])
 
-    const closed = closeLatestBanHistoryEntry({
-      history,
-      unbannedBy: 'mod-2'
-    })
-
-    expect(closed[0]?.unbannedBy).toBe('mod-2')
-    expect(closed[0]?.unbannedAt).toBeInstanceOf(Date)
+    expect(notes).toHaveLength(2)
+    expect(notes[0]?.text).toBe('hello')
+    expect(notes[0]?.noteId).toBeTruthy()
+    expect(notes[1]?.noteId).toBe('note-1')
   })
 
-  it('returns history unchanged when no open ban exists', () => {
-    const closedHistory = startBanHistoryEntry({
-      history: [],
-      bannedBy: 'mod-1'
-    })
-    const closed = closeLatestBanHistoryEntry({
-      history: closedHistory,
-      unbannedBy: 'mod-2'
-    })
+  it('defaults createdAt when missing', () => {
+    const notes = normalizeStaffNotes([
+      {
+        noteId: 'note-2',
+        text: 'fresh',
+        authorId: 'mod-1'
+      }
+    ])
 
-    const unchanged = closeLatestBanHistoryEntry({
-      history: closed,
-      unbannedBy: 'mod-3'
-    })
+    expect(notes[0]?.createdAt).toBeInstanceOf(Date)
+  })
 
-    expect(unchanged).toBe(closed)
-    expect(unchanged[0]?.unbannedBy).toBe('mod-2')
+  it('updates and removes notes by id', () => {
+    const notes = [
+      {
+        noteId: 'note-1',
+        text: 'first',
+        authorId: 'mod-1',
+        createdAt: new Date()
+      },
+      {
+        noteId: 'note-2',
+        text: 'second',
+        authorId: 'mod-2',
+        createdAt: new Date()
+      }
+    ]
+
+    expect(updateStaffNote(notes, 'note-2', 'updated')?.[1]?.text).toBe(
+      'updated'
+    )
+    expect(removeStaffNote(notes, 'note-1')).toHaveLength(1)
+  })
+
+  it('returns null when update or delete targets are invalid', () => {
+    const notes = [
+      {
+        noteId: 'note-1',
+        text: 'first',
+        authorId: 'mod-1',
+        createdAt: new Date()
+      }
+    ]
+
+    expect(updateStaffNote(notes, 'missing', 'updated')).toBeNull()
+    expect(updateStaffNote(notes, 'note-1', '   ')).toBeNull()
+    expect(removeStaffNote(notes, 'missing')).toBeNull()
   })
 })

@@ -44,7 +44,7 @@ gambling_bot/
 ## Daily workflow (no manual link/unlink)
 
 1. When editing shared code, run `pnpm dev` in this repo (TypeScript watch → `dist/`).
-2. Run `pnpm dev` in discord and/or admin as usual — a `predev` hook auto-links local shared when the sibling repo exists.
+2. Run `pnpm dev` in discord and/or admin as usual - a `predev` hook auto-links local shared when the sibling repo exists.
 3. Commit changes in any repo normally. Linking only affects `node_modules`, not `package.json` or lockfiles.
 
 If `pnpm install` replaces the symlink, the next `pnpm dev` re-links automatically.

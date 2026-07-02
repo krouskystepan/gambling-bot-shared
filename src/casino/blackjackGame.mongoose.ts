@@ -38,7 +38,9 @@ export const BlackjackGameSchema = new Schema<TBlackjackGame>(
     },
     activeHandIndex: { type: Number, required: true, default: 0 },
 
-    dealerCards: [cardSchema]
+    dealerCards: [cardSchema],
+
+    idleNudgeSentAt: { type: Date, default: null }
   },
   { timestamps: true }
 )

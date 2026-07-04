@@ -4,7 +4,6 @@ import type { TPrediction } from '../types/prediction'
 import type {
   TAddPredictionBet,
   TCreatePrediction,
-  TGetOldPredictions,
   TGetPrediction,
   TUpdatePredictionStatus
 } from './types'
@@ -29,20 +28,6 @@ export function createPredictionDb(predictionModel: Model<TPrediction>) {
     return predictionModel.find({
       status,
       ...(useAutolock ? { autolock: { $lte: now } } : {})
-    })
-  }
-
-  const getOldPredictions = async ({
-    statuses,
-    olderThanDays
-  }: TGetOldPredictions) => {
-    const cutoffDate = new Date(
-      Date.now() - olderThanDays * 24 * 60 * 60 * 1000
-    )
-
-    return predictionModel.find({
-      status: { $in: statuses },
-      updatedAt: { $lte: cutoffDate }
     })
   }
 
@@ -126,7 +111,6 @@ export function createPredictionDb(predictionModel: Model<TPrediction>) {
   return {
     getPredictionById,
     getPredictionToLock,
-    getOldPredictions,
     createPrediction,
     updatePredictionStatus,
     deletePrediction,

@@ -1,3 +1,4 @@
+export * from './durations'
 export * from './formatters'
 export * from './generateId'
 export * from './parseTimeToSeconds'

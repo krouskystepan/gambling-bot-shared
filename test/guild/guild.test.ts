@@ -1,4 +1,5 @@
 import {
+  channelsFormSchema,
   defaultGlobalSettings,
   getCurrencyPlacement,
   getCurrencySymbol,
@@ -6,6 +7,7 @@ import {
   guildCalendarRangeToUtc,
   isCommonTimezone,
   isGlobalFeatureDisabled,
+  isWorkerLogChannelConfigured,
   normalizeGlobalSettings,
   resolveGuildTimezone
 } from 'gambling-bot-shared/guild'
@@ -20,6 +22,7 @@ const baseConfig = (globalSettings?: TGuildConfiguration['globalSettings']) =>
     winAnnouncementsChannelId: '',
     predictionChannelIds: { actions: '', logs: '' },
     raffleChannelIds: { actions: '', logs: '' },
+    workerLogChannelId: '',
     managerRoleId: '',
     bannedRoleId: '',
     casinoSettings: {} as TGuildConfiguration['casinoSettings'],
@@ -188,6 +191,43 @@ describe('guild timezone helpers', () => {
 describe('globalSettingsFormSchema', () => {
   it('accepts default global settings', () => {
     const result = globalSettingsFormSchema.safeParse(defaultGlobalSettings)
+    expect(result.success).toBe(true)
+  })
+})
+
+describe('isWorkerLogChannelConfigured', () => {
+  it('returns false when unset', () => {
+    expect(isWorkerLogChannelConfigured(null)).toBe(false)
+    expect(isWorkerLogChannelConfigured({ workerLogChannelId: '' })).toBe(false)
+  })
+
+  it('returns true when channel id is set', () => {
+    expect(
+      isWorkerLogChannelConfigured({ workerLogChannelId: '123456789' })
+    ).toBe(true)
+  })
+})
+
+describe('channelsFormSchema', () => {
+  it('accepts empty worker log channel id', () => {
+    const result = channelsFormSchema.safeParse({
+      atm: { actions: '', logs: '' },
+      casino: { casinoChannelIds: [], winAnnouncementsChannelId: '' },
+      prediction: { actions: '', logs: '' },
+      raffle: { actions: '', logs: '' },
+      workerLogChannelId: ''
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('accepts valid worker log channel id', () => {
+    const result = channelsFormSchema.safeParse({
+      atm: { actions: '', logs: '' },
+      casino: { casinoChannelIds: [], winAnnouncementsChannelId: '' },
+      prediction: { actions: '', logs: '' },
+      raffle: { actions: '', logs: '' },
+      workerLogChannelId: '987654321'
+    })
     expect(result.success).toBe(true)
   })
 })

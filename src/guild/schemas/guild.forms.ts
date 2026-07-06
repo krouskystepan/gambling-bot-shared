@@ -10,7 +10,8 @@ export const channelsFormSchema = z.object({
   atm: atmChannelsFormSchema,
   casino: casinoChannelsFormSchema,
   prediction: predictionChannelsFormSchema,
-  raffle: raffleChannelsFormSchema
+  raffle: raffleChannelsFormSchema,
+  workerLogChannelId: z.string()
 })
 
 export const managerRoleFormSchema = z.object({

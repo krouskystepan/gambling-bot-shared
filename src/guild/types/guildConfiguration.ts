@@ -20,6 +20,7 @@ export type TGuildConfiguration = {
     actions: string
     logs: string
   }
+  workerLogChannelId: string
   managerRoleId: string
   bannedRoleId: string
   casinoSettings: typeof defaultCasinoSettings

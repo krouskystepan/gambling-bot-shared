@@ -1,4 +1,5 @@
 export * from './blackjack'
+export * from './blackjackWorkers'
 export * from './casinoGames'
 export * from './defaultConfig'
 export * from './lotteryConfig'

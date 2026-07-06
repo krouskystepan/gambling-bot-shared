@@ -8,6 +8,8 @@ import {
   SLOT_MAX_SIMULATE_SPINS,
   SUITES,
   VALUES,
+  blackjackAutostandIdleMs,
+  blackjackIdleNudgeThresholdMs,
   calculateRTP,
   casinoSettingsSchema,
   defaultCasinoSettings,
@@ -15,6 +17,7 @@ import {
   formatPlinkoBinMultipliersForDisplay,
   getPlinkoMirrorBin,
   getPlinkoMultiplierAtPathIndex,
+  hoursUntilBlackjackAutostand,
   normalizeCasinoSettings,
   normalizePlinkoBinMultipliers,
   pathIndexToPlinkoBin,
@@ -313,6 +316,21 @@ describe('casino constants', () => {
   it('exports blackjack card constants', () => {
     expect(SUITES.length).toBe(4)
     expect(VALUES[0].value).toBe(11)
+  })
+
+  it('computes hours until blackjack autostand', () => {
+    const now = Date.parse('2024-06-15T12:00:00Z')
+    const updatedAt = new Date(now - 6 * 60 * 60 * 1000)
+
+    expect(hoursUntilBlackjackAutostand(updatedAt, now)).toBe(18)
+    expect(
+      hoursUntilBlackjackAutostand(new Date(now - 23 * 60 * 60 * 1000), now)
+    ).toBe(1)
+  })
+
+  it('exports blackjack worker timing constants', () => {
+    expect(blackjackIdleNudgeThresholdMs()).toBe(3 * 60 * 60 * 1000)
+    expect(blackjackAutostandIdleMs()).toBe(24 * 60 * 60 * 1000)
   })
 
   it('exports transaction and game record constants', () => {

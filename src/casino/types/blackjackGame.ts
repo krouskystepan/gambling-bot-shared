@@ -34,6 +34,8 @@ export type TBlackjackGame = {
 
   dealerCards: Card[]
 
+  idleNudgeSentAt?: Date | null
+
   createdAt: Date
   updatedAt: Date
 }

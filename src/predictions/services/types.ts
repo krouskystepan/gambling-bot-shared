@@ -4,11 +4,6 @@ export type TCreatePrediction = Omit<TPrediction, 'createdAt' | 'updatedAt'>
 
 export type TGetPrediction = Pick<TPrediction, 'predictionId' | 'guildId'>
 
-export type TGetOldPredictions = {
-  statuses: TPrediction['status'][]
-  olderThanDays: number
-}
-
 export type TUpdatePredictionStatus = Pick<
   TPrediction,
   'predictionId' | 'guildId'

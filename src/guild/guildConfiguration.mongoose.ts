@@ -49,6 +49,10 @@ export const GuildConfigurationSchema = new Schema<TGuildConfiguration>({
       default: ''
     }
   },
+  workerLogChannelId: {
+    type: String,
+    default: ''
+  },
   managerRoleId: {
     type: String,
     default: ''

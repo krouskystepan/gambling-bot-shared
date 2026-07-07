@@ -209,6 +209,8 @@ describe('runMonteCarloSimulation', () => {
   })
 
   it('handles invalid string multipliers', async () => {
+    const random = vi.spyOn(Math, 'random').mockReturnValue(0)
+
     const result = await runMonteCarloSimulation(
       'dice',
       {
@@ -222,9 +224,12 @@ describe('runMonteCarloSimulation', () => {
     )
 
     expect(result.empiricalRtp).toBe(0)
+    random.mockRestore()
   })
 
   it('handles zero string multipliers', async () => {
+    const random = vi.spyOn(Math, 'random').mockReturnValue(0)
+
     const result = await runMonteCarloSimulation(
       'dice',
       {
@@ -238,6 +243,7 @@ describe('runMonteCarloSimulation', () => {
     )
 
     expect(result.empiricalRtp).toBe(0)
+    random.mockRestore()
   })
 
   it('handles empty slot symbol weights', async () => {

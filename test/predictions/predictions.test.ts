@@ -475,6 +475,182 @@ describe('createPredictionLifecycleService', () => {
   })
 })
 
+describe('resetStuckPayout', () => {
+  it('returns NOT_FOUND when prediction is missing', async () => {
+    const lifecycle = createPredictionLifecycleService({
+      predictionDb: {
+        getPredictionById: vi.fn().mockResolvedValue(null),
+        updatePredictionStatus: vi.fn()
+      } as never,
+      casinoBet: {
+        refundLockedBet: vi.fn(),
+        settleCasinoWinnings: vi.fn()
+      }
+    })
+
+    expect(
+      await lifecycle.resetStuckPayout({
+        predictionId: 'pred-1',
+        guildId: 'guild-1'
+      })
+    ).toEqual({ ok: false, code: 'NOT_FOUND' })
+  })
+
+  it('returns INVALID_STATUS when prediction is not paying', async () => {
+    const lifecycle = createPredictionLifecycleService({
+      predictionDb: {
+        getPredictionById: vi
+          .fn()
+          .mockResolvedValue(samplePrediction({ status: 'ended' })),
+        updatePredictionStatus: vi.fn()
+      } as never,
+      casinoBet: {
+        refundLockedBet: vi.fn(),
+        settleCasinoWinnings: vi.fn()
+      }
+    })
+
+    expect(
+      await lifecycle.resetStuckPayout({
+        predictionId: 'pred-1',
+        guildId: 'guild-1'
+      })
+    ).toEqual({ ok: false, code: 'INVALID_STATUS' })
+  })
+
+  it('returns PARTIAL_PAYOUT when settlement transactions exist', async () => {
+    const lifecycle = createPredictionLifecycleService({
+      predictionDb: {
+        getPredictionById: vi
+          .fn()
+          .mockResolvedValue(samplePrediction({ status: 'paying' })),
+        updatePredictionStatus: vi.fn()
+      } as never,
+      casinoBet: {
+        refundLockedBet: vi.fn(),
+        settleCasinoWinnings: vi.fn()
+      },
+      hasSettlementTransactions: vi.fn().mockResolvedValue(true)
+    })
+
+    expect(
+      await lifecycle.resetStuckPayout({
+        predictionId: 'pred-1',
+        guildId: 'guild-1'
+      })
+    ).toEqual({ ok: false, code: 'PARTIAL_PAYOUT' })
+  })
+
+  it('rolls back paying to ended when no settlement transactions exist', async () => {
+    const prediction = samplePrediction({ status: 'paying' })
+    const updated = { ...prediction, status: 'ended' as const }
+    const updatePredictionStatus = vi.fn().mockResolvedValue(updated)
+
+    const lifecycle = createPredictionLifecycleService({
+      predictionDb: {
+        getPredictionById: vi.fn().mockResolvedValue(prediction),
+        updatePredictionStatus
+      } as never,
+      casinoBet: {
+        refundLockedBet: vi.fn(),
+        settleCasinoWinnings: vi.fn()
+      },
+      hasSettlementTransactions: vi.fn().mockResolvedValue(false)
+    })
+
+    const result = await lifecycle.resetStuckPayout({
+      predictionId: 'pred-1',
+      guildId: 'guild-1'
+    })
+
+    expect(result).toEqual({ ok: true, prediction: updated })
+    expect(updatePredictionStatus).toHaveBeenCalledWith({
+      predictionId: 'pred-1',
+      guildId: 'guild-1',
+      fromStatus: 'paying',
+      toStatus: 'ended'
+    })
+  })
+
+  it('rolls back without settlement check when there are no bets', async () => {
+    const prediction = samplePrediction({
+      status: 'paying',
+      choices: [
+        { choiceName: 'Yes', odds: 2, bets: [] },
+        { choiceName: 'No', odds: 1.5, bets: [] }
+      ]
+    })
+    const updated = { ...prediction, status: 'ended' as const }
+    const hasSettlementTransactions = vi.fn()
+
+    const lifecycle = createPredictionLifecycleService({
+      predictionDb: {
+        getPredictionById: vi.fn().mockResolvedValue(prediction),
+        updatePredictionStatus: vi.fn().mockResolvedValue(updated)
+      } as never,
+      casinoBet: {
+        refundLockedBet: vi.fn(),
+        settleCasinoWinnings: vi.fn()
+      },
+      hasSettlementTransactions
+    })
+
+    const result = await lifecycle.resetStuckPayout({
+      predictionId: 'pred-1',
+      guildId: 'guild-1'
+    })
+
+    expect(result).toEqual({ ok: true, prediction: updated })
+    expect(hasSettlementTransactions).not.toHaveBeenCalled()
+  })
+
+  it('rolls back when bets exist but no settlement checker is provided', async () => {
+    const prediction = samplePrediction({ status: 'paying' })
+    const updated = { ...prediction, status: 'ended' as const }
+
+    const lifecycle = createPredictionLifecycleService({
+      predictionDb: {
+        getPredictionById: vi.fn().mockResolvedValue(prediction),
+        updatePredictionStatus: vi.fn().mockResolvedValue(updated)
+      } as never,
+      casinoBet: {
+        refundLockedBet: vi.fn(),
+        settleCasinoWinnings: vi.fn()
+      }
+    })
+
+    expect(
+      await lifecycle.resetStuckPayout({
+        predictionId: 'pred-1',
+        guildId: 'guild-1'
+      })
+    ).toEqual({ ok: true, prediction: updated })
+  })
+
+  it('returns INVALID_STATUS when the rollback update fails', async () => {
+    const lifecycle = createPredictionLifecycleService({
+      predictionDb: {
+        getPredictionById: vi
+          .fn()
+          .mockResolvedValue(samplePrediction({ status: 'paying' })),
+        updatePredictionStatus: vi.fn().mockResolvedValue(null)
+      } as never,
+      casinoBet: {
+        refundLockedBet: vi.fn(),
+        settleCasinoWinnings: vi.fn()
+      },
+      hasSettlementTransactions: vi.fn().mockResolvedValue(false)
+    })
+
+    expect(
+      await lifecycle.resetStuckPayout({
+        predictionId: 'pred-1',
+        guildId: 'guild-1'
+      })
+    ).toEqual({ ok: false, code: 'INVALID_STATUS' })
+  })
+})
+
 describe('createPredictionFormSchema', () => {
   it('accepts valid prediction form', () => {
     const result = createPredictionFormSchema.safeParse({

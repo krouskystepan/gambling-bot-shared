@@ -7,6 +7,8 @@ export const STAFF_ADMIN_ACTIONS = {
   PREDICTION_END: 'prediction-end',
   PREDICTION_PAYOUT: 'prediction-payout',
   PREDICTION_CANCEL: 'prediction-cancel',
+  PREDICTION_RESET_PAYOUT: 'prediction-reset-payout',
+  BLACKJACK_FORCE_CLOSE: 'blackjack-force-close',
   ATM_REJECT: 'atm-reject',
   USER_BAN: 'user-ban',
   USER_UNBAN: 'user-unban',

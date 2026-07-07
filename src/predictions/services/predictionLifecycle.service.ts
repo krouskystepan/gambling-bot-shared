@@ -7,11 +7,16 @@ import type { PayPredictionResult } from './types'
 type PredictionLifecycleDeps = {
   predictionDb: PredictionDb
   casinoBet: Pick<CasinoBetService, 'refundLockedBet' | 'settleCasinoWinnings'>
+  hasSettlementTransactions?: (params: {
+    guildId: string
+    referenceIds: string[]
+  }) => Promise<boolean>
 }
 
 export function createPredictionLifecycleService({
   predictionDb,
-  casinoBet
+  casinoBet,
+  hasSettlementTransactions
 }: PredictionLifecycleDeps) {
   const { getPredictionById, updatePredictionStatus } = predictionDb
   const { refundLockedBet, settleCasinoWinnings } = casinoBet
@@ -36,6 +41,49 @@ export function createPredictionLifecycleService({
       fromStatus: 'paying',
       toStatus: 'ended'
     })
+  }
+
+  const resetStuckPayout = async ({
+    predictionId,
+    guildId
+  }: {
+    predictionId: string
+    guildId: string
+  }): Promise<
+    | { ok: true; prediction: TPrediction }
+    | {
+        ok: false
+        code: 'NOT_FOUND' | 'INVALID_STATUS' | 'PARTIAL_PAYOUT'
+      }
+  > => {
+    const prediction = await getPredictionById({ predictionId, guildId })
+    if (!prediction) return { ok: false, code: 'NOT_FOUND' }
+    if (prediction.status !== 'paying') {
+      return { ok: false, code: 'INVALID_STATUS' }
+    }
+
+    const betIds = prediction.choices
+      .flatMap((choice) => choice.bets)
+      .map((bet) => resolvePredictionBetId(bet, predictionId))
+
+    if (betIds.length > 0 && hasSettlementTransactions) {
+      const hasSettlement = await hasSettlementTransactions({
+        guildId,
+        referenceIds: betIds
+      })
+      if (hasSettlement) return { ok: false, code: 'PARTIAL_PAYOUT' }
+    }
+
+    const updated = await updatePredictionStatus({
+      predictionId,
+      guildId,
+      fromStatus: 'paying',
+      toStatus: 'ended'
+    })
+
+    if (!updated) return { ok: false, code: 'INVALID_STATUS' }
+
+    return { ok: true, prediction: updated }
   }
 
   const endPrediction = async ({
@@ -177,7 +225,8 @@ export function createPredictionLifecycleService({
   return {
     endPrediction,
     cancelPrediction,
-    payoutPrediction
+    payoutPrediction,
+    resetStuckPayout
   }
 }
 

@@ -14,7 +14,7 @@ export const AtmRequestSchema = new Schema<TAtmRequest>(
 
     status: {
       type: String,
-      enum: ['pending', 'approved', 'rejected'],
+      enum: ['pending', 'approved', 'rejected', 'cancelled'],
       required: true,
       default: 'pending',
       index: true

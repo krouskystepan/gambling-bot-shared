@@ -7,7 +7,7 @@ export type TAtmRequest = {
   amount: number
   account: string
 
-  status: 'pending' | 'approved' | 'rejected'
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled'
   handledBy?: string
   handledAt?: Date
   notes?: string

@@ -1,5 +1,8 @@
 import {
+  MODERATION_MANAGER_TARGET_ERROR,
+  MODERATION_SELF_ERROR,
   appendStaffNote,
+  canModerateUserTarget,
   createStaffNoteEntry,
   isUserBanned,
   normalizeStaffNote,
@@ -8,6 +11,57 @@ import {
   updateStaffNote
 } from 'gambling-bot-shared/user'
 import { describe, expect, it } from 'vitest'
+
+describe('canModerateUserTarget', () => {
+  it('denies self moderation', () => {
+    expect(
+      canModerateUserTarget({
+        actorUserId: 'mod-1',
+        actorIsElevated: false,
+        targetUserId: 'mod-1',
+        targetHasManagerRole: false
+      })
+    ).toEqual({ ok: false, code: 'SELF' })
+  })
+
+  it('denies manager moderating another manager', () => {
+    expect(
+      canModerateUserTarget({
+        actorUserId: 'mod-1',
+        actorIsElevated: false,
+        targetUserId: 'mod-2',
+        targetHasManagerRole: true
+      })
+    ).toEqual({ ok: false, code: 'MANAGER_TARGET' })
+  })
+
+  it('allows manager moderating a player', () => {
+    expect(
+      canModerateUserTarget({
+        actorUserId: 'mod-1',
+        actorIsElevated: false,
+        targetUserId: 'player-1',
+        targetHasManagerRole: false
+      })
+    ).toEqual({ ok: true })
+  })
+
+  it('allows elevated staff moderating a manager', () => {
+    expect(
+      canModerateUserTarget({
+        actorUserId: 'admin-1',
+        actorIsElevated: true,
+        targetUserId: 'mod-2',
+        targetHasManagerRole: true
+      })
+    ).toEqual({ ok: true })
+  })
+
+  it('exports moderation error messages', () => {
+    expect(MODERATION_SELF_ERROR).toContain('yourself')
+    expect(MODERATION_MANAGER_TARGET_ERROR).toContain('Managers')
+  })
+})
 
 describe('isUserBanned', () => {
   it('returns true when banned flag is set', () => {

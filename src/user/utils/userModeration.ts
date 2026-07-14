@@ -6,6 +6,33 @@ export const USER_BANNED_ERROR = 'USER_BANNED'
 export const USER_BANNED_MESSAGE =
   'Your account is restricted. Contact server staff.'
 
+export const MODERATION_SELF_ERROR = 'You cannot ban or unban yourself.'
+
+export const MODERATION_MANAGER_TARGET_ERROR =
+  'Managers cannot ban or unban other managers.'
+
+export function canModerateUserTarget({
+  actorUserId,
+  actorIsElevated,
+  targetUserId,
+  targetHasManagerRole
+}: {
+  actorUserId: string
+  actorIsElevated: boolean
+  targetUserId: string
+  targetHasManagerRole: boolean
+}): { ok: true } | { ok: false; code: 'SELF' | 'MANAGER_TARGET' } {
+  if (actorUserId === targetUserId) {
+    return { ok: false, code: 'SELF' }
+  }
+
+  if (targetHasManagerRole && !actorIsElevated) {
+    return { ok: false, code: 'MANAGER_TARGET' }
+  }
+
+  return { ok: true }
+}
+
 export function isUserBanned(user: Pick<TUser, 'banned'>): boolean {
   return Boolean(user.banned)
 }

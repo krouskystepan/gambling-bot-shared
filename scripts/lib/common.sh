@@ -26,6 +26,10 @@ is_admin_app() {
   [ "$(basename "$1")" = "gambling-bot-admin" ]
 }
 
+abs_path() {
+  node -e "console.log(require('fs').realpathSync(process.argv[1]))" "$1"
+}
+
 LOCAL_SHARED_MARKER=".local-shared-source"
 
 is_app_linked_to_local() {
@@ -45,7 +49,8 @@ is_app_linked_to_local() {
         const markerPath = path.join(nm, marker);
         if (!fs.existsSync(markerPath)) process.exit(1);
         const source = fs.readFileSync(markerPath, 'utf8').trim();
-        process.exit(source === sharedReal ? 0 : 1);
+        const sourceReal = fs.realpathSync(source);
+        process.exit(sourceReal === sharedReal ? 0 : 1);
       } catch {
         process.exit(1);
       }
@@ -82,19 +87,26 @@ app_uses_local_shared() {
 sync_admin_shared_copy() {
   local app_dir="$1"
   local nm="$app_dir/node_modules/gambling-bot-shared"
+  local shared_abs
+  shared_abs="$(abs_path "$SHARED")"
 
   ensure_shared_built
   mkdir -p "$nm"
   rsync -a --delete "$SHARED/dist/" "$nm/dist/"
   cp "$SHARED/package.json" "$nm/package.json"
-  printf '%s\n' "$SHARED" >"$nm/$LOCAL_SHARED_MARKER"
+  printf '%s\n' "$shared_abs" >"$nm/$LOCAL_SHARED_MARKER"
 }
 
 ensure_shared_built() {
-  if [ ! -f "$SHARED/dist/index.js" ]; then
-    info "Building gambling-bot-shared (dist/ missing)"
-    (cd "$SHARED" && pnpm build)
+  if [ -f "$SHARED/dist/common/index.js" ]; then
+    if type log_skip &>/dev/null; then
+      log_skip "gambling-bot-shared: dist already built"
+    fi
+    return 0
   fi
+
+  info "Building gambling-bot-shared (dist/ missing)"
+  (cd "$SHARED" && pnpm build)
 }
 
 package_json_has_link_override() {
@@ -156,13 +168,16 @@ link_app_to_shared() {
   mkdir -p "$app_dir/node_modules"
   rm -rf "$nm"
 
+  local shared_abs
+  shared_abs="$(abs_path "$SHARED")"
+
   if is_admin_app "$app_dir"; then
     sync_admin_shared_copy "$app_dir"
   else
-    ln -s "$SHARED" "$nm"
+    ln -s "$shared_abs" "$nm"
   fi
 
-  if ! app_uses_local_shared "$app_dir" "$SHARED"; then
+  if ! app_uses_local_shared "$app_dir" "$shared_abs"; then
     die "Failed to link $app_name to local shared"
   fi
 }

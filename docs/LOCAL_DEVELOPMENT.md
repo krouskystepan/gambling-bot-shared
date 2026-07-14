@@ -2,13 +2,7 @@
 
 ## Bootstrap the whole workspace
 
-From GitHub (clones all three repos as siblings, installs deps, builds shared, links consumers):
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/krouskystepan/gambling-bot-shared/main/scripts/setup-workspace.sh | bash
-```
-
-Run from the folder where you want the three repos as siblings (defaults to the current directory):
+From the folder where you want the three repos as siblings (defaults to the current directory):
 
 ```bash
 cd ~/Code/gambling_bot
@@ -21,14 +15,18 @@ Custom directory:
 curl -fsSL https://raw.githubusercontent.com/krouskystepan/gambling-bot-shared/main/scripts/setup-workspace.sh | bash -s -- ~/Code/gambling_bot
 ```
 
-When you already have `gambling-bot-shared` checked out:
+The script clones all three repos, installs dependencies, builds shared, links consumers, and seeds `.env` files when missing. Re-runs skip steps that are already done.
 
-```bash
-pnpm setup-workspace
-# or: bash scripts/setup-workspace.sh ~/Code/gambling_bot
-```
+Environment variables:
 
-Defaults: current directory, branch `main`, owner `krouskystepan`. Override with `WORKSPACE_DIR`, `GITHUB_BRANCH`, or `GITHUB_OWNER`.
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `WORKSPACE_DIR` | current directory | Parent folder for the three repos |
+| `GITHUB_OWNER` | `krouskystepan` | GitHub org/user for clone URLs |
+| `GITHUB_BRANCH` | `main` | Branch to clone or update |
+| `SETUP_UPDATE` | (prompt in TTY) | `yes` or `no` — update existing checkouts without prompting |
+
+If you already have `gambling-bot-shared` checked out locally, you can also run `pnpm setup-workspace` or `bash scripts/setup-workspace.sh` from that repo.
 
 ## Layout
 

@@ -1,3 +1,4 @@
+import { parseReadableStringToNumber } from '../../common/formatters'
 import {
   BONUS_MAX_AMOUNT,
   BONUS_MAX_STREAK_MULTIPLIER
@@ -30,11 +31,13 @@ export const normalizeBonusSettings = (
   }
 })
 
-/** Parse admin integer inputs (digits only) and clamp to the bonus amount cap. */
+/** Parse admin money inputs (`1000`, `2k`, `4.5k`) and clamp to the bonus amount cap. */
 export const parseBonusAmountInput = (raw: string): number => {
-  const digits = raw.replace(/\D/g, '')
-  if (!digits) return 0
-  return clampAmount(Number(digits))
+  const trimmed = raw.trim()
+  if (!trimmed) return 0
+  const parsed = parseReadableStringToNumber(trimmed)
+  if (Number.isNaN(parsed)) return 0
+  return clampAmount(parsed)
 }
 
 /** Parse streak multiplier text and clamp to the allowed range. */

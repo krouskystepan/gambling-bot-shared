@@ -197,8 +197,13 @@ describe('normalizeBonusSettings', () => {
 
 describe('bonus input parsers', () => {
   it('parses amount and multiplier inputs', () => {
-    expect(parseBonusAmountInput('12abc34')).toBe(1234)
+    expect(parseBonusAmountInput('1000')).toBe(1000)
+    expect(parseBonusAmountInput('2k')).toBe(2000)
+    expect(parseBonusAmountInput('4.5k')).toBe(4500)
+    expect(parseBonusAmountInput('2M')).toBe(2_000_000)
+    expect(parseBonusAmountInput('12abc34')).toBe(0)
     expect(parseBonusAmountInput('')).toBe(0)
+    expect(parseBonusAmountInput('not-a-number')).toBe(0)
     expect(parseBonusMultiplierInput('2.5')).toBe(2.5)
     expect(parseBonusMultiplierInput('not-a-number')).toBeUndefined()
   })

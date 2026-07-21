@@ -29,9 +29,27 @@ const deepMerge = <T extends Record<string, unknown>>(
   return result
 }
 
+/** Prefer `houseEdge`; fall back to legacy `casinoCut` from stored guild settings. */
+const resolveHouseEdge = (
+  rawGame: Record<string, unknown> | undefined,
+  fallback: number
+): number => {
+  if (typeof rawGame?.houseEdge === 'number') return rawGame.houseEdge
+  if (typeof rawGame?.casinoCut === 'number') return rawGame.casinoCut
+  return fallback
+}
+
 export const normalizeCasinoSettings = (
   settings: Partial<TCasinoSettings> | null | undefined
 ): TCasinoSettings => {
+  const raw = settings as
+    | {
+        rps?: Record<string, unknown>
+        raffle?: Record<string, unknown>
+      }
+    | null
+    | undefined
+
   const merged = deepMerge(
     defaultCasinoSettings as Record<string, unknown>,
     settings as Record<string, unknown> | null | undefined
@@ -39,6 +57,20 @@ export const normalizeCasinoSettings = (
 
   return {
     ...merged,
+    rps: {
+      houseEdge: resolveHouseEdge(
+        raw?.rps,
+        defaultCasinoSettings.rps.houseEdge
+      ),
+      maxBet: merged.rps.maxBet,
+      minBet: merged.rps.minBet
+    },
+    raffle: {
+      houseEdge: resolveHouseEdge(
+        raw?.raffle,
+        defaultCasinoSettings.raffle.houseEdge
+      )
+    },
     plinko: {
       ...merged.plinko,
       binMultipliers: normalizePlinkoBinMultipliers(

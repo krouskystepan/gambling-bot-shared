@@ -3,6 +3,7 @@ import {
   LOTTERY_TOTAL_NUMBERS,
   MINI_NUMBERS,
   PLINKO_ROW_COUNT,
+  calculateHiloRtp,
   getPlinkoMultiplierAtPathIndex,
   normalizePlinkoBinMultipliers
 } from '../constants'
@@ -35,6 +36,11 @@ export const calculateRTP = (
     case 'coinflip': {
       const { winMultiplier } = settings as TCasinoSettings['coinflip']
       return 0.5 * toNumber(winMultiplier) * 100
+    }
+
+    case 'hilo': {
+      const { houseEdge } = settings as TCasinoSettings['hilo']
+      return calculateHiloRtp(toNumber(houseEdge))
     }
 
     case 'slots': {
@@ -143,8 +149,8 @@ export const calculateRTP = (
     }
 
     case 'rps': {
-      const { casinoCut } = settings as TCasinoSettings['rps']
-      return (1 - toNumber(casinoCut)) * 100
+      const { houseEdge } = settings as TCasinoSettings['rps']
+      return (1 - toNumber(houseEdge)) * 100
     }
 
     case 'goldenJackpot': {
@@ -154,8 +160,8 @@ export const calculateRTP = (
     }
 
     case 'raffle': {
-      const { casinoCut } = settings as TCasinoSettings['raffle']
-      return (1 - toNumber(casinoCut)) * 100
+      const { houseEdge } = settings as TCasinoSettings['raffle']
+      return (1 - toNumber(houseEdge)) * 100
     }
 
     case 'blackjack':

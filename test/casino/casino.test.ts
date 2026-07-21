@@ -15,13 +15,16 @@ import {
   defaultCasinoSettings,
   expandPlinkoBinMultipliers,
   formatPlinkoBinMultipliersForDisplay,
+  getHiloWinMultiplier,
   getPlinkoMirrorBin,
   getPlinkoMultiplierAtPathIndex,
+  hiloRankFromLabel,
   hoursUntilBlackjackAutostand,
   normalizeCasinoSettings,
   normalizePlinkoBinMultipliers,
   pathIndexToPlinkoBin,
   plinkoBinToPathIndex,
+  resolveHiloRound,
   shouldAnnounceByMultiplier,
   shouldAnnounceGoldenJackpotHit,
   shouldAnnouncePlinkoBall,
@@ -90,12 +93,28 @@ describe('normalizeCasinoSettings', () => {
       defaultCasinoSettings.coinflip.winMultiplier
     )
   })
+
+  it('migrates legacy casinoCut to houseEdge', () => {
+    const normalized = normalizeCasinoSettings({
+      rps: { casinoCut: 0.1, maxBet: 0, minBet: 0 } as never,
+      raffle: { casinoCut: 0.05 } as never
+    })
+    expect(normalized.rps.houseEdge).toBe(0.1)
+    expect(normalized.raffle.houseEdge).toBe(0.05)
+    expect('casinoCut' in (normalized.rps as Record<string, unknown>)).toBe(
+      false
+    )
+  })
 })
 
 describe('calculateRTP', () => {
   it('computes RTP for each casino game', () => {
     expect(calculateRTP('dice', defaultCasinoSettings.dice)).toBeGreaterThan(0)
     expect(calculateRTP('coinflip', defaultCasinoSettings.coinflip)).toBe(95)
+    expect(calculateRTP('hilo', defaultCasinoSettings.hilo)).toBeCloseTo(
+      (1 - 0.03 * (48 / 51)) * 100,
+      5
+    )
     expect(calculateRTP('slots', defaultCasinoSettings.slots)).toBeGreaterThan(
       0
     )
@@ -338,6 +357,47 @@ describe('casino constants', () => {
     expect(TRANSACTION_SOURCES).toContain('casino')
     expect(GAME_RECORD_FIELDS.slots).toContain('symbolWeights')
     expect(GAME_RECORD_FIELDS.plinko).toContain('binMultipliers')
+  })
+})
+
+describe('hiloRankFromLabel', () => {
+  it('maps labels to ace-high ranks', () => {
+    expect(hiloRankFromLabel('2')).toBe(2)
+    expect(hiloRankFromLabel('10')).toBe(10)
+    expect(hiloRankFromLabel('J')).toBe(11)
+    expect(hiloRankFromLabel('Q')).toBe(12)
+    expect(hiloRankFromLabel('K')).toBe(13)
+    expect(hiloRankFromLabel('A')).toBe(14)
+  })
+
+  it('throws on unknown labels', () => {
+    expect(() => hiloRankFromLabel('X')).toThrow(/Unknown Hi-Lo card label/)
+  })
+})
+
+describe('hilo odds', () => {
+  it('pays void-style odds with house edge on a single deck', () => {
+    // Middle card (8): 24 higher, 24 lower → mult = 0.97 * 48 / 24
+    expect(getHiloWinMultiplier(8, 'higher', 0.03)).toBeCloseTo(1.94, 5)
+    expect(getHiloWinMultiplier(8, 'lower', 0.03)).toBeCloseTo(1.94, 5)
+    // King: 4 aces higher, 44 lower
+    expect(getHiloWinMultiplier(13, 'higher', 0.03)).toBeCloseTo(
+      (0.97 * 48) / 4,
+      5
+    )
+    expect(getHiloWinMultiplier(13, 'lower', 0.03)).toBeCloseTo(
+      (0.97 * 48) / 44,
+      5
+    )
+    expect(getHiloWinMultiplier(14, 'higher', 0.03)).toBeNull()
+    expect(getHiloWinMultiplier(2, 'lower', 0.03)).toBeNull()
+  })
+
+  it('resolves win lose push', () => {
+    expect(resolveHiloRound(8, 10, 'higher')).toBe('win')
+    expect(resolveHiloRound(8, 5, 'higher')).toBe('lose')
+    expect(resolveHiloRound(8, 8, 'higher')).toBe('push')
+    expect(resolveHiloRound(8, 5, 'lower')).toBe('win')
   })
 })
 

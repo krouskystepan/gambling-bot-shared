@@ -3,7 +3,7 @@ export const readableGameValueNames = [
   { name: 'Minimum Bet Amount', value: 'minBet' },
   { name: 'Win Multiplier (x)', value: 'winMultiplier' },
   { name: 'Win Multipliers (x)', value: 'winMultipliers' },
-  { name: 'Casino House Cut (%)', value: 'casinoCut' },
+  { name: 'House Edge (%)', value: 'houseEdge' },
   { name: 'One-In Chance (e.g. 1 in 10,000)', value: 'oneInChance' },
   { name: 'Symbol Weights', value: 'symbolWeights' },
   { name: 'Plinko Minimum Multiplier', value: 'plinkoMinMultiplier' },
@@ -14,6 +14,7 @@ export const readableGameValueNames = [
   { name: 'Slots Minimum Multiplier', value: 'slotsMinMultiplier' },
   { name: 'Dice Minimum Multiplier', value: 'diceMinMultiplier' },
   { name: 'Coin Flip Minimum Multiplier', value: 'coinflipMinMultiplier' },
+  { name: 'Hi-Lo Minimum Multiplier', value: 'hiloMinMultiplier' },
   { name: 'Lottery Minimum Multiplier', value: 'lotteryMinMultiplier' },
   { name: 'Roulette Minimum Multiplier', value: 'rouletteMinMultiplier' },
   { name: 'Blackjack Minimum Multiplier', value: 'blackjackMinMultiplier' }
@@ -22,6 +23,7 @@ export const readableGameValueNames = [
 export const readableGameNames = [
   { name: 'Dice', value: 'dice' },
   { name: 'Coin Flip', value: 'coinflip' },
+  { name: 'Hi-Lo', value: 'hilo' },
   { name: 'Slots', value: 'slots' },
   { name: 'Lottery', value: 'lottery' },
   { name: 'Roulette', value: 'roulette' },
@@ -42,6 +44,11 @@ export const defaultCasinoSettings = {
   },
   coinflip: {
     winMultiplier: 1.9,
+    maxBet: 0,
+    minBet: 0
+  },
+  hilo: {
+    houseEdge: 0.03,
     maxBet: 0,
     minBet: 0
   },
@@ -87,7 +94,7 @@ export const defaultCasinoSettings = {
     minBet: 0
   },
   rps: {
-    casinoCut: 0.025,
+    houseEdge: 0.025,
     maxBet: 0,
     minBet: 0
   },
@@ -106,7 +113,7 @@ export const defaultCasinoSettings = {
     minBet: 0
   },
   raffle: {
-    casinoCut: 0.01
+    houseEdge: 0.01
   },
   plinko: {
     binMultipliers: {
@@ -129,8 +136,9 @@ export const defaultCasinoSettings = {
     slotsMinMultiplier: 100,
     lotteryMinMultiplier: 40,
     rouletteMinMultiplier: 18,
-    blackjackMinMultiplier: 2.5,
+    blackjackMinMultiplier: 0,
     diceMinMultiplier: 0,
-    coinflipMinMultiplier: 0
+    coinflipMinMultiplier: 0,
+    hiloMinMultiplier: 0
   }
 }

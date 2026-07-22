@@ -17,6 +17,7 @@ function createMockModels(
     'predictions',
     'vipRooms',
     'blackjackGames',
+    'minesGames',
     'userBans',
     'users'
   ]
@@ -40,6 +41,7 @@ describe('normalizeGuildWipeEntities', () => {
       'predictions',
       'vip',
       'blackjack',
+      'mines',
       'users'
     ])
   })
@@ -60,6 +62,7 @@ describe('normalizeGuildWipeEntities', () => {
       'predictions',
       'vip',
       'blackjack',
+      'mines',
       'users'
     ])
   })
@@ -137,6 +140,7 @@ describe('runGuildDataWipe', () => {
       'predictions',
       'vipRooms',
       'blackjackGames',
+      'minesGames',
       'userBans',
       'users'
     ])

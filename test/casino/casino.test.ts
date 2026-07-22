@@ -16,13 +16,19 @@ import {
   expandPlinkoBinMultipliers,
   formatPlinkoBinMultipliersForDisplay,
   getHiloWinMultiplier,
+  getMinesFairMultiplier,
+  getMinesPayoutMultiplier,
   getPlinkoMirrorBin,
   getPlinkoMultiplierAtPathIndex,
   hiloRankFromLabel,
   hoursUntilBlackjackAutostand,
+  hoursUntilMinesAutoResolve,
   isLimboWin,
   isValidLimboTarget,
+  isValidMineCount,
   limboHitProbability,
+  minesAutoResolveIdleMs,
+  minesIdleNudgeThresholdMs,
   normalizeCasinoSettings,
   normalizePlinkoBinMultipliers,
   pathIndexToPlinkoBin,
@@ -120,6 +126,7 @@ describe('calculateRTP', () => {
       5
     )
     expect(calculateRTP('limbo', defaultCasinoSettings.limbo)).toBe(97)
+    expect(calculateRTP('mines', defaultCasinoSettings.mines)).toBe(97)
     expect(calculateRTP('slots', defaultCasinoSettings.slots)).toBeGreaterThan(
       0
     )
@@ -352,9 +359,28 @@ describe('casino constants', () => {
     ).toBe(1)
   })
 
+  it('computes hours until mines auto-resolve', () => {
+    const now = Date.parse('2024-06-15T12:00:00Z')
+    const updatedAt = new Date(now - 6 * 60 * 60 * 1000)
+
+    expect(hoursUntilMinesAutoResolve(updatedAt, now)).toBe(18)
+    expect(
+      hoursUntilMinesAutoResolve(new Date(now - 23 * 60 * 60 * 1000), now)
+    ).toBe(1)
+  })
+
+  it('includes mines in casino game ids', () => {
+    expect(CASINO_GAME_IDS).toContain('mines')
+  })
+
   it('exports blackjack worker timing constants', () => {
     expect(blackjackIdleNudgeThresholdMs()).toBe(3 * 60 * 60 * 1000)
     expect(blackjackAutostandIdleMs()).toBe(24 * 60 * 60 * 1000)
+  })
+
+  it('exports mines worker timing constants', () => {
+    expect(minesIdleNudgeThresholdMs()).toBe(3 * 60 * 60 * 1000)
+    expect(minesAutoResolveIdleMs()).toBe(24 * 60 * 60 * 1000)
   })
 
   it('exports transaction and game record constants', () => {
@@ -437,6 +463,48 @@ describe('limbo math', () => {
     expect(isValidLimboTarget(1)).toBe(false)
     expect(isValidLimboTarget(1_000_001)).toBe(false)
     expect(isValidLimboTarget(NaN)).toBe(false)
+  })
+})
+
+describe('mines math', () => {
+  const houseEdge = 0.03
+
+  it('computes known fair and payout multipliers', () => {
+    // 1 mine, 1 safe: fair = 20/19
+    expect(getMinesFairMultiplier(1, 1)).toBeCloseTo(20 / 19, 10)
+    expect(getMinesPayoutMultiplier(1, 1, houseEdge)).toBeCloseTo(
+      (20 / 19) * 0.97,
+      10
+    )
+
+    // 3 mines, 2 safe: fair = (20/17) * (19/16)
+    expect(getMinesFairMultiplier(3, 2)).toBeCloseTo((20 / 17) * (19 / 16), 10)
+    expect(getMinesPayoutMultiplier(3, 2, houseEdge)).toBeCloseTo(
+      (20 / 17) * (19 / 16) * 0.97,
+      10
+    )
+
+    expect(getMinesFairMultiplier(5, 0)).toBe(1)
+    expect(getMinesPayoutMultiplier(5, 0, houseEdge)).toBe(0.97)
+  })
+
+  it('rejects invalid mine counts and reveal depths', () => {
+    expect(getMinesFairMultiplier(0, 1)).toBe(0)
+    expect(getMinesFairMultiplier(20, 1)).toBe(0)
+    expect(getMinesFairMultiplier(3, 18)).toBe(0)
+    expect(getMinesPayoutMultiplier(3, -1, houseEdge)).toBe(0)
+  })
+
+  it('validates mine count against settings bounds', () => {
+    expect(isValidMineCount(1, 1, 10)).toBe(true)
+    expect(isValidMineCount(10, 1, 10)).toBe(true)
+    expect(isValidMineCount(0, 1, 10)).toBe(false)
+    expect(isValidMineCount(11, 1, 10)).toBe(false)
+    expect(isValidMineCount(1.5, 1, 10)).toBe(false)
+  })
+
+  it('reports RTP as (1 - houseEdge) * 100 at default edge', () => {
+    expect(calculateRTP('mines', defaultCasinoSettings.mines)).toBe(97)
   })
 })
 

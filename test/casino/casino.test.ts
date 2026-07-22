@@ -20,11 +20,15 @@ import {
   getPlinkoMultiplierAtPathIndex,
   hiloRankFromLabel,
   hoursUntilBlackjackAutostand,
+  isLimboWin,
+  isValidLimboTarget,
+  limboHitProbability,
   normalizeCasinoSettings,
   normalizePlinkoBinMultipliers,
   pathIndexToPlinkoBin,
   plinkoBinToPathIndex,
   resolveHiloRound,
+  rollLimboResult,
   shouldAnnounceByMultiplier,
   shouldAnnounceGoldenJackpotHit,
   shouldAnnouncePlinkoBall,
@@ -115,6 +119,7 @@ describe('calculateRTP', () => {
       (1 - 0.03 * (48 / 51)) * 100,
       5
     )
+    expect(calculateRTP('limbo', defaultCasinoSettings.limbo)).toBe(97)
     expect(calculateRTP('slots', defaultCasinoSettings.slots)).toBeGreaterThan(
       0
     )
@@ -398,6 +403,40 @@ describe('hilo odds', () => {
     expect(resolveHiloRound(8, 5, 'higher')).toBe('lose')
     expect(resolveHiloRound(8, 8, 'higher')).toBe('push')
     expect(resolveHiloRound(8, 5, 'lower')).toBe('win')
+  })
+})
+
+describe('limbo math', () => {
+  const houseEdge = 0.03
+
+  it('keeps hitProb × target ≈ 1 - houseEdge for common targets', () => {
+    for (const target of [2, 10, 100]) {
+      expect(limboHitProbability(target, houseEdge) * target).toBeCloseTo(
+        1 - houseEdge,
+        10
+      )
+    }
+  })
+
+  it('rolls and rounds to 2 decimals with floor at 1.00', () => {
+    // U=1 → raw 0.97 → floored display to 1.00
+    expect(rollLimboResult(houseEdge, 1)).toBe(1)
+    expect(rollLimboResult(houseEdge, 0.485)).toBe(2)
+    expect(rollLimboResult(houseEdge, Number.EPSILON)).toBeGreaterThan(1)
+  })
+
+  it('uses rounded result for win checks', () => {
+    expect(isLimboWin(2, 2)).toBe(true)
+    expect(isLimboWin(1.99, 2)).toBe(false)
+    expect(isLimboWin(10.5, 10)).toBe(true)
+  })
+
+  it('validates target bounds', () => {
+    expect(isValidLimboTarget(1.01)).toBe(true)
+    expect(isValidLimboTarget(1_000_000)).toBe(true)
+    expect(isValidLimboTarget(1)).toBe(false)
+    expect(isValidLimboTarget(1_000_001)).toBe(false)
+    expect(isValidLimboTarget(NaN)).toBe(false)
   })
 })
 

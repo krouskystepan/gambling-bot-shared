@@ -15,6 +15,7 @@ export const readableGameValueNames = [
   { name: 'Dice Minimum Multiplier', value: 'diceMinMultiplier' },
   { name: 'Coin Flip Minimum Multiplier', value: 'coinflipMinMultiplier' },
   { name: 'Hi-Lo Minimum Multiplier', value: 'hiloMinMultiplier' },
+  { name: 'Limbo Minimum Multiplier', value: 'limboMinMultiplier' },
   { name: 'Lottery Minimum Multiplier', value: 'lotteryMinMultiplier' },
   { name: 'Roulette Minimum Multiplier', value: 'rouletteMinMultiplier' },
   { name: 'Blackjack Minimum Multiplier', value: 'blackjackMinMultiplier' }
@@ -24,6 +25,7 @@ export const readableGameNames = [
   { name: 'Dice', value: 'dice' },
   { name: 'Coin Flip', value: 'coinflip' },
   { name: 'Hi-Lo', value: 'hilo' },
+  { name: 'Limbo', value: 'limbo' },
   { name: 'Slots', value: 'slots' },
   { name: 'Lottery', value: 'lottery' },
   { name: 'Roulette', value: 'roulette' },
@@ -48,6 +50,11 @@ export const defaultCasinoSettings = {
     minBet: 0
   },
   hilo: {
+    houseEdge: 0.03,
+    maxBet: 0,
+    minBet: 0
+  },
+  limbo: {
     houseEdge: 0.03,
     maxBet: 0,
     minBet: 0
@@ -139,6 +146,7 @@ export const defaultCasinoSettings = {
     blackjackMinMultiplier: 0,
     diceMinMultiplier: 0,
     coinflipMinMultiplier: 0,
-    hiloMinMultiplier: 0
+    hiloMinMultiplier: 0,
+    limboMinMultiplier: 50
   }
 }

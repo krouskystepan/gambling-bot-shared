@@ -43,6 +43,11 @@ export const calculateRTP = (
       return calculateHiloRtp(toNumber(houseEdge))
     }
 
+    case 'limbo': {
+      const { houseEdge } = settings as TCasinoSettings['limbo']
+      return (1 - toNumber(houseEdge)) * 100
+    }
+
     case 'slots': {
       const { symbolWeights, winMultipliers } =
         settings as TCasinoSettings['slots']

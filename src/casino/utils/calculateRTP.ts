@@ -48,6 +48,11 @@ export const calculateRTP = (
       return (1 - toNumber(houseEdge)) * 100
     }
 
+    case 'mines': {
+      const { houseEdge } = settings as TCasinoSettings['mines']
+      return (1 - toNumber(houseEdge)) * 100
+    }
+
     case 'slots': {
       const { symbolWeights, winMultipliers } =
         settings as TCasinoSettings['slots']

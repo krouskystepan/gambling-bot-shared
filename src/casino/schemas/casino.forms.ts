@@ -70,6 +70,14 @@ export const casinoSettingsSchema = z.object({
     maxBet: num
   }),
 
+  mines: z.object({
+    houseEdge: num,
+    minBet: num,
+    maxBet: num,
+    minMines: num,
+    maxMines: num
+  }),
+
   prediction: z.object({
     minBet: num,
     maxBet: num
@@ -94,6 +102,7 @@ export const casinoSettingsSchema = z.object({
     lotteryMinMultiplier: num,
     rouletteMinMultiplier: num,
     blackjackMinMultiplier: num,
+    minesMinMultiplier: num,
     diceMinMultiplier: num,
     coinflipMinMultiplier: num,
     hiloMinMultiplier: num,

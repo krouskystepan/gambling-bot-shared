@@ -1,10 +1,12 @@
 import {
   BACCARAT_8_DECK_PROBS,
+  BLACKJACK_OUTCOME_PROBS,
   LOTTERY_NUM_TO_DRAW,
   LOTTERY_TOTAL_NUMBERS,
   MINI_NUMBERS,
   PLINKO_ROW_COUNT,
   calculateHiloRtp,
+  defaultCasinoSettings,
   getPlinkoMultiplierAtPathIndex,
   normalizePlinkoBinMultipliers
 } from '../constants'
@@ -199,7 +201,22 @@ export const calculateRTP = (
       return (1 - toNumber(houseEdge)) * 100
     }
 
-    case 'blackjack':
+    case 'blackjack': {
+      const { winMultipliers } = settings as TCasinoSettings['blackjack']
+      const multipliers = {
+        ...defaultCasinoSettings.blackjack.winMultipliers,
+        ...winMultipliers
+      }
+      const p = BLACKJACK_OUTCOME_PROBS
+
+      return (
+        (p.win * toNumber(multipliers.win) +
+          p.blackjack * toNumber(multipliers.blackjack) +
+          p.push * toNumber(multipliers.push)) *
+        100
+      )
+    }
+
     case 'prediction':
       return 0
 

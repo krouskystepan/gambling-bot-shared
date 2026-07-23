@@ -4,6 +4,7 @@ export const readableGameValueNames = [
   { name: 'Win Multiplier (x)', value: 'winMultiplier' },
   { name: 'Win Multipliers (x)', value: 'winMultipliers' },
   { name: 'House Edge (%)', value: 'houseEdge' },
+  { name: 'Timeout Fee (%)', value: 'timeoutFee' },
   { name: 'One-In Chance (e.g. 1 in 10,000)', value: 'oneInChance' },
   { name: 'Symbol Weights', value: 'symbolWeights' },
   { name: 'Plinko Minimum Multiplier', value: 'plinkoMinMultiplier' },
@@ -57,6 +58,7 @@ export const defaultCasinoSettings = {
   },
   hilo: {
     houseEdge: 0.03,
+    timeoutFee: 0.1,
     maxBet: 0,
     minBet: 0
   },
@@ -110,9 +112,9 @@ export const defaultCasinoSettings = {
     winMultipliers: {
       player: 2,
       banker: 1.95,
-      tie: 9,
-      playerPair: 12,
-      bankerPair: 12
+      tie: 9.5,
+      playerPair: 12.5,
+      bankerPair: 12.5
     },
     maxBet: 0,
     minBet: 0

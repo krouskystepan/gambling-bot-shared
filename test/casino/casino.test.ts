@@ -19,6 +19,7 @@ import {
   defaultCasinoSettings,
   expandPlinkoBinMultipliers,
   formatPlinkoBinMultipliersForDisplay,
+  getHiloTimeoutRefund,
   getHiloWinMultiplier,
   getMinesFairMultiplier,
   getMinesPayoutMultiplier,
@@ -484,6 +485,25 @@ describe('hilo odds', () => {
     expect(resolveHiloRound(8, 5, 'higher')).toBe('lose')
     expect(resolveHiloRound(8, 8, 'higher')).toBe('push')
     expect(resolveHiloRound(8, 5, 'lower')).toBe('win')
+  })
+})
+
+describe('getHiloTimeoutRefund', () => {
+  it('refunds 90% when timeout fee is 10%', () => {
+    expect(getHiloTimeoutRefund(1000, 0.1)).toBe(900)
+  })
+
+  it('refunds the full bet when fee is 0', () => {
+    expect(getHiloTimeoutRefund(1000, 0)).toBe(1000)
+  })
+
+  it('refunds nothing when fee is 1', () => {
+    expect(getHiloTimeoutRefund(1000, 1)).toBe(0)
+  })
+
+  it('clamps out-of-range fees', () => {
+    expect(getHiloTimeoutRefund(1000, -0.5)).toBe(1000)
+    expect(getHiloTimeoutRefund(1000, 1.5)).toBe(0)
   })
 })
 

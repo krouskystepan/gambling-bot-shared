@@ -67,3 +67,12 @@ export const calculateHiloRtp = (houseEdge: number): number => {
   const decisive = remaining - (HILO_SUITS_PER_RANK - 1)
   return (1 - houseEdge * (decisive / remaining)) * 100
 }
+
+/** Refund after timeout: `bet * (1 - clamp(timeoutFee, 0, 1))`. */
+export const getHiloTimeoutRefund = (
+  bet: number,
+  timeoutFee: number
+): number => {
+  const fee = Math.min(Math.max(timeoutFee, 0), 1)
+  return bet * (1 - fee)
+}

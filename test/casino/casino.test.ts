@@ -8,10 +8,14 @@ import {
   SLOT_MAX_SIMULATE_SPINS,
   SUITES,
   VALUES,
+  baccaratCardValue,
+  baccaratIdleNudgeThresholdMs,
+  baccaratIdleRefundMs,
   blackjackAutostandIdleMs,
   blackjackIdleNudgeThresholdMs,
   calculateRTP,
   casinoSettingsSchema,
+  dealBaccaratRound,
   defaultCasinoSettings,
   expandPlinkoBinMultipliers,
   formatPlinkoBinMultipliersForDisplay,
@@ -20,10 +24,14 @@ import {
   getMinesPayoutMultiplier,
   getPlinkoMirrorBin,
   getPlinkoMultiplierAtPathIndex,
+  handTotal,
   hiloRankFromLabel,
+  hoursUntilBaccaratIdleRefund,
   hoursUntilBlackjackAutostand,
   hoursUntilMinesAutoResolve,
   isLimboWin,
+  isPair,
+  isValidBaccaratBetSide,
   isValidLimboTarget,
   isValidMineCount,
   limboHitProbability,
@@ -33,11 +41,14 @@ import {
   normalizePlinkoBinMultipliers,
   pathIndexToPlinkoBin,
   plinkoBinToPathIndex,
+  resolveBaccaratBet,
   resolveHiloRound,
   rollLimboResult,
   shouldAnnounceByMultiplier,
   shouldAnnounceGoldenJackpotHit,
   shouldAnnouncePlinkoBall,
+  shouldBankerDrawThird,
+  shouldPlayerDrawThird,
   validateBetAmount
 } from 'gambling-bot-shared/casino'
 import {
@@ -137,6 +148,15 @@ describe('calculateRTP', () => {
       expect.objectContaining({
         number: expect.any(Number),
         color: expect.any(Number)
+      })
+    )
+    expect(calculateRTP('baccarat', defaultCasinoSettings.baccarat)).toEqual(
+      expect.objectContaining({
+        player: expect.any(Number),
+        banker: expect.any(Number),
+        tie: expect.any(Number),
+        playerPair: expect.any(Number),
+        bankerPair: expect.any(Number)
       })
     )
     expect(calculateRTP('rps', defaultCasinoSettings.rps)).toBeGreaterThan(0)
@@ -359,6 +379,18 @@ describe('casino constants', () => {
     ).toBe(1)
   })
 
+  it('computes hours until baccarat idle refund', () => {
+    const now = Date.parse('2024-06-15T12:00:00Z')
+    const updatedAt = new Date(now - 6 * 60 * 60 * 1000)
+
+    expect(hoursUntilBaccaratIdleRefund(updatedAt, now)).toBe(18)
+    expect(
+      hoursUntilBaccaratIdleRefund(new Date(now - 23 * 60 * 60 * 1000), now)
+    ).toBe(1)
+    expect(baccaratIdleNudgeThresholdMs()).toBe(3 * 60 * 60 * 1000)
+    expect(baccaratIdleRefundMs()).toBe(24 * 60 * 60 * 1000)
+  })
+
   it('computes hours until mines auto-resolve', () => {
     const now = Date.parse('2024-06-15T12:00:00Z')
     const updatedAt = new Date(now - 6 * 60 * 60 * 1000)
@@ -371,6 +403,11 @@ describe('casino constants', () => {
 
   it('includes mines in casino game ids', () => {
     expect(CASINO_GAME_IDS).toContain('mines')
+  })
+
+  it('includes baccarat in casino game ids and record fields', () => {
+    expect(CASINO_GAME_IDS).toContain('baccarat')
+    expect(GAME_RECORD_FIELDS.baccarat).toContain('winMultipliers')
   })
 
   it('exports blackjack worker timing constants', () => {
@@ -463,6 +500,213 @@ describe('limbo math', () => {
     expect(isValidLimboTarget(1)).toBe(false)
     expect(isValidLimboTarget(1_000_001)).toBe(false)
     expect(isValidLimboTarget(NaN)).toBe(false)
+  })
+})
+
+describe('baccarat math', () => {
+  const card = (label: string, suite = '♠️') => ({ label, suite })
+  const mult = defaultCasinoSettings.baccarat.winMultipliers
+
+  it('maps face values (A=1, 10/JQK=0)', () => {
+    expect(baccaratCardValue('A')).toBe(1)
+    expect(baccaratCardValue('9')).toBe(9)
+    expect(baccaratCardValue('10')).toBe(0)
+    expect(baccaratCardValue('J')).toBe(0)
+    expect(baccaratCardValue('Q')).toBe(0)
+    expect(baccaratCardValue('K')).toBe(0)
+    expect(() => baccaratCardValue('X')).toThrow(/Unknown baccarat card label/)
+  })
+
+  it('totals hands modulo 10 and detects pairs', () => {
+    expect(handTotal([card('9'), card('8')])).toBe(7)
+    expect(handTotal([card('K'), card('A')])).toBe(1)
+    expect(isPair([card('7', '♠️'), card('7', '♥️')])).toBe(true)
+    expect(isPair([card('7'), card('8')])).toBe(false)
+    expect(isPair([card('7')])).toBe(false)
+  })
+
+  it('applies natural stand and player third-card rule', () => {
+    expect(shouldPlayerDrawThird(5)).toBe(true)
+    expect(shouldPlayerDrawThird(6)).toBe(false)
+  })
+
+  it('applies banker tableau samples', () => {
+    // Player stands → banker draws on 0–5
+    expect(shouldBankerDrawThird(5, false)).toBe(true)
+    expect(shouldBankerDrawThird(6, false)).toBe(false)
+
+    // Banker 0–2 always draws after player third
+    expect(shouldBankerDrawThird(2, true, 8)).toBe(true)
+
+    // Banker 3 draws unless player third is 8
+    expect(shouldBankerDrawThird(3, true, 7)).toBe(true)
+    expect(shouldBankerDrawThird(3, true, 8)).toBe(false)
+
+    // Banker 4 draws on player third 2–7
+    expect(shouldBankerDrawThird(4, true, 2)).toBe(true)
+    expect(shouldBankerDrawThird(4, true, 1)).toBe(false)
+
+    // Banker 5 draws on player third 4–7
+    expect(shouldBankerDrawThird(5, true, 4)).toBe(true)
+    expect(shouldBankerDrawThird(5, true, 3)).toBe(false)
+
+    // Banker 6 draws only on player third 6–7
+    expect(shouldBankerDrawThird(6, true, 6)).toBe(true)
+    expect(shouldBankerDrawThird(6, true, 5)).toBe(false)
+
+    // Banker 7 always stands after player third
+    expect(shouldBankerDrawThird(7, true, 6)).toBe(false)
+  })
+
+  it('deals naturals without third cards', () => {
+    const shoe = [
+      card('9'),
+      card('K'), // player 9
+      card('8'),
+      card('A'), // banker 9
+      card('2'),
+      card('3')
+    ]
+    const round = dealBaccaratRound(() => shoe.shift()!)
+    expect(round.playerCards).toHaveLength(2)
+    expect(round.bankerCards).toHaveLength(2)
+    expect(round.outcome).toBe('tie')
+    expect(round.playerTotal).toBe(9)
+    expect(round.bankerTotal).toBe(9)
+  })
+
+  it('deals player third then banker tableau', () => {
+    // Player 4 (draws), Banker 3; player third = 8 → banker stands
+    const shoe = [
+      card('2'),
+      card('2'), // player 4
+      card('2'),
+      card('A'), // banker 3
+      card('8'), // player third
+      card('K') // unused
+    ]
+    const round = dealBaccaratRound(() => shoe.shift()!)
+    expect(round.playerCards).toHaveLength(3)
+    expect(round.bankerCards).toHaveLength(2)
+    expect(round.playerTotal).toBe(2)
+    expect(round.bankerTotal).toBe(3)
+    expect(round.outcome).toBe('banker')
+  })
+
+  it('deals when player stands and banker draws', () => {
+    // Player 6 (stands), Banker 4 (draws)
+    const shoe = [
+      card('3'),
+      card('3'), // player 6
+      card('2'),
+      card('2'), // banker 4
+      card('A') // banker third → 5
+    ]
+    const round = dealBaccaratRound(() => shoe.shift()!)
+    expect(round.playerCards).toHaveLength(2)
+    expect(round.bankerCards).toHaveLength(3)
+    expect(round.playerTotal).toBe(6)
+    expect(round.bankerTotal).toBe(5)
+    expect(round.outcome).toBe('player')
+  })
+
+  it('resolves main bets with push on tie and pair sides', () => {
+    expect(
+      resolveBaccaratBet(
+        'player',
+        { outcome: 'player', playerPair: false, bankerPair: false },
+        mult
+      )
+    ).toEqual({ won: true, push: false, multiplier: 2 })
+
+    expect(
+      resolveBaccaratBet(
+        'banker',
+        { outcome: 'banker', playerPair: false, bankerPair: false },
+        mult
+      )
+    ).toEqual({ won: true, push: false, multiplier: 1.95 })
+
+    expect(
+      resolveBaccaratBet(
+        'player',
+        { outcome: 'banker', playerPair: false, bankerPair: false },
+        mult
+      )
+    ).toEqual({ won: false, push: false, multiplier: 0 })
+
+    expect(
+      resolveBaccaratBet(
+        'player',
+        { outcome: 'tie', playerPair: false, bankerPair: false },
+        mult
+      )
+    ).toEqual({ won: false, push: true, multiplier: 1 })
+
+    expect(
+      resolveBaccaratBet(
+        'tie',
+        { outcome: 'tie', playerPair: false, bankerPair: false },
+        mult
+      )
+    ).toEqual({ won: true, push: false, multiplier: 9 })
+
+    expect(
+      resolveBaccaratBet(
+        'tie',
+        { outcome: 'player', playerPair: false, bankerPair: false },
+        mult
+      )
+    ).toEqual({ won: false, push: false, multiplier: 0 })
+
+    expect(
+      resolveBaccaratBet(
+        'playerPair',
+        { outcome: 'banker', playerPair: true, bankerPair: false },
+        mult
+      )
+    ).toEqual({ won: true, push: false, multiplier: 12 })
+
+    expect(
+      resolveBaccaratBet(
+        'playerPair',
+        { outcome: 'player', playerPair: false, bankerPair: false },
+        mult
+      )
+    ).toEqual({ won: false, push: false, multiplier: 0 })
+
+    expect(
+      resolveBaccaratBet(
+        'bankerPair',
+        { outcome: 'tie', playerPair: false, bankerPair: true },
+        mult
+      )
+    ).toEqual({ won: true, push: false, multiplier: 12 })
+
+    expect(
+      resolveBaccaratBet(
+        'bankerPair',
+        { outcome: 'tie', playerPair: false, bankerPair: false },
+        mult
+      )
+    ).toEqual({ won: false, push: false, multiplier: 0 })
+
+    expect(isValidBaccaratBetSide('bankerPair')).toBe(true)
+    expect(isValidBaccaratBetSide('side')).toBe(false)
+  })
+
+  it('reports ~98–99% RTP for player/banker defaults', () => {
+    const rtp = calculateRTP(
+      'baccarat',
+      defaultCasinoSettings.baccarat
+    ) as Record<string, number>
+
+    expect(rtp.player).toBeGreaterThan(98)
+    expect(rtp.player).toBeLessThan(99)
+    expect(rtp.banker).toBeGreaterThan(98)
+    expect(rtp.banker).toBeLessThan(99.5)
+    expect(rtp.tie).toBeGreaterThan(80)
+    expect(rtp.playerPair).toBeGreaterThan(80)
   })
 })
 

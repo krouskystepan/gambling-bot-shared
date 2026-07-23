@@ -1,5 +1,6 @@
 export * from './constants'
 export * from './types/casinoSettings'
+export * from './types/baccaratGame'
 export * from './types/blackjackGame'
 export * from './types/minesGame'
 export * from './mines/engine'

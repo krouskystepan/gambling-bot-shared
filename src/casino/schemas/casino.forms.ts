@@ -52,6 +52,12 @@ export const casinoSettingsSchema = z.object({
     maxBet: num
   }),
 
+  baccarat: z.object({
+    winMultipliers: z.record(z.string(), num),
+    minBet: num,
+    maxBet: num
+  }),
+
   rps: z.object({
     houseEdge: num,
     minBet: num,
@@ -101,6 +107,7 @@ export const casinoSettingsSchema = z.object({
     slotsMinMultiplier: num,
     lotteryMinMultiplier: num,
     rouletteMinMultiplier: num,
+    baccaratMinMultiplier: num,
     blackjackMinMultiplier: num,
     minesMinMultiplier: num,
     diceMinMultiplier: num,

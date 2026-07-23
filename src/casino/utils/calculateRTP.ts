@@ -1,4 +1,5 @@
 import {
+  BACCARAT_8_DECK_PROBS,
   LOTTERY_NUM_TO_DRAW,
   LOTTERY_TOTAL_NUMBERS,
   MINI_NUMBERS,
@@ -155,6 +156,30 @@ export const calculateRTP = (
         range: rangeRTP,
         dozen: dozenRTP,
         column: columnRTP
+      }
+    }
+
+    case 'baccarat': {
+      const { winMultipliers } = settings as TCasinoSettings['baccarat']
+      const p = BACCARAT_8_DECK_PROBS
+
+      // Player/banker push on tie (return stake = 1x). Pair bets are independent.
+      const playerRTP =
+        (p.player * toNumber(winMultipliers.player) + p.tie * 1) * 100
+      const bankerRTP =
+        (p.banker * toNumber(winMultipliers.banker) + p.tie * 1) * 100
+      const tieRTP = p.tie * toNumber(winMultipliers.tie) * 100
+      const playerPairRTP =
+        p.playerPair * toNumber(winMultipliers.playerPair) * 100
+      const bankerPairRTP =
+        p.bankerPair * toNumber(winMultipliers.bankerPair) * 100
+
+      return {
+        player: playerRTP,
+        banker: bankerRTP,
+        tie: tieRTP,
+        playerPair: playerPairRTP,
+        bankerPair: bankerPairRTP
       }
     }
 

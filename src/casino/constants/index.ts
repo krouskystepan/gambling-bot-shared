@@ -1,3 +1,5 @@
+export * from './baccaratConfig'
+export * from './baccaratWorkers'
 export * from './blackjack'
 export * from './blackjackWorkers'
 export * from './casinoGames'

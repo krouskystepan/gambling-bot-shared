@@ -43,6 +43,10 @@
       "types": "./dist/blackjack/index.d.ts",
       "default": "./dist/blackjack/index.js"
     },
+    "./baccarat": {
+      "types": "./dist/baccarat/index.d.ts",
+      "default": "./dist/baccarat/index.js"
+    },
     "./mines": {
       "types": "./dist/mines/index.d.ts",
       "default": "./dist/mines/index.js"

@@ -18,6 +18,7 @@ export const readableGameValueNames = [
   { name: 'Limbo Minimum Multiplier', value: 'limboMinMultiplier' },
   { name: 'Lottery Minimum Multiplier', value: 'lotteryMinMultiplier' },
   { name: 'Roulette Minimum Multiplier', value: 'rouletteMinMultiplier' },
+  { name: 'Baccarat Minimum Multiplier', value: 'baccaratMinMultiplier' },
   { name: 'Blackjack Minimum Multiplier', value: 'blackjackMinMultiplier' },
   { name: 'Mines Minimum Multiplier', value: 'minesMinMultiplier' },
   { name: 'Minimum Mines', value: 'minMines' },
@@ -32,6 +33,7 @@ export const readableGameNames = [
   { name: 'Slots', value: 'slots' },
   { name: 'Lottery', value: 'lottery' },
   { name: 'Roulette', value: 'roulette' },
+  { name: 'Baccarat', value: 'baccarat' },
   { name: 'Rock Paper Scissors', value: 'rps' },
   { name: 'Golden Jackpot', value: 'goldenJackpot' },
   { name: 'Blackjack', value: 'blackjack' },
@@ -104,6 +106,17 @@ export const defaultCasinoSettings = {
     maxBet: 0,
     minBet: 0
   },
+  baccarat: {
+    winMultipliers: {
+      player: 2,
+      banker: 1.95,
+      tie: 9,
+      playerPair: 12,
+      bankerPair: 12
+    },
+    maxBet: 0,
+    minBet: 0
+  },
   rps: {
     houseEdge: 0.025,
     maxBet: 0,
@@ -154,6 +167,7 @@ export const defaultCasinoSettings = {
     slotsMinMultiplier: 100,
     lotteryMinMultiplier: 40,
     rouletteMinMultiplier: 18,
+    baccaratMinMultiplier: 9,
     blackjackMinMultiplier: 0,
     minesMinMultiplier: 0,
     diceMinMultiplier: 0,

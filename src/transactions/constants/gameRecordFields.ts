@@ -2,6 +2,7 @@ export const GAME_RECORD_FIELDS = {
   slots: ['winMultipliers', 'symbolWeights'],
   lottery: ['winMultipliers'],
   roulette: ['winMultipliers'],
+  baccarat: ['winMultipliers'],
   plinko: ['binMultipliers']
 } as const
 

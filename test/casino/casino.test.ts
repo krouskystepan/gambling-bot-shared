@@ -166,7 +166,21 @@ describe('calculateRTP', () => {
     expect(
       calculateRTP('raffle', defaultCasinoSettings.raffle)
     ).toBeGreaterThan(0)
-    expect(calculateRTP('blackjack', defaultCasinoSettings.blackjack)).toBe(0)
+    expect(
+      calculateRTP('blackjack', defaultCasinoSettings.blackjack)
+    ).toBeCloseTo(99.5, 5)
+    expect(
+      calculateRTP('blackjack', {
+        ...defaultCasinoSettings.blackjack,
+        winMultipliers: { win: 1.8, blackjack: 2, push: 1 }
+      })
+    ).toBeLessThan(99.5)
+    expect(
+      calculateRTP('blackjack', {
+        maxBet: 0,
+        minBet: 0
+      } as never)
+    ).toBeCloseTo(99.5, 5)
     expect(calculateRTP('prediction', defaultCasinoSettings.prediction)).toBe(0)
     expect(
       calculateRTP('plinko', defaultCasinoSettings.plinko)
@@ -408,6 +422,10 @@ describe('casino constants', () => {
   it('includes baccarat in casino game ids and record fields', () => {
     expect(CASINO_GAME_IDS).toContain('baccarat')
     expect(GAME_RECORD_FIELDS.baccarat).toContain('winMultipliers')
+  })
+
+  it('includes blackjack winMultipliers in record fields', () => {
+    expect(GAME_RECORD_FIELDS.blackjack).toContain('winMultipliers')
   })
 
   it('exports blackjack worker timing constants', () => {

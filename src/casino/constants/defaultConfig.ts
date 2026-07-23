@@ -129,6 +129,11 @@ export const defaultCasinoSettings = {
     minBet: 0
   },
   blackjack: {
+    winMultipliers: {
+      win: 2,
+      blackjack: 2.5,
+      push: 1
+    },
     maxBet: 0,
     minBet: 0
   },

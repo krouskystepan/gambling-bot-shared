@@ -11,6 +11,7 @@ export type GuildWipeEntity =
   | 'blackjack'
   | 'baccarat'
   | 'mines'
+  | 'roulette'
 
 export type GuildDataWipeDeleteResult = {
   deletedCount?: number
@@ -31,6 +32,7 @@ export type GuildDataWipeModels = {
   blackjackGames: GuildDataWipeModel
   baccaratGames: GuildDataWipeModel
   minesGames: GuildDataWipeModel
+  rouletteGames: GuildDataWipeModel
   userBans: GuildDataWipeModel
   users: GuildDataWipeModel
 }
@@ -56,6 +58,7 @@ const WIPE_ENTITY_ORDER: Exclude<GuildWipeEntity, 'all'>[] = [
   'blackjack',
   'baccarat',
   'mines',
+  'roulette',
   'users'
 ]
 
@@ -71,6 +74,7 @@ const ENTITY_TO_MODEL_KEY: Record<
   blackjack: 'blackjackGames',
   baccarat: 'baccaratGames',
   mines: 'minesGames',
+  roulette: 'rouletteGames',
   users: 'users'
 }
 
@@ -83,6 +87,7 @@ const WIPE_LABELS: Record<keyof GuildDataWipeModels, string> = {
   blackjackGames: 'Blackjack games',
   baccaratGames: 'Baccarat games',
   minesGames: 'Mines games',
+  rouletteGames: 'Roulette games',
   userBans: 'User bans',
   users: 'Users'
 }

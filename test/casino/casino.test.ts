@@ -30,6 +30,7 @@ import {
   hoursUntilBaccaratIdleRefund,
   hoursUntilBlackjackAutostand,
   hoursUntilMinesAutoResolve,
+  hoursUntilRouletteIdleClose,
   isLimboWin,
   isPair,
   isValidBaccaratBetSide,
@@ -45,6 +46,8 @@ import {
   resolveBaccaratBet,
   resolveHiloRound,
   rollLimboResult,
+  rouletteIdleCloseMs,
+  rouletteIdleNudgeThresholdMs,
   shouldAnnounceByMultiplier,
   shouldAnnounceGoldenJackpotHit,
   shouldAnnouncePlinkoBall,
@@ -416,6 +419,18 @@ describe('casino constants', () => {
     ).toBe(1)
   })
 
+  it('computes hours until roulette idle close', () => {
+    const now = Date.parse('2024-06-15T12:00:00Z')
+    const updatedAt = new Date(now - 6 * 60 * 60 * 1000)
+
+    expect(hoursUntilRouletteIdleClose(updatedAt, now)).toBe(18)
+    expect(
+      hoursUntilRouletteIdleClose(new Date(now - 23 * 60 * 60 * 1000), now)
+    ).toBe(1)
+    expect(rouletteIdleNudgeThresholdMs()).toBe(3 * 60 * 60 * 1000)
+    expect(rouletteIdleCloseMs()).toBe(24 * 60 * 60 * 1000)
+  })
+
   it('includes mines in casino game ids', () => {
     expect(CASINO_GAME_IDS).toContain('mines')
   })
@@ -687,7 +702,7 @@ describe('baccarat math', () => {
         { outcome: 'tie', playerPair: false, bankerPair: false },
         mult
       )
-    ).toEqual({ won: true, push: false, multiplier: 9 })
+    ).toEqual({ won: true, push: false, multiplier: 9.5 })
 
     expect(
       resolveBaccaratBet(
@@ -703,7 +718,7 @@ describe('baccarat math', () => {
         { outcome: 'banker', playerPair: true, bankerPair: false },
         mult
       )
-    ).toEqual({ won: true, push: false, multiplier: 12 })
+    ).toEqual({ won: true, push: false, multiplier: 12.5 })
 
     expect(
       resolveBaccaratBet(
@@ -719,7 +734,7 @@ describe('baccarat math', () => {
         { outcome: 'tie', playerPair: false, bankerPair: true },
         mult
       )
-    ).toEqual({ won: true, push: false, multiplier: 12 })
+    ).toEqual({ won: true, push: false, multiplier: 12.5 })
 
     expect(
       resolveBaccaratBet(

@@ -51,6 +51,10 @@
       "types": "./dist/mines/index.d.ts",
       "default": "./dist/mines/index.js"
     },
+    "./roulette": {
+      "types": "./dist/roulette/index.d.ts",
+      "default": "./dist/roulette/index.js"
+    },
     "./user": {
       "types": "./dist/user/index.d.ts",
       "default": "./dist/user/index.js"

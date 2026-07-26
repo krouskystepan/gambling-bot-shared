@@ -20,6 +20,7 @@ function createMockModels(
     'baccaratGames',
     'minesGames',
     'rouletteGames',
+    'slotsGames',
     'userBans',
     'users'
   ]
@@ -46,6 +47,7 @@ describe('normalizeGuildWipeEntities', () => {
       'baccarat',
       'mines',
       'roulette',
+      'slots',
       'users'
     ])
   })
@@ -69,6 +71,7 @@ describe('normalizeGuildWipeEntities', () => {
       'baccarat',
       'mines',
       'roulette',
+      'slots',
       'users'
     ])
   })
@@ -149,6 +152,7 @@ describe('runGuildDataWipe', () => {
       'baccaratGames',
       'minesGames',
       'rouletteGames',
+      'slotsGames',
       'userBans',
       'users'
     ])

@@ -31,6 +31,7 @@ import {
   hoursUntilBlackjackAutostand,
   hoursUntilMinesAutoResolve,
   hoursUntilRouletteIdleClose,
+  hoursUntilSlotsIdleClose,
   isLimboWin,
   isPair,
   isValidBaccaratBetSide,
@@ -53,6 +54,8 @@ import {
   shouldAnnouncePlinkoBall,
   shouldBankerDrawThird,
   shouldPlayerDrawThird,
+  slotsIdleCloseMs,
+  slotsIdleNudgeThresholdMs,
   validateBetAmount
 } from 'gambling-bot-shared/casino'
 import {
@@ -429,6 +432,18 @@ describe('casino constants', () => {
     ).toBe(1)
     expect(rouletteIdleNudgeThresholdMs()).toBe(3 * 60 * 60 * 1000)
     expect(rouletteIdleCloseMs()).toBe(24 * 60 * 60 * 1000)
+  })
+
+  it('computes hours until slots idle close', () => {
+    const now = Date.parse('2024-06-15T12:00:00Z')
+    const updatedAt = new Date(now - 6 * 60 * 60 * 1000)
+
+    expect(hoursUntilSlotsIdleClose(updatedAt, now)).toBe(18)
+    expect(
+      hoursUntilSlotsIdleClose(new Date(now - 23 * 60 * 60 * 1000), now)
+    ).toBe(1)
+    expect(slotsIdleNudgeThresholdMs()).toBe(3 * 60 * 60 * 1000)
+    expect(slotsIdleCloseMs()).toBe(24 * 60 * 60 * 1000)
   })
 
   it('includes mines in casino game ids', () => {

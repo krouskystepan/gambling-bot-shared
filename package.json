@@ -55,6 +55,10 @@
       "types": "./dist/roulette/index.d.ts",
       "default": "./dist/roulette/index.js"
     },
+    "./slots": {
+      "types": "./dist/slots/index.d.ts",
+      "default": "./dist/slots/index.js"
+    },
     "./user": {
       "types": "./dist/user/index.d.ts",
       "default": "./dist/user/index.js"

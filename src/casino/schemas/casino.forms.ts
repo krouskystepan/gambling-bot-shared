@@ -21,6 +21,19 @@ export const casinoSettingsSchema = z.object({
     maxBet: num
   }),
 
+  hilo: z.object({
+    houseEdge: num,
+    timeoutFee: num,
+    minBet: num,
+    maxBet: num
+  }),
+
+  limbo: z.object({
+    houseEdge: num,
+    minBet: num,
+    maxBet: num
+  }),
+
   slots: z.object({
     winMultipliers: z.record(z.string(), num),
     symbolWeights: z.record(z.string(), num),
@@ -40,8 +53,14 @@ export const casinoSettingsSchema = z.object({
     maxBet: num
   }),
 
+  baccarat: z.object({
+    winMultipliers: z.record(z.string(), num),
+    minBet: num,
+    maxBet: num
+  }),
+
   rps: z.object({
-    casinoCut: num,
+    houseEdge: num,
     minBet: num,
     maxBet: num
   }),
@@ -54,8 +73,17 @@ export const casinoSettingsSchema = z.object({
   }),
 
   blackjack: z.object({
+    winMultipliers: z.record(z.string(), num),
     minBet: num,
     maxBet: num
+  }),
+
+  mines: z.object({
+    houseEdge: num,
+    minBet: num,
+    maxBet: num,
+    minMines: num,
+    maxMines: num
   }),
 
   prediction: z.object({
@@ -64,7 +92,7 @@ export const casinoSettingsSchema = z.object({
   }),
 
   raffle: z.object({
-    casinoCut: num
+    houseEdge: num
   }),
 
   plinko: z.object({
@@ -81,8 +109,12 @@ export const casinoSettingsSchema = z.object({
     slotsMinMultiplier: num,
     lotteryMinMultiplier: num,
     rouletteMinMultiplier: num,
+    baccaratMinMultiplier: num,
     blackjackMinMultiplier: num,
+    minesMinMultiplier: num,
     diceMinMultiplier: num,
-    coinflipMinMultiplier: num
+    coinflipMinMultiplier: num,
+    hiloMinMultiplier: num,
+    limboMinMultiplier: num
   })
 })

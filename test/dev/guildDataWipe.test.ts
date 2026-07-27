@@ -17,6 +17,10 @@ function createMockModels(
     'predictions',
     'vipRooms',
     'blackjackGames',
+    'baccaratGames',
+    'minesGames',
+    'rouletteGames',
+    'slotsGames',
     'userBans',
     'users'
   ]
@@ -40,6 +44,10 @@ describe('normalizeGuildWipeEntities', () => {
       'predictions',
       'vip',
       'blackjack',
+      'baccarat',
+      'mines',
+      'roulette',
+      'slots',
       'users'
     ])
   })
@@ -60,6 +68,10 @@ describe('normalizeGuildWipeEntities', () => {
       'predictions',
       'vip',
       'blackjack',
+      'baccarat',
+      'mines',
+      'roulette',
+      'slots',
       'users'
     ])
   })
@@ -137,6 +149,10 @@ describe('runGuildDataWipe', () => {
       'predictions',
       'vipRooms',
       'blackjackGames',
+      'baccaratGames',
+      'minesGames',
+      'rouletteGames',
+      'slotsGames',
       'userBans',
       'users'
     ])

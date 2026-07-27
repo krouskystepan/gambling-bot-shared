@@ -1,6 +1,6 @@
 {
   "name": "gambling-bot-shared",
-  "version": "1.0.14",
+  "version": "1.1.0",
   "license": "MIT",
   "type": "commonjs",
   "repository": {
@@ -42,6 +42,22 @@
     "./blackjack": {
       "types": "./dist/blackjack/index.d.ts",
       "default": "./dist/blackjack/index.js"
+    },
+    "./baccarat": {
+      "types": "./dist/baccarat/index.d.ts",
+      "default": "./dist/baccarat/index.js"
+    },
+    "./mines": {
+      "types": "./dist/mines/index.d.ts",
+      "default": "./dist/mines/index.js"
+    },
+    "./roulette": {
+      "types": "./dist/roulette/index.d.ts",
+      "default": "./dist/roulette/index.js"
+    },
+    "./slots": {
+      "types": "./dist/slots/index.d.ts",
+      "default": "./dist/slots/index.js"
     },
     "./user": {
       "types": "./dist/user/index.d.ts",

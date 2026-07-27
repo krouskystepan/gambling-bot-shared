@@ -3,7 +3,8 @@ export const readableGameValueNames = [
   { name: 'Minimum Bet Amount', value: 'minBet' },
   { name: 'Win Multiplier (x)', value: 'winMultiplier' },
   { name: 'Win Multipliers (x)', value: 'winMultipliers' },
-  { name: 'Casino House Cut (%)', value: 'casinoCut' },
+  { name: 'House Edge (%)', value: 'houseEdge' },
+  { name: 'Timeout Fee (%)', value: 'timeoutFee' },
   { name: 'One-In Chance (e.g. 1 in 10,000)', value: 'oneInChance' },
   { name: 'Symbol Weights', value: 'symbolWeights' },
   { name: 'Plinko Minimum Multiplier', value: 'plinkoMinMultiplier' },
@@ -14,20 +15,30 @@ export const readableGameValueNames = [
   { name: 'Slots Minimum Multiplier', value: 'slotsMinMultiplier' },
   { name: 'Dice Minimum Multiplier', value: 'diceMinMultiplier' },
   { name: 'Coin Flip Minimum Multiplier', value: 'coinflipMinMultiplier' },
+  { name: 'Hi-Lo Minimum Multiplier', value: 'hiloMinMultiplier' },
+  { name: 'Limbo Minimum Multiplier', value: 'limboMinMultiplier' },
   { name: 'Lottery Minimum Multiplier', value: 'lotteryMinMultiplier' },
   { name: 'Roulette Minimum Multiplier', value: 'rouletteMinMultiplier' },
-  { name: 'Blackjack Minimum Multiplier', value: 'blackjackMinMultiplier' }
+  { name: 'Baccarat Minimum Multiplier', value: 'baccaratMinMultiplier' },
+  { name: 'Blackjack Minimum Multiplier', value: 'blackjackMinMultiplier' },
+  { name: 'Mines Minimum Multiplier', value: 'minesMinMultiplier' },
+  { name: 'Minimum Mines', value: 'minMines' },
+  { name: 'Maximum Mines', value: 'maxMines' }
 ]
 
 export const readableGameNames = [
   { name: 'Dice', value: 'dice' },
   { name: 'Coin Flip', value: 'coinflip' },
+  { name: 'Hi-Lo', value: 'hilo' },
+  { name: 'Limbo', value: 'limbo' },
   { name: 'Slots', value: 'slots' },
   { name: 'Lottery', value: 'lottery' },
   { name: 'Roulette', value: 'roulette' },
+  { name: 'Baccarat', value: 'baccarat' },
   { name: 'Rock Paper Scissors', value: 'rps' },
   { name: 'Golden Jackpot', value: 'goldenJackpot' },
   { name: 'Blackjack', value: 'blackjack' },
+  { name: 'Mines', value: 'mines' },
   { name: 'Prediction', value: 'prediction' },
   { name: 'Raffle', value: 'raffle' },
   { name: 'Plinko', value: 'plinko' },
@@ -42,6 +53,17 @@ export const defaultCasinoSettings = {
   },
   coinflip: {
     winMultiplier: 1.9,
+    maxBet: 0,
+    minBet: 0
+  },
+  hilo: {
+    houseEdge: 0.03,
+    timeoutFee: 0.1,
+    maxBet: 0,
+    minBet: 0
+  },
+  limbo: {
+    houseEdge: 0.03,
     maxBet: 0,
     minBet: 0
   },
@@ -86,8 +108,19 @@ export const defaultCasinoSettings = {
     maxBet: 0,
     minBet: 0
   },
+  baccarat: {
+    winMultipliers: {
+      player: 2,
+      banker: 1.95,
+      tie: 9.5,
+      playerPair: 12.5,
+      bankerPair: 12.5
+    },
+    maxBet: 0,
+    minBet: 0
+  },
   rps: {
-    casinoCut: 0.025,
+    houseEdge: 0.025,
     maxBet: 0,
     minBet: 0
   },
@@ -98,15 +131,27 @@ export const defaultCasinoSettings = {
     minBet: 0
   },
   blackjack: {
+    winMultipliers: {
+      win: 2,
+      blackjack: 2.5,
+      push: 1
+    },
     maxBet: 0,
     minBet: 0
+  },
+  mines: {
+    houseEdge: 0.03,
+    maxBet: 0,
+    minBet: 0,
+    minMines: 1,
+    maxMines: 10
   },
   prediction: {
     maxBet: 0,
     minBet: 0
   },
   raffle: {
-    casinoCut: 0.01
+    houseEdge: 0.01
   },
   plinko: {
     binMultipliers: {
@@ -129,8 +174,12 @@ export const defaultCasinoSettings = {
     slotsMinMultiplier: 100,
     lotteryMinMultiplier: 40,
     rouletteMinMultiplier: 18,
-    blackjackMinMultiplier: 2.5,
+    baccaratMinMultiplier: 9,
+    blackjackMinMultiplier: 0,
+    minesMinMultiplier: 0,
     diceMinMultiplier: 0,
-    coinflipMinMultiplier: 0
+    coinflipMinMultiplier: 0,
+    hiloMinMultiplier: 0,
+    limboMinMultiplier: 50
   }
 }

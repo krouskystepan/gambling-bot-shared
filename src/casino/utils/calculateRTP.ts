@@ -1,8 +1,12 @@
 import {
+  BACCARAT_8_DECK_PROBS,
+  BLACKJACK_OUTCOME_PROBS,
   LOTTERY_NUM_TO_DRAW,
   LOTTERY_TOTAL_NUMBERS,
   MINI_NUMBERS,
   PLINKO_ROW_COUNT,
+  calculateHiloRtp,
+  defaultCasinoSettings,
   getPlinkoMultiplierAtPathIndex,
   normalizePlinkoBinMultipliers
 } from '../constants'
@@ -35,6 +39,21 @@ export const calculateRTP = (
     case 'coinflip': {
       const { winMultiplier } = settings as TCasinoSettings['coinflip']
       return 0.5 * toNumber(winMultiplier) * 100
+    }
+
+    case 'hilo': {
+      const { houseEdge } = settings as TCasinoSettings['hilo']
+      return calculateHiloRtp(toNumber(houseEdge))
+    }
+
+    case 'limbo': {
+      const { houseEdge } = settings as TCasinoSettings['limbo']
+      return (1 - toNumber(houseEdge)) * 100
+    }
+
+    case 'mines': {
+      const { houseEdge } = settings as TCasinoSettings['mines']
+      return (1 - toNumber(houseEdge)) * 100
     }
 
     case 'slots': {
@@ -142,9 +161,33 @@ export const calculateRTP = (
       }
     }
 
+    case 'baccarat': {
+      const { winMultipliers } = settings as TCasinoSettings['baccarat']
+      const p = BACCARAT_8_DECK_PROBS
+
+      // Player/banker push on tie (return stake = 1x). Pair bets are independent.
+      const playerRTP =
+        (p.player * toNumber(winMultipliers.player) + p.tie * 1) * 100
+      const bankerRTP =
+        (p.banker * toNumber(winMultipliers.banker) + p.tie * 1) * 100
+      const tieRTP = p.tie * toNumber(winMultipliers.tie) * 100
+      const playerPairRTP =
+        p.playerPair * toNumber(winMultipliers.playerPair) * 100
+      const bankerPairRTP =
+        p.bankerPair * toNumber(winMultipliers.bankerPair) * 100
+
+      return {
+        player: playerRTP,
+        banker: bankerRTP,
+        tie: tieRTP,
+        playerPair: playerPairRTP,
+        bankerPair: bankerPairRTP
+      }
+    }
+
     case 'rps': {
-      const { casinoCut } = settings as TCasinoSettings['rps']
-      return (1 - toNumber(casinoCut)) * 100
+      const { houseEdge } = settings as TCasinoSettings['rps']
+      return (1 - toNumber(houseEdge)) * 100
     }
 
     case 'goldenJackpot': {
@@ -154,11 +197,26 @@ export const calculateRTP = (
     }
 
     case 'raffle': {
-      const { casinoCut } = settings as TCasinoSettings['raffle']
-      return (1 - toNumber(casinoCut)) * 100
+      const { houseEdge } = settings as TCasinoSettings['raffle']
+      return (1 - toNumber(houseEdge)) * 100
     }
 
-    case 'blackjack':
+    case 'blackjack': {
+      const { winMultipliers } = settings as TCasinoSettings['blackjack']
+      const multipliers = {
+        ...defaultCasinoSettings.blackjack.winMultipliers,
+        ...winMultipliers
+      }
+      const p = BLACKJACK_OUTCOME_PROBS
+
+      return (
+        (p.win * toNumber(multipliers.win) +
+          p.blackjack * toNumber(multipliers.blackjack) +
+          p.push * toNumber(multipliers.push)) *
+        100
+      )
+    }
+
     case 'prediction':
       return 0
 

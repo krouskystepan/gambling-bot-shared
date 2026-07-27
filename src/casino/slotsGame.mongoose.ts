@@ -16,7 +16,7 @@ export const SlotsGameSchema = new Schema<TSlotsGame>(
     phase: {
       type: String,
       required: true,
-      enum: ['ready', 'result'],
+      enum: ['ready', 'spinning', 'result'],
       default: 'ready'
     },
     lastReels: { type: String, default: null },
@@ -24,6 +24,7 @@ export const SlotsGameSchema = new Schema<TSlotsGame>(
     lastSpinsCount: { type: Number, default: null },
     lastTotalBet: { type: Number, default: null },
     lastWinsCount: { type: Number, default: null },
+    pendingBatchResults: { type: [String], default: null },
     activeBetId: { type: String, default: null, index: true },
     lockedAmount: { type: Number, default: null },
     idleNudgeSentAt: { type: Date, default: null }

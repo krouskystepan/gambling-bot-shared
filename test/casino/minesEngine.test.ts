@@ -6,6 +6,7 @@ import {
   isMinesBust,
   isMinesFinished,
   placeMines,
+  resolveFinishedMines,
   resolveIdleMines,
   revealCell
 } from 'gambling-bot-shared/casino'
@@ -160,6 +161,38 @@ describe('mines engine', () => {
       payout: 0,
       multiplier: 0,
       forfeited: true
+    })
+  })
+
+  it('resolves finished bust / cash-out for in-flight recovery', () => {
+    const busted = start()
+    revealCell(busted, 0)
+    expect(resolveFinishedMines(busted)).toEqual({
+      payout: 0,
+      multiplier: 0,
+      resultKind: 'BUST'
+    })
+
+    const cashed = start()
+    revealCell(cashed, 2)
+    cashed.status = 'FINISHED'
+    const resolved = resolveFinishedMines(cashed)
+    expect(resolved.resultKind).toBe('CASH_OUT')
+    expect(resolved.payout).toBeGreaterThan(0)
+
+    const unfinished = start()
+    expect(resolveFinishedMines(unfinished)).toEqual({
+      payout: 0,
+      multiplier: 0,
+      resultKind: 'FORFEIT'
+    })
+
+    const finishedNoReveals = start()
+    finishedNoReveals.status = 'FINISHED'
+    expect(resolveFinishedMines(finishedNoReveals)).toEqual({
+      payout: 0,
+      multiplier: 0,
+      resultKind: 'FORFEIT'
     })
   })
 

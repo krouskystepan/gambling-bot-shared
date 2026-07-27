@@ -203,3 +203,45 @@ export const resolveIdleMines = (
   state.status = 'FINISHED'
   return { payout: 0, multiplier: 0, forfeited: true }
 }
+
+export type MinesFinishedResolution = {
+  payout: number
+  multiplier: number
+  resultKind: 'BUST' | 'CASH_OUT' | 'FORFEIT'
+}
+
+/**
+ * Resolve a game already marked FINISHED but not yet settled/deleted
+ * (crash mid-reveal settlement).
+ */
+export const resolveFinishedMines = (
+  state: MinesEngineState
+): MinesFinishedResolution => {
+  if (state.status !== 'FINISHED') {
+    return { payout: 0, multiplier: 0, resultKind: 'FORFEIT' }
+  }
+
+  if (isMinesBust(state)) {
+    return { payout: 0, multiplier: 0, resultKind: 'BUST' }
+  }
+
+  const safeCount = state.revealedIndices.filter(
+    (index) => !state.mineIndices.includes(index)
+  ).length
+
+  if (safeCount < 1) {
+    return { payout: 0, multiplier: 0, resultKind: 'FORFEIT' }
+  }
+
+  const multiplier = getMinesPayoutMultiplier(
+    state.mineCount,
+    safeCount,
+    state.houseEdgeSnapshot
+  )
+
+  return {
+    payout: state.betAmount * multiplier,
+    multiplier,
+    resultKind: 'CASH_OUT'
+  }
+}

@@ -7,7 +7,7 @@ export type TRouletteSlipBet = {
   displayValue: string
 }
 
-export type RouletteSessionPhase = 'betting' | 'result'
+export type RouletteSessionPhase = 'betting' | 'spinning' | 'result'
 
 export type TRouletteGame = {
   userId: string
@@ -21,6 +21,7 @@ export type TRouletteGame = {
   bets: TRouletteSlipBet[]
   lastBets: TRouletteSlipBet[]
   lastSpinResult?: string | null
+  pendingSpinResult?: string | null
   lastNetResult?: number | null
   /** Set only while a spin is reserved and not yet settled. */
   activeBetId?: string | null

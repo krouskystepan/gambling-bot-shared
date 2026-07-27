@@ -1,3 +1,13 @@
+import type { BaccaratBetSide, BaccaratCard } from '../constants/baccaratConfig'
+
+export type BaccaratSessionPhase = 'waiting' | 'dealing'
+
+export type TBaccaratPendingDeal = {
+  side: BaccaratBetSide
+  playerCards: BaccaratCard[]
+  bankerCards: BaccaratCard[]
+}
+
 export type TBaccaratGame = {
   userId: string
   guildId: string
@@ -7,6 +17,8 @@ export type TBaccaratGame = {
   betAmount: number
   showBalance: boolean
   skipAnimations: boolean
+  phase: BaccaratSessionPhase
+  pendingDeal?: TBaccaratPendingDeal | null
 
   idleNudgeSentAt?: Date | null
 

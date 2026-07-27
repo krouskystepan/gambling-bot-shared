@@ -1,0 +1,1 @@
+export const CASINO_IN_FLIGHT_GRACE_MS = 60_000

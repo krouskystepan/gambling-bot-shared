@@ -1,4 +1,5 @@
 export * from './baccaratConfig'
+export * from './casinoRecovery'
 export * from './baccaratWorkers'
 export * from './blackjack'
 export * from './blackjackWorkers'

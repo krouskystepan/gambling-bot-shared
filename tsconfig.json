@@ -20,6 +20,7 @@
       "gambling-bot-shared/user": ["src/user/index.ts"],
       "gambling-bot-shared/atm": ["src/atm/index.ts"],
       "gambling-bot-shared/vip": ["src/vip/index.ts"],
+      "gambling-bot-shared/quests": ["src/quests/index.ts"],
       "gambling-bot-shared/mongoose": ["src/mongoose/index.ts"]
     }
   },

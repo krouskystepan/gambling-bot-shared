@@ -21,6 +21,8 @@ export const UserSchema = new Schema<TUser>(
     lockedBalance: { type: Number, default: 0 }, // ONLY for in-flight bets
     lastDailyClaim: { type: Date, default: null },
     dailyStreak: { type: Number, default: 0 },
+    questDailyStreak: { type: Number, default: 0 },
+    lastQuestDailyCompleteDate: { type: String, default: null },
     banned: { type: Boolean, default: false },
     bannedAt: { type: Date, default: null },
     bannedBy: { type: String, default: null },

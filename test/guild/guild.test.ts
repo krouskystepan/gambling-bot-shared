@@ -129,6 +129,7 @@ describe('isGlobalFeatureDisabled', () => {
       disableRaffleManagement: true,
       disableDailyBonus: true,
       disableVip: true,
+      disableQuests: true,
       maintenanceMode: true
     })
 
@@ -143,6 +144,7 @@ describe('isGlobalFeatureDisabled', () => {
     expect(isGlobalFeatureDisabled(config, 'raffleManagement')).toBe(true)
     expect(isGlobalFeatureDisabled(config, 'dailyBonus')).toBe(true)
     expect(isGlobalFeatureDisabled(config, 'vip')).toBe(true)
+    expect(isGlobalFeatureDisabled(config, 'quests')).toBe(true)
     expect(isGlobalFeatureDisabled(config, 'maintenance')).toBe(true)
   })
 

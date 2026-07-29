@@ -123,6 +123,7 @@ export const GuildConfigurationSchema = new Schema<TGuildConfiguration>({
     disableRaffleManagement: { type: Boolean, default: false },
     disableDailyBonus: { type: Boolean, default: false },
     disableVip: { type: Boolean, default: false },
+    disableQuests: { type: Boolean, default: false },
     maintenanceMode: { type: Boolean, default: false },
     timezone: { type: String, default: defaultGlobalSettings.timezone },
     currencySymbol: {

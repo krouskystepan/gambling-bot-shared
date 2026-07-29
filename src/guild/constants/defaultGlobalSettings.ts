@@ -12,6 +12,7 @@ export type GlobalSettings = {
   disableRaffleManagement: boolean
   disableDailyBonus: boolean
   disableVip: boolean
+  disableQuests: boolean
   maintenanceMode: boolean
   timezone: string
   currencySymbol: string
@@ -31,6 +32,7 @@ export const defaultGlobalSettings: GlobalSettings = {
   disableRaffleManagement: false,
   disableDailyBonus: false,
   disableVip: false,
+  disableQuests: false,
   maintenanceMode: false,
   timezone: 'UTC',
   currencySymbol: '$',

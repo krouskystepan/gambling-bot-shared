@@ -31,6 +31,7 @@ export const globalSettingsFormSchema = z.object({
   disableRaffleManagement: z.boolean(),
   disableDailyBonus: z.boolean(),
   disableVip: z.boolean(),
+  disableQuests: z.boolean(),
   maintenanceMode: z.boolean(),
   timezone: z.enum(COMMON_TIMEZONES),
   currencySymbol: z

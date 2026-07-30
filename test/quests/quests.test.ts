@@ -230,9 +230,30 @@ describe('quest conditions', () => {
 describe('aggregateQuestActivityFromTransactions', () => {
   it('aggregates wins, bets, bonus claims, and vip', () => {
     const stats = aggregateQuestActivityFromTransactions([
-      { type: 'win', amount: 100, meta: { game: 'dice' } },
-      { type: 'win', amount: 50, meta: { game: 'blackjack' } },
-      { type: 'bet', amount: 40, meta: { game: 'dice' } },
+      {
+        type: 'win',
+        amount: 100,
+        referenceId: 'd1',
+        meta: { game: 'dice' }
+      },
+      {
+        type: 'bet',
+        amount: 40,
+        referenceId: 'd1',
+        meta: { game: 'dice' }
+      },
+      {
+        type: 'win',
+        amount: 50,
+        referenceId: 'bj1',
+        meta: { game: 'blackjack' }
+      },
+      {
+        type: 'bet',
+        amount: 25,
+        referenceId: 'bj1',
+        meta: { game: 'blackjack' }
+      },
       { type: 'bonus', amount: 10, meta: { bonusStreak: 2 } },
       { type: 'bonus', amount: 10, meta: { questId: 'q1' } },
       { type: 'vip', amount: 500, meta: { action: 'buy-finalize' } },
@@ -241,19 +262,86 @@ describe('aggregateQuestActivityFromTransactions', () => {
     ])
 
     expect(stats.casinoWins).toBe(2)
-    expect(stats.casinoBets).toBe(1)
+    expect(stats.casinoBets).toBe(2)
     expect(stats.casinoWinnings).toBe(150)
-    expect(stats.netProfit).toBe(110)
+    expect(stats.netProfit).toBe(85)
     expect(stats.bonusClaims).toBe(1)
     expect(stats.vipPurchases).toBe(1)
+  })
+
+  it('does not count stake-return pushes as casino wins', () => {
+    const stats = aggregateQuestActivityFromTransactions([
+      {
+        type: 'bet',
+        amount: 100,
+        referenceId: 'push1',
+        meta: { game: 'blackjack' }
+      },
+      {
+        type: 'win',
+        amount: 100,
+        referenceId: 'push1',
+        meta: { game: 'blackjack' }
+      },
+      {
+        type: 'bet',
+        amount: 50,
+        referenceId: 'win1',
+        meta: { game: 'blackjack' }
+      },
+      {
+        type: 'win',
+        amount: 100,
+        referenceId: 'win1',
+        meta: { game: 'blackjack' }
+      },
+      {
+        type: 'bet',
+        amount: 20,
+        referenceId: 'tie1',
+        meta: { game: 'baccarat' }
+      },
+      {
+        type: 'win',
+        amount: 20,
+        referenceId: 'tie1',
+        meta: { game: 'baccarat' }
+      }
+    ])
+
+    expect(stats.casinoWins).toBe(1)
+    expect(stats.casinoBets).toBe(3)
+    expect(stats.casinoWinnings).toBe(220)
+    expect(stats.netProfit).toBe(50)
   })
 
   it('filters by game', () => {
     const stats = aggregateQuestActivityFromTransactions(
       [
-        { type: 'win', amount: 100, meta: { game: 'dice' } },
-        { type: 'win', amount: 50, meta: { game: 'blackjack' } },
-        { type: 'bet', amount: 20, meta: { game: 'blackjack' } }
+        {
+          type: 'win',
+          amount: 100,
+          referenceId: 'd1',
+          meta: { game: 'dice' }
+        },
+        {
+          type: 'bet',
+          amount: 40,
+          referenceId: 'd1',
+          meta: { game: 'dice' }
+        },
+        {
+          type: 'win',
+          amount: 50,
+          referenceId: 'bj1',
+          meta: { game: 'blackjack' }
+        },
+        {
+          type: 'bet',
+          amount: 20,
+          referenceId: 'bj1',
+          meta: { game: 'blackjack' }
+        }
       ],
       'blackjack'
     )

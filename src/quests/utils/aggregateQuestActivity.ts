@@ -5,7 +5,7 @@ import { guildCalendarRangeToUtc } from '../../guild/utils/guildTimezone'
 import type { TTransaction } from '../../transactions/types/transaction'
 import type { QuestActivityStats } from '../utils/computeQuestProgress'
 
-type TxLean = Pick<TTransaction, 'type' | 'amount' | 'meta'>
+type TxLean = Pick<TTransaction, 'type' | 'amount' | 'meta' | 'referenceId'>
 
 const isDailyBonusClaim = (tx: TxLean): boolean => {
   if (tx.type !== 'bonus') return false
@@ -26,6 +26,10 @@ const matchesGame = (tx: TxLean, game: CasinoGameId | undefined): boolean => {
   return tx.meta?.game === game
 }
 
+/** Stake-return pushes pay amount === bet; real wins pay more than the bet. */
+const isActualCasinoWin = (winAmount: number, betAmount: number | undefined) =>
+  betAmount == null ? winAmount > 0 : winAmount > betAmount
+
 export const emptyQuestActivityStats = (): QuestActivityStats => ({
   casinoWins: 0,
   casinoBets: 0,
@@ -40,10 +44,25 @@ export const aggregateQuestActivityFromTransactions = (
   game?: CasinoGameId
 ): QuestActivityStats => {
   const stats = emptyQuestActivityStats()
+  const betAmountByRef = new Map<string, number>()
+
+  for (const tx of transactions) {
+    if (tx.type === 'bet' && matchesGame(tx, game) && tx.referenceId) {
+      betAmountByRef.set(
+        tx.referenceId,
+        (betAmountByRef.get(tx.referenceId) ?? 0) + tx.amount
+      )
+    }
+  }
 
   for (const tx of transactions) {
     if (tx.type === 'win' && matchesGame(tx, game)) {
-      stats.casinoWins += 1
+      const betAmount = tx.referenceId
+        ? betAmountByRef.get(tx.referenceId)
+        : undefined
+      if (isActualCasinoWin(tx.amount, betAmount)) {
+        stats.casinoWins += 1
+      }
       stats.casinoWinnings += tx.amount
       stats.netProfit += tx.amount
     } else if (tx.type === 'bet' && matchesGame(tx, game)) {
@@ -86,7 +105,7 @@ export async function loadQuestActivityStats({
 
   const query = transactionModel
     .find(filter)
-    .select({ type: 1, amount: 1, meta: 1 })
+    .select({ type: 1, amount: 1, meta: 1, referenceId: 1 })
 
   if (session) {
     query.session(session)

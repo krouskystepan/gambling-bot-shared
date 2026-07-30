@@ -17,6 +17,7 @@ export type GlobalFeature =
   | 'raffleManagement'
   | 'dailyBonus'
   | 'vip'
+  | 'quests'
   | 'maintenance'
 
 export function isGlobalFeatureDisabled(
@@ -49,6 +50,8 @@ export function isGlobalFeatureDisabled(
       return settings.disableDailyBonus
     case 'vip':
       return settings.disableVip
+    case 'quests':
+      return settings.disableQuests
     case 'maintenance':
       return settings.maintenanceMode
     default: {

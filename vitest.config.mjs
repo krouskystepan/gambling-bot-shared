@@ -19,6 +19,7 @@ const domains = [
   'user',
   'atm',
   'vip',
+  'quests',
   'mongoose'
 ]
 

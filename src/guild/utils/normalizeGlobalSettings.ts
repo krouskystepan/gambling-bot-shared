@@ -77,6 +77,10 @@ export const normalizeGlobalSettings = (
     settings?.disableVip,
     defaultGlobalSettings.disableVip
   ),
+  disableQuests: coerceBool(
+    settings?.disableQuests,
+    defaultGlobalSettings.disableQuests
+  ),
   maintenanceMode: coerceBool(
     settings?.maintenanceMode,
     defaultGlobalSettings.maintenanceMode

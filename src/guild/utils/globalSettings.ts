@@ -9,6 +9,7 @@ export type GlobalFeature =
   | 'registration'
   | 'deposit'
   | 'withdraw'
+  | 'peerTransfers'
   | 'casinoGames'
   | 'casinoGamesForMods'
   | 'predictions'
@@ -34,6 +35,8 @@ export function isGlobalFeatureDisabled(
       return settings.disableDeposits
     case 'withdraw':
       return settings.disableWithdrawals
+    case 'peerTransfers':
+      return settings.disablePeerTransfers
     case 'casinoGames':
       return settings.disableCasinoGames
     case 'casinoGamesForMods':

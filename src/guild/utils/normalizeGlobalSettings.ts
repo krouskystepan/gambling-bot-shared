@@ -45,6 +45,10 @@ export const normalizeGlobalSettings = (
     settings?.disableWithdrawals,
     defaultGlobalSettings.disableWithdrawals
   ),
+  disablePeerTransfers: coerceBool(
+    settings?.disablePeerTransfers,
+    defaultGlobalSettings.disablePeerTransfers
+  ),
   disableCasinoGames: coerceBool(
     settings?.disableCasinoGames,
     defaultGlobalSettings.disableCasinoGames

@@ -1,5 +1,6 @@
 import type { BonusSettings } from '../../bonus/types/bonus'
 import { defaultCasinoSettings } from '../../casino/constants/defaultConfig'
+import { defaultPaySettings } from '../../pay/constants/defaultPaySettings'
 import type { GlobalSettings } from '../constants/defaultGlobalSettings'
 
 export type RewardMode = 'linear' | 'exponential'
@@ -24,6 +25,7 @@ export type TGuildConfiguration = {
   managerRoleId: string
   bannedRoleId: string
   casinoSettings: typeof defaultCasinoSettings
+  paySettings: typeof defaultPaySettings
   vipSettings: {
     roleOwnerId: string
     roleMemberId: string

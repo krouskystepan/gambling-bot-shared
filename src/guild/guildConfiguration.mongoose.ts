@@ -1,6 +1,7 @@
 import { Schema } from 'mongoose'
 
 import { defaultCasinoSettings } from '../casino/constants/defaultConfig'
+import { defaultPaySettings } from '../pay/constants/defaultPaySettings'
 import { defaultGlobalSettings } from './constants/defaultGlobalSettings'
 import { TGuildConfiguration } from './types/guildConfiguration'
 
@@ -65,6 +66,10 @@ export const GuildConfigurationSchema = new Schema<TGuildConfiguration>({
     type: Schema.Types.Mixed,
     default: defaultCasinoSettings
   },
+  paySettings: {
+    type: Schema.Types.Mixed,
+    default: defaultPaySettings
+  },
   vipSettings: {
     roleOwnerId: {
       type: String,
@@ -115,6 +120,7 @@ export const GuildConfigurationSchema = new Schema<TGuildConfiguration>({
     disableRegistrations: { type: Boolean, default: false },
     disableDeposits: { type: Boolean, default: false },
     disableWithdrawals: { type: Boolean, default: false },
+    disablePeerTransfers: { type: Boolean, default: false },
     disableCasinoGames: { type: Boolean, default: false },
     disableCasinoGamesForMods: { type: Boolean, default: false },
     disablePredictions: { type: Boolean, default: false },

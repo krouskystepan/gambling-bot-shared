@@ -26,6 +26,7 @@ const baseConfig = (globalSettings?: TGuildConfiguration['globalSettings']) =>
     managerRoleId: '',
     bannedRoleId: '',
     casinoSettings: {} as TGuildConfiguration['casinoSettings'],
+    paySettings: {} as TGuildConfiguration['paySettings'],
     vipSettings: {
       roleOwnerId: '',
       roleMemberId: '',
@@ -121,6 +122,7 @@ describe('isGlobalFeatureDisabled', () => {
       disableRegistrations: true,
       disableDeposits: true,
       disableWithdrawals: true,
+      disablePeerTransfers: true,
       disableCasinoGames: true,
       disableCasinoGamesForMods: true,
       disablePredictions: true,
@@ -136,6 +138,7 @@ describe('isGlobalFeatureDisabled', () => {
     expect(isGlobalFeatureDisabled(config, 'registration')).toBe(true)
     expect(isGlobalFeatureDisabled(config, 'deposit')).toBe(true)
     expect(isGlobalFeatureDisabled(config, 'withdraw')).toBe(true)
+    expect(isGlobalFeatureDisabled(config, 'peerTransfers')).toBe(true)
     expect(isGlobalFeatureDisabled(config, 'casinoGames')).toBe(true)
     expect(isGlobalFeatureDisabled(config, 'casinoGamesForMods')).toBe(true)
     expect(isGlobalFeatureDisabled(config, 'predictions')).toBe(true)

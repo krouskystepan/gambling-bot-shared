@@ -1,6 +1,6 @@
 {
   "name": "gambling-bot-shared",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "license": "MIT",
   "type": "commonjs",
   "repository": {
@@ -66,6 +66,10 @@
     "./atm": {
       "types": "./dist/atm/index.d.ts",
       "default": "./dist/atm/index.js"
+    },
+    "./pay": {
+      "types": "./dist/pay/index.d.ts",
+      "default": "./dist/pay/index.js"
     },
     "./vip": {
       "types": "./dist/vip/index.d.ts",

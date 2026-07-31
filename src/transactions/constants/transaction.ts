@@ -7,7 +7,9 @@ export const TRANSACTION_TYPES = [
   'win',
   'refund',
   'bonus',
-  'vip'
+  'vip',
+  'transfer_out',
+  'transfer_in'
 ] as const satisfies readonly TTransaction['type'][]
 
 export const TRANSACTION_SOURCES = [

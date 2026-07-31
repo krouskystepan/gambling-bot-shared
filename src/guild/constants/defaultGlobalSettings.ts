@@ -4,6 +4,7 @@ export type GlobalSettings = {
   disableRegistrations: boolean
   disableDeposits: boolean
   disableWithdrawals: boolean
+  disablePeerTransfers: boolean
   disableCasinoGames: boolean
   disableCasinoGamesForMods: boolean
   disablePredictions: boolean
@@ -24,6 +25,7 @@ export const defaultGlobalSettings: GlobalSettings = {
   disableRegistrations: false,
   disableDeposits: false,
   disableWithdrawals: false,
+  disablePeerTransfers: false,
   disableCasinoGames: false,
   disableCasinoGamesForMods: false,
   disablePredictions: false,

@@ -13,6 +13,8 @@ describe('computeUserNetProfit', () => {
     expect(computeUserNetProfitDelta('refund', 5)).toBe(0)
     expect(computeUserNetProfitDelta('vip', 5)).toBe(0)
     expect(computeUserNetProfitDelta('withdraw', 5)).toBe(0)
+    expect(computeUserNetProfitDelta('transfer_out', 1000)).toBe(0)
+    expect(computeUserNetProfitDelta('transfer_in', 980)).toBe(0)
   })
 
   it('rolls up a transaction list', () => {

@@ -23,6 +23,7 @@ export const globalSettingsFormSchema = z.object({
   disableRegistrations: z.boolean(),
   disableDeposits: z.boolean(),
   disableWithdrawals: z.boolean(),
+  disablePeerTransfers: z.boolean(),
   disableCasinoGames: z.boolean(),
   disableCasinoGamesForMods: z.boolean(),
   disablePredictions: z.boolean(),

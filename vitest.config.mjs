@@ -18,6 +18,7 @@ const domains = [
   'blackjack',
   'user',
   'atm',
+  'pay',
   'vip',
   'quests',
   'mongoose'

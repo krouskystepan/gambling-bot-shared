@@ -67,6 +67,10 @@
       "types": "./dist/atm/index.d.ts",
       "default": "./dist/atm/index.js"
     },
+    "./pay": {
+      "types": "./dist/pay/index.d.ts",
+      "default": "./dist/pay/index.js"
+    },
     "./vip": {
       "types": "./dist/vip/index.d.ts",
       "default": "./dist/vip/index.js"

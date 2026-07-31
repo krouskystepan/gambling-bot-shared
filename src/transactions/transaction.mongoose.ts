@@ -10,7 +10,17 @@ export const TransactionSchema = new Schema<TTransaction>(
     type: {
       type: String,
       required: true,
-      enum: ['deposit', 'withdraw', 'bet', 'win', 'refund', 'bonus', 'vip']
+      enum: [
+        'deposit',
+        'withdraw',
+        'bet',
+        'win',
+        'refund',
+        'bonus',
+        'vip',
+        'transfer_out',
+        'transfer_in'
+      ]
     },
     source: {
       type: String,

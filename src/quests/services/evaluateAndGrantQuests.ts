@@ -73,7 +73,7 @@ async function grantBonusReward({
         amount,
         type: 'bonus',
         source: 'system',
-        referenceId: `quest-${generateId()}`,
+        referenceId: generateId('quest'),
         meta
       }
     ],
@@ -146,6 +146,7 @@ export async function evaluateAndGrantQuests(
       dateKey: scopeDateKey,
       timezone,
       game,
+      activityAfter: user.questActivityAfter ?? null,
       session: sessionOrNull
     })
     statsCache.set(cacheKey, stats)

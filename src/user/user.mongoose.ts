@@ -23,6 +23,7 @@ export const UserSchema = new Schema<TUser>(
     dailyStreak: { type: Number, default: 0 },
     questDailyStreak: { type: Number, default: 0 },
     lastQuestDailyCompleteDate: { type: String, default: null },
+    questActivityAfter: { type: Date, default: null },
     banned: { type: Boolean, default: false },
     bannedAt: { type: Date, default: null },
     bannedBy: { type: String, default: null },

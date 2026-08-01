@@ -10,29 +10,33 @@ import {
 function createMockModels(
   counts: Partial<Record<keyof GuildDataWipeModels, number>> = {}
 ): GuildDataWipeModels {
-  const keys: Array<keyof GuildDataWipeModels> = [
-    'transactions',
-    'atmRequests',
-    'raffles',
-    'predictions',
-    'vipRooms',
-    'blackjackGames',
-    'baccaratGames',
-    'minesGames',
-    'rouletteGames',
-    'slotsGames',
-    'userBans',
-    'users'
-  ]
+  const deleteModel = (
+    key: Exclude<keyof GuildDataWipeModels, 'userQuestStreaks'>
+  ): GuildDataWipeModels[Exclude<
+    keyof GuildDataWipeModels,
+    'userQuestStreaks'
+  >] => ({
+    deleteMany: async () => ({ deletedCount: counts[key] ?? 0 })
+  })
 
-  return Object.fromEntries(
-    keys.map((key) => [
-      key,
-      {
-        deleteMany: async () => ({ deletedCount: counts[key] ?? 0 })
-      }
-    ])
-  ) as unknown as GuildDataWipeModels
+  return {
+    transactions: deleteModel('transactions'),
+    atmRequests: deleteModel('atmRequests'),
+    raffles: deleteModel('raffles'),
+    predictions: deleteModel('predictions'),
+    vipRooms: deleteModel('vipRooms'),
+    blackjackGames: deleteModel('blackjackGames'),
+    baccaratGames: deleteModel('baccaratGames'),
+    minesGames: deleteModel('minesGames'),
+    rouletteGames: deleteModel('rouletteGames'),
+    slotsGames: deleteModel('slotsGames'),
+    userQuestProgress: deleteModel('userQuestProgress'),
+    userBans: deleteModel('userBans'),
+    users: deleteModel('users'),
+    userQuestStreaks: {
+      resetMany: async () => ({ modifiedCount: counts.userQuestStreaks ?? 0 })
+    }
+  }
 }
 
 describe('normalizeGuildWipeEntities', () => {
@@ -48,6 +52,7 @@ describe('normalizeGuildWipeEntities', () => {
       'mines',
       'roulette',
       'slots',
+      'quests',
       'users'
     ])
   })
@@ -72,6 +77,7 @@ describe('normalizeGuildWipeEntities', () => {
       'mines',
       'roulette',
       'slots',
+      'quests',
       'users'
     ])
   })
@@ -97,6 +103,10 @@ describe('runGuildDataWipe', () => {
       deleted.push('userBans')
       return { deletedCount: 1 }
     }
+    models.userQuestProgress.deleteMany = async () => {
+      deleted.push('userQuestProgress')
+      return { deletedCount: 4 }
+    }
 
     const summary = await runGuildDataWipe({
       guildId: 'guild-1',
@@ -104,12 +114,99 @@ describe('runGuildDataWipe', () => {
       models
     })
 
-    expect(deleted).toEqual(['transactions', 'userBans', 'users'])
+    expect(deleted).toEqual([
+      'transactions',
+      'userBans',
+      'userQuestProgress',
+      'users'
+    ])
     expect(summary.deleted).toEqual({
       transactions: 3,
       userBans: 1,
+      userQuestProgress: 4,
       users: 2
     })
+  })
+
+  it('wipes quest progress and resets streaks', async () => {
+    const deleted: string[] = []
+    const models = createMockModels({
+      userQuestProgress: 7,
+      userQuestStreaks: 5
+    })
+
+    models.userQuestProgress.deleteMany = async () => {
+      deleted.push('userQuestProgress')
+      return { deletedCount: 7 }
+    }
+    models.userQuestStreaks.resetMany = async () => {
+      deleted.push('userQuestStreaks')
+      return { modifiedCount: 5 }
+    }
+
+    const summary = await runGuildDataWipe({
+      guildId: 'guild-1',
+      entities: ['quests'],
+      models
+    })
+
+    expect(deleted).toEqual(['userQuestProgress', 'userQuestStreaks'])
+    expect(summary.deleted).toEqual({
+      userQuestProgress: 7,
+      userQuestStreaks: 5
+    })
+  })
+
+  it('treats missing modifiedCount on streak reset as zero', async () => {
+    const models = createMockModels()
+    models.userQuestProgress.deleteMany = async () => ({ deletedCount: 1 })
+    models.userQuestStreaks.resetMany = async () => ({})
+
+    const summary = await runGuildDataWipe({
+      guildId: 'guild-1',
+      entities: ['quests'],
+      models
+    })
+
+    expect(summary.deleted).toEqual({
+      userQuestProgress: 1,
+      userQuestStreaks: 0
+    })
+  })
+
+  it('does not double-delete quest progress when quests and users are selected', async () => {
+    const deleted: string[] = []
+    const models = createMockModels()
+
+    models.userQuestProgress.deleteMany = async () => {
+      deleted.push('userQuestProgress')
+      return { deletedCount: 2 }
+    }
+    models.userQuestStreaks.resetMany = async () => {
+      deleted.push('userQuestStreaks')
+      return { modifiedCount: 1 }
+    }
+    models.userBans.deleteMany = async () => {
+      deleted.push('userBans')
+      return { deletedCount: 0 }
+    }
+    models.users.deleteMany = async () => {
+      deleted.push('users')
+      return { deletedCount: 1 }
+    }
+
+    await runGuildDataWipe({
+      guildId: 'guild-1',
+      entities: ['quests', 'users'],
+      models
+    })
+
+    expect(deleted).toEqual([
+      'userQuestProgress',
+      'userQuestStreaks',
+      'userBans',
+      'users'
+    ])
   })
 
   it('treats missing deletedCount as zero', async () => {
@@ -130,6 +227,14 @@ describe('runGuildDataWipe', () => {
     const models = createMockModels()
 
     for (const key of Object.keys(models) as Array<keyof GuildDataWipeModels>) {
+      if (key === 'userQuestStreaks') {
+        models.userQuestStreaks.resetMany = async () => {
+          deleted.push(key)
+          return { modifiedCount: 1 }
+        }
+        continue
+      }
+
       models[key].deleteMany = async () => {
         deleted.push(key)
         return { deletedCount: 1 }
@@ -153,6 +258,8 @@ describe('runGuildDataWipe', () => {
       'minesGames',
       'rouletteGames',
       'slotsGames',
+      'userQuestProgress',
+      'userQuestStreaks',
       'userBans',
       'users'
     ])

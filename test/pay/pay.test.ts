@@ -239,7 +239,7 @@ describe('createPeerTransferService', () => {
     expect(result.gross).toBe(1000)
     expect(result.fee).toBe(20)
     expect(result.net).toBe(980)
-    expect(result.referenceId).toMatch(/^pay_/)
+    expect(result.referenceId).toMatch(/^pay-/)
     expect(result.senderBalance).toBe(4000)
     expect(result.receiverBalance).toBe(1080)
 

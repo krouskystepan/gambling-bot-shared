@@ -30,6 +30,15 @@ const matchesGame = (tx: TxLean, game: CasinoGameId | undefined): boolean => {
 const isActualCasinoWin = (winAmount: number, betAmount: number | undefined) =>
   betAmount == null ? winAmount > 0 : winAmount > betAmount
 
+/** Multi-play bets (slots batch, multi-roll) store play count in meta.rounds. */
+const betPlayCount = (tx: TxLean): number => {
+  const rounds = tx.meta?.rounds
+  if (typeof rounds !== 'number' || !Number.isFinite(rounds) || rounds < 1) {
+    return 1
+  }
+  return Math.floor(rounds)
+}
+
 export const emptyQuestActivityStats = (): QuestActivityStats => ({
   casinoWins: 0,
   casinoBets: 0,
@@ -66,7 +75,7 @@ export const aggregateQuestActivityFromTransactions = (
       stats.casinoWinnings += tx.amount
       stats.netProfit += tx.amount
     } else if (tx.type === 'bet' && matchesGame(tx, game)) {
-      stats.casinoBets += 1
+      stats.casinoBets += betPlayCount(tx)
       stats.netProfit -= tx.amount
     } else if (isDailyBonusClaim(tx)) {
       stats.bonusClaims += 1
@@ -85,6 +94,7 @@ export async function loadQuestActivityStats({
   dateKey,
   timezone,
   game,
+  activityAfter,
   session
 }: {
   transactionModel: Model<TTransaction>
@@ -94,13 +104,21 @@ export async function loadQuestActivityStats({
   dateKey: string | null
   timezone?: string | null
   game?: CasinoGameId
+  /** Ignore transactions at or before this instant (dev quest wipe cutoff). */
+  activityAfter?: Date | null
   session?: ClientSession | null
 }): Promise<QuestActivityStats> {
   const filter: Record<string, unknown> = { userId, guildId }
 
   if (dateKey) {
     const { start, end } = guildCalendarRangeToUtc(dateKey, dateKey, timezone)
-    filter.createdAt = { $gte: start, $lte: end }
+    if (activityAfter && activityAfter >= start) {
+      filter.createdAt = { $gt: activityAfter, $lte: end }
+    } else {
+      filter.createdAt = { $gte: start, $lte: end }
+    }
+  } else if (activityAfter) {
+    filter.createdAt = { $gt: activityAfter }
   }
 
   const query = transactionModel

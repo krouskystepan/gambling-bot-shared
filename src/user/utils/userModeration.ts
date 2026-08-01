@@ -51,7 +51,7 @@ export function createStaffNoteEntry(
   if (!normalized) return null
 
   return {
-    noteId: generateId(),
+    noteId: generateId('note'),
     text: normalized,
     authorId,
     createdAt: new Date()
@@ -75,7 +75,7 @@ export function normalizeStaffNotes(notes: StaffNoteLike[]): TUserStaffNote[] {
         noteId:
           typeof note.noteId === 'string' && note.noteId.length > 0
             ? note.noteId
-            : generateId(),
+            : generateId('note'),
         text,
         authorId: note.authorId,
         createdAt: note.createdAt ? new Date(note.createdAt) : new Date()

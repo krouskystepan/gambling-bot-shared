@@ -108,7 +108,7 @@ export function createPeerTransferService({
     const { feePercent, feeAmount, netAmount, grossAmount } =
       calculateTransferFee(amount, paySettings.feePercent)
 
-    const referenceId = `pay_${generateId()}`
+    const referenceId = generateId('pay')
     let senderBalance = 0
     let receiverBalance = 0
 

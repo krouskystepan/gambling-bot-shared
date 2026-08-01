@@ -350,6 +350,38 @@ describe('aggregateQuestActivityFromTransactions', () => {
     expect(stats.netProfit).toBe(30)
   })
 
+  it('counts meta.rounds as separate bets for multi-play batches', () => {
+    const stats = aggregateQuestActivityFromTransactions([
+      {
+        type: 'bet',
+        amount: 300,
+        referenceId: 'slots1',
+        meta: { game: 'slots', rounds: 3 }
+      },
+      {
+        type: 'bet',
+        amount: 50,
+        referenceId: 'dice1',
+        meta: { game: 'dice', rounds: 5 }
+      },
+      {
+        type: 'bet',
+        amount: 10,
+        referenceId: 'bj1',
+        meta: { game: 'blackjack', rounds: 0 }
+      },
+      {
+        type: 'bet',
+        amount: 10,
+        referenceId: 'bj2',
+        meta: { game: 'blackjack' }
+      }
+    ])
+
+    expect(stats.casinoBets).toBe(10)
+    expect(stats.netProfit).toBe(-370)
+  })
+
   it('returns empty stats helper', () => {
     expect(emptyQuestActivityStats().casinoWins).toBe(0)
   })
@@ -402,6 +434,44 @@ describe('loadQuestActivityStats', () => {
 
     expect(stats.casinoWins).toBe(0)
     expect(find.mock.calls[0]?.[0]).toEqual({ userId: 'u1', guildId: 'g1' })
+  })
+
+  it('applies activityAfter cutoff for lifetime and daily scopes', async () => {
+    const lean = vi.fn().mockResolvedValue([])
+    const select = vi.fn().mockReturnValue({ lean })
+    const find = vi.fn().mockReturnValue({ select })
+    const cutoff = new Date('2026-06-15T10:00:00.000Z')
+
+    await loadQuestActivityStats({
+      transactionModel: { find } as never,
+      userId: 'u1',
+      guildId: 'g1',
+      dateKey: null,
+      activityAfter: cutoff
+    })
+
+    expect(find.mock.calls[0]?.[0]).toEqual({
+      userId: 'u1',
+      guildId: 'g1',
+      createdAt: { $gt: cutoff }
+    })
+
+    find.mockClear()
+
+    await loadQuestActivityStats({
+      transactionModel: { find } as never,
+      userId: 'u1',
+      guildId: 'g1',
+      dateKey: '2026-06-15',
+      timezone: 'UTC',
+      activityAfter: cutoff
+    })
+
+    const dailyFilter = find.mock.calls[0]?.[0] as {
+      createdAt: { $gt: Date; $lte: Date }
+    }
+    expect(dailyFilter.createdAt.$gt).toEqual(cutoff)
+    expect(dailyFilter.createdAt.$lte).toBeInstanceOf(Date)
   })
 })
 

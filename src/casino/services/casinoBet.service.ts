@@ -1,6 +1,9 @@
 import type { Model } from 'mongoose'
 
-import type { TTransaction } from '../../transactions/types/transaction'
+import type {
+  TTransaction,
+  TransactionMeta
+} from '../../transactions/types/transaction'
 import type { TUser } from '../../user/types/user'
 import type { CasinoGameId } from '../constants/casinoGames'
 
@@ -8,6 +11,14 @@ type CasinoBetModels = {
   userModel: Model<TUser>
   transactionModel: Model<TTransaction>
 }
+
+const casinoTxMeta = (
+  game: CasinoGameId,
+  rounds?: number
+): TransactionMeta => ({
+  game,
+  ...(rounds != null ? { rounds } : {})
+})
 
 export function createCasinoBetService({
   userModel,
@@ -18,13 +29,15 @@ export function createCasinoBetService({
     guildId,
     amount,
     betId,
-    game
+    game,
+    rounds
   }: {
     userId: string
     guildId: string
     amount: number
     betId: string
     game: CasinoGameId
+    rounds?: number
   }) {
     const session = await userModel.db.startSession()
 
@@ -53,7 +66,7 @@ export function createCasinoBetService({
               type: 'refund',
               source: 'casino',
               referenceId: betId,
-              meta: { game }
+              meta: casinoTxMeta(game, rounds)
             }
           ],
           { session }
@@ -70,7 +83,8 @@ export function createCasinoBetService({
     totalBet,
     winnings,
     betId,
-    game
+    game,
+    rounds
   }: {
     userId: string
     guildId: string
@@ -78,6 +92,7 @@ export function createCasinoBetService({
     winnings: number
     betId: string
     game: CasinoGameId
+    rounds?: number
   }) {
     const session = await userModel.db.startSession()
 
@@ -118,7 +133,7 @@ export function createCasinoBetService({
                   type: 'win',
                   source: 'casino',
                   referenceId: betId,
-                  meta: { game }
+                  meta: casinoTxMeta(game, rounds)
                 }
               ],
               { session }

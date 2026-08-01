@@ -13,15 +13,24 @@ export type GuildWipeEntity =
   | 'mines'
   | 'roulette'
   | 'slots'
+  | 'quests'
 
 export type GuildDataWipeDeleteResult = {
   deletedCount?: number
+}
+
+export type GuildDataWipeUpdateResult = {
+  modifiedCount?: number
 }
 
 export type GuildDataWipeModel = {
   deleteMany: (filter: {
     guildId: string
   }) => Promise<GuildDataWipeDeleteResult>
+}
+
+export type GuildDataWipeQuestStreakModel = {
+  resetMany: (filter: { guildId: string }) => Promise<GuildDataWipeUpdateResult>
 }
 
 export type GuildDataWipeModels = {
@@ -35,6 +44,8 @@ export type GuildDataWipeModels = {
   minesGames: GuildDataWipeModel
   rouletteGames: GuildDataWipeModel
   slotsGames: GuildDataWipeModel
+  userQuestProgress: GuildDataWipeModel
+  userQuestStreaks: GuildDataWipeQuestStreakModel
   userBans: GuildDataWipeModel
   users: GuildDataWipeModel
 }
@@ -62,12 +73,18 @@ const WIPE_ENTITY_ORDER: Exclude<GuildWipeEntity, 'all'>[] = [
   'mines',
   'roulette',
   'slots',
+  'quests',
   'users'
 ]
 
+type GuildDataWipeDeleteModelKey = Exclude<
+  keyof GuildDataWipeModels,
+  'userQuestStreaks'
+>
+
 const ENTITY_TO_MODEL_KEY: Record<
-  Exclude<GuildWipeEntity, 'all'>,
-  keyof GuildDataWipeModels
+  Exclude<GuildWipeEntity, 'all' | 'quests'>,
+  GuildDataWipeDeleteModelKey
 > = {
   transactions: 'transactions',
   atm: 'atmRequests',
@@ -93,6 +110,8 @@ const WIPE_LABELS: Record<keyof GuildDataWipeModels, string> = {
   minesGames: 'Mines games',
   rouletteGames: 'Roulette games',
   slotsGames: 'Slots games',
+  userQuestProgress: 'Quest progress',
+  userQuestStreaks: 'Quest streaks',
   userBans: 'User bans',
   users: 'Users'
 }
@@ -130,6 +149,26 @@ function buildWipeTargets(
     (entity) => {
       const targets: WipeTarget[] = []
 
+      if (entity === 'quests') {
+        targets.push({
+          key: 'userQuestProgress',
+          label: WIPE_LABELS.userQuestProgress,
+          entity,
+          run: async () =>
+            countDeleted(await models.userQuestProgress.deleteMany({ guildId }))
+        })
+        targets.push({
+          key: 'userQuestStreaks',
+          label: WIPE_LABELS.userQuestStreaks,
+          entity,
+          run: async () => {
+            const result = await models.userQuestStreaks.resetMany({ guildId })
+            return result.modifiedCount ?? 0
+          }
+        })
+        return targets
+      }
+
       if (entity === 'users') {
         targets.push({
           key: 'userBans',
@@ -138,6 +177,18 @@ function buildWipeTargets(
           run: async () =>
             countDeleted(await models.userBans.deleteMany({ guildId }))
         })
+        // Avoid orphaned progress rows when users are wiped without quests.
+        if (!selected.has('quests')) {
+          targets.push({
+            key: 'userQuestProgress',
+            label: WIPE_LABELS.userQuestProgress,
+            entity,
+            run: async () =>
+              countDeleted(
+                await models.userQuestProgress.deleteMany({ guildId })
+              )
+          })
+        }
       }
 
       const key = ENTITY_TO_MODEL_KEY[entity]

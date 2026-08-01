@@ -1,4 +1,5 @@
 import { SUITES, VALUES } from '../constants/blackjack'
+import type { CasinoSessionStats } from './casinoSessionStats'
 
 export type Suite = (typeof SUITES)[number]
 export type CardLabel = (typeof VALUES)[number]['label']
@@ -9,7 +10,7 @@ export type Card = {
   value: number
 }
 
-export type GamePhase = 'PLAYER' | 'DEALER' | 'FINISHED'
+export type GamePhase = 'BETTING' | 'PLAYER' | 'DEALER' | 'RESULT'
 
 export type TBlackjackHand = {
   cards: Card[]
@@ -23,7 +24,12 @@ export type TBlackjackGame = {
   guildId: string
   channelId: string
   messageId: string
-  betId: string
+  gameId: string
+  /** Set only while a hand is reserved and not yet settled. */
+  activeBetId?: string | null
+  baseBetAmount: number | null
+  showBalance: boolean
+  skipAnimations: boolean
 
   deck: Card[]
   deckIndex: number
@@ -34,6 +40,7 @@ export type TBlackjackGame = {
 
   dealerCards: Card[]
 
+  sessionStats: CasinoSessionStats
   idleNudgeSentAt?: Date | null
 
   createdAt: Date

@@ -17,6 +17,11 @@ export type TUser = {
   questDailyStreak: number
   /** yyyy-MM-dd (guild TZ) of last day a daily quest was completed. */
   lastQuestDailyCompleteDate: string | null
+  /**
+   * When set, quest activity aggregation ignores transactions at/before this time.
+   * Used by dev quest wipes so completions can be retested without deleting bets.
+   */
+  questActivityAfter: Date | null
   banned: boolean
   bannedAt: Date | null
   bannedBy: string | null

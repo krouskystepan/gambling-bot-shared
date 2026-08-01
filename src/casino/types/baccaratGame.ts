@@ -1,6 +1,7 @@
 import type { BaccaratBetSide, BaccaratCard } from '../constants/baccaratConfig'
+import type { CasinoSessionStats } from './casinoSessionStats'
 
-export type BaccaratSessionPhase = 'waiting' | 'dealing'
+export type BaccaratSessionPhase = 'waiting' | 'dealing' | 'result'
 
 export type TBaccaratPendingDeal = {
   side: BaccaratBetSide
@@ -13,12 +14,17 @@ export type TBaccaratGame = {
   guildId: string
   channelId: string
   messageId: string
-  betId: string
-  betAmount: number
+  gameId: string
+  /** Set only while a round is reserved and not yet settled. */
+  activeBetId?: string | null
+  betAmount: number | null
+  /** Last settled side; used for Rebet. */
+  lastSide?: BaccaratBetSide | null
   showBalance: boolean
   skipAnimations: boolean
   phase: BaccaratSessionPhase
   pendingDeal?: TBaccaratPendingDeal | null
+  sessionStats: CasinoSessionStats
 
   idleNudgeSentAt?: Date | null
 

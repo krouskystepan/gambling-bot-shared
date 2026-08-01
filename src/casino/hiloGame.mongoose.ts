@@ -1,11 +1,12 @@
 import { Schema } from 'mongoose'
 
-import { TBaccaratGame } from './types/baccaratGame'
+import { THiloGame } from './types/hiloGame'
 
-const baccaratCardSchema = new Schema(
+const hiloCardSchema = new Schema(
   {
     label: { type: String, required: true },
-    suite: { type: String, required: true }
+    suite: { type: String, required: true },
+    rank: { type: Number, required: true }
   },
   { _id: false }
 )
@@ -20,7 +21,7 @@ const sessionStatsSchema = new Schema(
   { _id: false }
 )
 
-export const BaccaratGameSchema = new Schema<TBaccaratGame>(
+export const HiloGameSchema = new Schema<THiloGame>(
   {
     userId: { type: String, required: true, index: true },
     guildId: { type: String, required: true, index: true },
@@ -28,34 +29,18 @@ export const BaccaratGameSchema = new Schema<TBaccaratGame>(
     messageId: { type: String, required: true },
     gameId: { type: String, required: true, index: true },
     activeBetId: { type: String, default: null, index: true },
+
     betAmount: { type: Number, default: null },
-    lastSide: { type: String, default: null },
+    firstCard: { type: hiloCardSchema, default: null },
+    remainingDeck: { type: [hiloCardSchema], required: true, default: [] },
+    houseEdgeSnapshot: { type: Number, required: true, default: 0 },
     showBalance: { type: Boolean, required: true, default: false },
-    skipAnimations: { type: Boolean, required: true, default: false },
-    phase: {
+
+    status: {
       type: String,
+      enum: ['BETTING', 'WAITING', 'SETTLING', 'RESULT'],
       required: true,
-      enum: ['waiting', 'dealing', 'result'],
-      default: 'waiting'
-    },
-    pendingDeal: {
-      type: new Schema(
-        {
-          side: { type: String, required: true },
-          playerCards: {
-            type: [baccaratCardSchema],
-            required: true,
-            default: []
-          },
-          bankerCards: {
-            type: [baccaratCardSchema],
-            required: true,
-            default: []
-          }
-        },
-        { _id: false }
-      ),
-      default: null
+      default: 'BETTING'
     },
     sessionStats: {
       type: sessionStatsSchema,
@@ -73,4 +58,6 @@ export const BaccaratGameSchema = new Schema<TBaccaratGame>(
   { timestamps: true }
 )
 
-BaccaratGameSchema.index({ userId: 1, guildId: 1 }, { unique: true })
+HiloGameSchema.index({ userId: 1, guildId: 1 }, { unique: true })
+HiloGameSchema.index({ status: 1, createdAt: 1 })
+HiloGameSchema.index({ status: 1, updatedAt: 1 })

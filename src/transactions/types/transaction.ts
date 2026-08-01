@@ -2,6 +2,8 @@ import type { CasinoGameId } from '../../casino/constants/casinoGames'
 
 export type TransactionMeta = {
   game?: CasinoGameId
+  /** How many plays/spins/hands this bet covered (e.g. slots batch, multi-roll). */
+  rounds?: number
   counterpartyId?: string
   grossAmount?: number
   feeAmount?: number

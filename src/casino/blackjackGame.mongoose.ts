@@ -36,7 +36,7 @@ export const BlackjackGameSchema = new Schema<TBlackjackGame>(
     messageId: { type: String, required: true },
     gameId: { type: String, required: true, index: true },
     activeBetId: { type: String, default: null, index: true },
-    baseBetAmount: { type: Number, required: true },
+    baseBetAmount: { type: Number, default: null },
     showBalance: { type: Boolean, required: true, default: false },
     skipAnimations: { type: Boolean, required: true, default: false },
 
@@ -46,9 +46,9 @@ export const BlackjackGameSchema = new Schema<TBlackjackGame>(
     hands: { type: [handSchema], required: true, default: [] },
     phase: {
       type: String,
-      enum: ['PLAYER', 'DEALER', 'RESULT'],
+      enum: ['BETTING', 'PLAYER', 'DEALER', 'RESULT'],
       required: true,
-      default: 'PLAYER'
+      default: 'BETTING'
     },
     activeHandIndex: { type: Number, required: true, default: 0 },
 

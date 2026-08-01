@@ -218,4 +218,17 @@ describe('mines engine', () => {
     const cash = cashOutPayout(state)
     expect(cash.kind).toBe('OK')
   })
+
+  it('rejects setup boards without a stake', () => {
+    expect(() =>
+      docToMinesEngine({
+        betAmount: null,
+        mineCount: null,
+        mineIndices: [],
+        revealedIndices: [],
+        houseEdgeSnapshot: 0.01,
+        status: 'SETUP'
+      })
+    ).toThrow(/active or settled board/)
+  })
 })

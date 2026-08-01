@@ -21,17 +21,17 @@ export const MinesGameSchema = new Schema<TMinesGame>(
     gameId: { type: String, required: true, index: true },
     activeBetId: { type: String, default: null, index: true },
 
-    betAmount: { type: Number, required: true },
-    mineCount: { type: Number, required: true },
+    betAmount: { type: Number, default: null },
+    mineCount: { type: Number, default: null },
     mineIndices: { type: [Number], required: true, default: [] },
     revealedIndices: { type: [Number], required: true, default: [] },
-    houseEdgeSnapshot: { type: Number, required: true },
+    houseEdgeSnapshot: { type: Number, required: true, default: 0 },
 
     status: {
       type: String,
-      enum: ['ACTIVE', 'RESULT'],
+      enum: ['SETUP', 'ACTIVE', 'RESULT'],
       required: true,
-      default: 'ACTIVE'
+      default: 'SETUP'
     },
     sessionStats: {
       type: sessionStatsSchema,

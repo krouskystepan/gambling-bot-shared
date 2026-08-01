@@ -28,7 +28,7 @@ export const BaccaratGameSchema = new Schema<TBaccaratGame>(
     messageId: { type: String, required: true },
     gameId: { type: String, required: true, index: true },
     activeBetId: { type: String, default: null, index: true },
-    betAmount: { type: Number, required: true },
+    betAmount: { type: Number, default: null },
     lastSide: { type: String, default: null },
     showBalance: { type: Boolean, required: true, default: false },
     skipAnimations: { type: Boolean, required: true, default: false },

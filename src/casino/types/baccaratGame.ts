@@ -17,7 +17,7 @@ export type TBaccaratGame = {
   gameId: string
   /** Set only while a round is reserved and not yet settled. */
   activeBetId?: string | null
-  betAmount: number
+  betAmount: number | null
   /** Last settled side; used for Rebet. */
   lastSide?: BaccaratBetSide | null
   showBalance: boolean

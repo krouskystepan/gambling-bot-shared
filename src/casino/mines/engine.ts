@@ -10,7 +10,7 @@ export type MinesEngineState = {
   mineIndices: number[]
   revealedIndices: number[]
   houseEdgeSnapshot: number
-  status: MinesGameStatus
+  status: Exclude<MinesGameStatus, 'SETUP'>
 }
 
 export type MinesRevealResult =
@@ -96,14 +96,24 @@ export const docToMinesEngine = (
     | 'houseEdgeSnapshot'
     | 'status'
   >
-): MinesEngineState => ({
-  betAmount: doc.betAmount,
-  mineCount: doc.mineCount,
-  mineIndices: [...doc.mineIndices],
-  revealedIndices: [...doc.revealedIndices],
-  houseEdgeSnapshot: doc.houseEdgeSnapshot,
-  status: doc.status
-})
+): MinesEngineState => {
+  if (
+    doc.status === 'SETUP' ||
+    doc.betAmount == null ||
+    doc.mineCount == null
+  ) {
+    throw new Error('Mines engine requires an active or settled board')
+  }
+
+  return {
+    betAmount: doc.betAmount,
+    mineCount: doc.mineCount,
+    mineIndices: [...doc.mineIndices],
+    revealedIndices: [...doc.revealedIndices],
+    houseEdgeSnapshot: doc.houseEdgeSnapshot,
+    status: doc.status
+  }
+}
 
 export const isMinesFinished = (state: MinesEngineState): boolean =>
   state.status === 'RESULT'

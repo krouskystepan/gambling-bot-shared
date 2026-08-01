@@ -10,7 +10,7 @@ export type Card = {
   value: number
 }
 
-export type GamePhase = 'PLAYER' | 'DEALER' | 'RESULT'
+export type GamePhase = 'BETTING' | 'PLAYER' | 'DEALER' | 'RESULT'
 
 export type TBlackjackHand = {
   cards: Card[]
@@ -27,7 +27,7 @@ export type TBlackjackGame = {
   gameId: string
   /** Set only while a hand is reserved and not yet settled. */
   activeBetId?: string | null
-  baseBetAmount: number
+  baseBetAmount: number | null
   showBalance: boolean
   skipAnimations: boolean
 

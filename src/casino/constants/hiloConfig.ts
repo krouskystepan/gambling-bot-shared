@@ -21,7 +21,7 @@ export const HILO_RANK_COUNT = HILO_LABELS.length
 export const HILO_SUITS_PER_RANK = 4
 export const HILO_DECK_SIZE = HILO_RANK_COUNT * HILO_SUITS_PER_RANK
 
-export type HiloGuess = 'higher' | 'lower'
+export type HiloGuess = 'higher' | 'lower' | 'same'
 export type HiloRoundOutcome = 'win' | 'lose' | 'push'
 
 export const hiloRankFromLabel = (label: string): number => {
@@ -32,19 +32,27 @@ export const hiloRankFromLabel = (label: string): number => {
 
 /**
  * Total payout multiplier (includes stake) for a win on `guess` given `first`.
- * Single 52-card deck, no replacement. Same-rank leftovers push (void).
+ * Single 52-card deck, no replacement.
+ * - higher / lower: same-rank leftovers push (void)
+ * - same: bet the next card matches rank (3 of 51 left)
  */
 export const getHiloWinMultiplier = (
   first: number,
   guess: HiloGuess,
   houseEdge: number
 ): number | null => {
+  const remaining = HILO_DECK_SIZE - 1
+
+  if (guess === 'same') {
+    const favorableCards = HILO_SUITS_PER_RANK - 1
+    return ((1 - houseEdge) * remaining) / favorableCards
+  }
+
   const favorableRanks =
     guess === 'higher' ? HILO_RANK_MAX - first : first - HILO_RANK_MIN
   const favorableCards = favorableRanks * HILO_SUITS_PER_RANK
   if (favorableCards <= 0) return null
 
-  const remaining = HILO_DECK_SIZE - 1
   const decisive = remaining - (HILO_SUITS_PER_RANK - 1)
   return ((1 - houseEdge) * decisive) / favorableCards
 }
@@ -54,6 +62,7 @@ export const resolveHiloRound = (
   second: number,
   guess: HiloGuess
 ): HiloRoundOutcome => {
+  if (guess === 'same') return second === first ? 'win' : 'lose'
   if (second === first) return 'push'
   const wentHigher = second > first
   const correct =

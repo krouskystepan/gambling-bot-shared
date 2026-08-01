@@ -534,6 +534,15 @@ describe('hilo odds', () => {
     )
     expect(getHiloWinMultiplier(14, 'higher', 0.03)).toBeNull()
     expect(getHiloWinMultiplier(2, 'lower', 0.03)).toBeNull()
+    // Same rank: 3 of 51 remaining
+    expect(getHiloWinMultiplier(2, 'same', 0.03)).toBeCloseTo(
+      (0.97 * 51) / 3,
+      5
+    )
+    expect(getHiloWinMultiplier(14, 'same', 0.03)).toBeCloseTo(
+      (0.97 * 51) / 3,
+      5
+    )
   })
 
   it('resolves win lose push', () => {
@@ -541,6 +550,8 @@ describe('hilo odds', () => {
     expect(resolveHiloRound(8, 5, 'higher')).toBe('lose')
     expect(resolveHiloRound(8, 8, 'higher')).toBe('push')
     expect(resolveHiloRound(8, 5, 'lower')).toBe('win')
+    expect(resolveHiloRound(8, 8, 'same')).toBe('win')
+    expect(resolveHiloRound(8, 10, 'same')).toBe('lose')
   })
 })
 

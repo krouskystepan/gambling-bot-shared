@@ -26,11 +26,11 @@ export type MinesRevealResult =
       kind: 'MINE'
       cellIndex: number
       revealedIndices: number[]
-      status: 'FINISHED'
+      status: 'RESULT'
     }
   | {
       kind: 'IGNORED'
-      reason: 'FINISHED' | 'ALREADY_REVEALED' | 'INVALID_INDEX'
+      reason: 'RESULT' | 'ALREADY_REVEALED' | 'INVALID_INDEX'
     }
 
 export type MinesCashOutResult =
@@ -38,11 +38,11 @@ export type MinesCashOutResult =
       kind: 'OK'
       multiplier: number
       payout: number
-      status: 'FINISHED'
+      status: 'RESULT'
     }
   | {
       kind: 'IGNORED'
-      reason: 'FINISHED' | 'NO_REVEALS'
+      reason: 'RESULT' | 'NO_REVEALS'
     }
 
 /** Fisher-Yates shuffle of `0..cellCount-1`, then take first `mineCount`. */
@@ -106,10 +106,10 @@ export const docToMinesEngine = (
 })
 
 export const isMinesFinished = (state: MinesEngineState): boolean =>
-  state.status === 'FINISHED'
+  state.status === 'RESULT'
 
 export const isMinesBust = (state: MinesEngineState): boolean =>
-  state.status === 'FINISHED' &&
+  state.status === 'RESULT' &&
   state.revealedIndices.some((i) => state.mineIndices.includes(i))
 
 export const currentMinesMultiplier = (state: MinesEngineState): number =>
@@ -124,7 +124,7 @@ export const revealCell = (
   cellIndex: number
 ): MinesRevealResult => {
   if (state.status !== 'ACTIVE') {
-    return { kind: 'IGNORED', reason: 'FINISHED' }
+    return { kind: 'IGNORED', reason: 'RESULT' }
   }
 
   if (
@@ -141,12 +141,12 @@ export const revealCell = (
 
   if (state.mineIndices.includes(cellIndex)) {
     state.revealedIndices = [...state.revealedIndices, cellIndex]
-    state.status = 'FINISHED'
+    state.status = 'RESULT'
     return {
       kind: 'MINE',
       cellIndex,
       revealedIndices: [...state.revealedIndices],
-      status: 'FINISHED'
+      status: 'RESULT'
     }
   }
 
@@ -166,7 +166,7 @@ export const revealCell = (
 
 export const cashOutPayout = (state: MinesEngineState): MinesCashOutResult => {
   if (state.status !== 'ACTIVE') {
-    return { kind: 'IGNORED', reason: 'FINISHED' }
+    return { kind: 'IGNORED', reason: 'RESULT' }
   }
 
   if (state.revealedIndices.length < 1) {
@@ -175,13 +175,13 @@ export const cashOutPayout = (state: MinesEngineState): MinesCashOutResult => {
 
   const multiplier = currentMinesMultiplier(state)
   const payout = state.betAmount * multiplier
-  state.status = 'FINISHED'
+  state.status = 'RESULT'
 
   return {
     kind: 'OK',
     multiplier,
     payout,
-    status: 'FINISHED'
+    status: 'RESULT'
   }
 }
 
@@ -196,11 +196,11 @@ export const resolveIdleMines = (
   if (state.revealedIndices.length >= 1) {
     const multiplier = currentMinesMultiplier(state)
     const payout = state.betAmount * multiplier
-    state.status = 'FINISHED'
+    state.status = 'RESULT'
     return { payout, multiplier, forfeited: false }
   }
 
-  state.status = 'FINISHED'
+  state.status = 'RESULT'
   return { payout: 0, multiplier: 0, forfeited: true }
 }
 
@@ -211,13 +211,13 @@ export type MinesFinishedResolution = {
 }
 
 /**
- * Resolve a game already marked FINISHED but not yet settled/deleted
+ * Resolve a game already marked RESULT but not yet settled/deleted
  * (crash mid-reveal settlement).
  */
 export const resolveFinishedMines = (
   state: MinesEngineState
 ): MinesFinishedResolution => {
-  if (state.status !== 'FINISHED') {
+  if (state.status !== 'RESULT') {
     return { payout: 0, multiplier: 0, resultKind: 'FORFEIT' }
   }
 

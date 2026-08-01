@@ -9,9 +9,10 @@ import {
   SUITES,
   VALUES,
   baccaratCardValue,
+  baccaratIdleCloseMs,
   baccaratIdleNudgeThresholdMs,
-  baccaratIdleRefundMs,
   blackjackAutostandIdleMs,
+  blackjackIdleCloseMs,
   blackjackIdleNudgeThresholdMs,
   calculateRTP,
   casinoSettingsSchema,
@@ -27,9 +28,11 @@ import {
   getPlinkoMultiplierAtPathIndex,
   handTotal,
   hiloRankFromLabel,
-  hoursUntilBaccaratIdleRefund,
+  hoursUntilBaccaratIdleClose,
   hoursUntilBlackjackAutostand,
+  hoursUntilBlackjackIdleClose,
   hoursUntilMinesAutoResolve,
+  hoursUntilMinesIdleClose,
   hoursUntilRouletteIdleClose,
   hoursUntilSlotsIdleClose,
   isLimboWin,
@@ -39,6 +42,7 @@ import {
   isValidMineCount,
   limboHitProbability,
   minesAutoResolveIdleMs,
+  minesIdleCloseMs,
   minesIdleNudgeThresholdMs,
   normalizeCasinoSettings,
   normalizePlinkoBinMultipliers,
@@ -400,16 +404,27 @@ describe('casino constants', () => {
     ).toBe(1)
   })
 
-  it('computes hours until baccarat idle refund', () => {
+  it('computes hours until blackjack idle close', () => {
     const now = Date.parse('2024-06-15T12:00:00Z')
     const updatedAt = new Date(now - 6 * 60 * 60 * 1000)
 
-    expect(hoursUntilBaccaratIdleRefund(updatedAt, now)).toBe(18)
+    expect(hoursUntilBlackjackIdleClose(updatedAt, now)).toBe(18)
     expect(
-      hoursUntilBaccaratIdleRefund(new Date(now - 23 * 60 * 60 * 1000), now)
+      hoursUntilBlackjackIdleClose(new Date(now - 23 * 60 * 60 * 1000), now)
+    ).toBe(1)
+    expect(blackjackIdleCloseMs()).toBe(24 * 60 * 60 * 1000)
+  })
+
+  it('computes hours until baccarat idle close', () => {
+    const now = Date.parse('2024-06-15T12:00:00Z')
+    const updatedAt = new Date(now - 6 * 60 * 60 * 1000)
+
+    expect(hoursUntilBaccaratIdleClose(updatedAt, now)).toBe(18)
+    expect(
+      hoursUntilBaccaratIdleClose(new Date(now - 23 * 60 * 60 * 1000), now)
     ).toBe(1)
     expect(baccaratIdleNudgeThresholdMs()).toBe(3 * 60 * 60 * 1000)
-    expect(baccaratIdleRefundMs()).toBe(24 * 60 * 60 * 1000)
+    expect(baccaratIdleCloseMs()).toBe(24 * 60 * 60 * 1000)
   })
 
   it('computes hours until mines auto-resolve', () => {
@@ -420,6 +435,17 @@ describe('casino constants', () => {
     expect(
       hoursUntilMinesAutoResolve(new Date(now - 23 * 60 * 60 * 1000), now)
     ).toBe(1)
+  })
+
+  it('computes hours until mines idle close', () => {
+    const now = Date.parse('2024-06-15T12:00:00Z')
+    const updatedAt = new Date(now - 6 * 60 * 60 * 1000)
+
+    expect(hoursUntilMinesIdleClose(updatedAt, now)).toBe(18)
+    expect(
+      hoursUntilMinesIdleClose(new Date(now - 23 * 60 * 60 * 1000), now)
+    ).toBe(1)
+    expect(minesIdleCloseMs()).toBe(24 * 60 * 60 * 1000)
   })
 
   it('computes hours until roulette idle close', () => {

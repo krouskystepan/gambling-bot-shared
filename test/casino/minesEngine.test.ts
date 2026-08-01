@@ -61,7 +61,7 @@ describe('mines engine', () => {
       expect.objectContaining({
         kind: 'MINE',
         cellIndex: 0,
-        status: 'FINISHED'
+        status: 'RESULT'
       })
     )
     expect(isMinesFinished(state)).toBe(true)
@@ -76,7 +76,7 @@ describe('mines engine', () => {
     expect(cash.kind).toBe('OK')
     if (cash.kind !== 'OK') return
     expect(cash.payout).toBeCloseTo(100 * cash.multiplier, 10)
-    expect(cash.status).toBe('FINISHED')
+    expect(cash.status).toBe('RESULT')
     expect(isMinesFinished(state)).toBe(true)
   })
 
@@ -110,11 +110,11 @@ describe('mines engine', () => {
     revealCell(state, 0)
     expect(revealCell(state, 2)).toEqual({
       kind: 'IGNORED',
-      reason: 'FINISHED'
+      reason: 'RESULT'
     })
     expect(cashOutPayout(state)).toEqual({
       kind: 'IGNORED',
-      reason: 'FINISHED'
+      reason: 'RESULT'
     })
   })
 
@@ -175,7 +175,7 @@ describe('mines engine', () => {
 
     const cashed = start()
     revealCell(cashed, 2)
-    cashed.status = 'FINISHED'
+    cashed.status = 'RESULT'
     const resolved = resolveFinishedMines(cashed)
     expect(resolved.resultKind).toBe('CASH_OUT')
     expect(resolved.payout).toBeGreaterThan(0)
@@ -188,7 +188,7 @@ describe('mines engine', () => {
     })
 
     const finishedNoReveals = start()
-    finishedNoReveals.status = 'FINISHED'
+    finishedNoReveals.status = 'RESULT'
     expect(resolveFinishedMines(finishedNoReveals)).toEqual({
       payout: 0,
       multiplier: 0,

@@ -20,7 +20,6 @@ import {
   defaultCasinoSettings,
   expandPlinkoBinMultipliers,
   formatPlinkoBinMultipliersForDisplay,
-  getHiloTimeoutRefund,
   getHiloWinMultiplier,
   getMinesFairMultiplier,
   getMinesPayoutMultiplier,
@@ -47,6 +46,7 @@ import {
   normalizeCasinoSettings,
   normalizePlinkoBinMultipliers,
   pathIndexToPlinkoBin,
+  pickSafestHiloGuess,
   plinkoBinToPathIndex,
   resolveBaccaratBet,
   resolveHiloRound,
@@ -143,10 +143,7 @@ describe('calculateRTP', () => {
   it('computes RTP for each casino game', () => {
     expect(calculateRTP('dice', defaultCasinoSettings.dice)).toBeGreaterThan(0)
     expect(calculateRTP('coinflip', defaultCasinoSettings.coinflip)).toBe(95)
-    expect(calculateRTP('hilo', defaultCasinoSettings.hilo)).toBeCloseTo(
-      (1 - 0.03 * (48 / 51)) * 100,
-      5
-    )
+    expect(calculateRTP('hilo', defaultCasinoSettings.hilo)).toBe(97)
     expect(calculateRTP('limbo', defaultCasinoSettings.limbo)).toBe(97)
     expect(calculateRTP('mines', defaultCasinoSettings.mines)).toBe(97)
     expect(calculateRTP('slots', defaultCasinoSettings.slots)).toBeGreaterThan(
@@ -519,17 +516,23 @@ describe('hiloRankFromLabel', () => {
 })
 
 describe('hilo odds', () => {
-  it('pays void-style odds with house edge on a single deck', () => {
-    // Middle card (8): 24 higher, 24 lower → mult = 0.97 * 48 / 24
-    expect(getHiloWinMultiplier(8, 'higher', 0.03)).toBeCloseTo(1.94, 5)
-    expect(getHiloWinMultiplier(8, 'lower', 0.03)).toBeCloseTo(1.94, 5)
+  it('pays full-deck odds with house edge (same rank loses for higher/lower)', () => {
+    // Middle card (8): 24 higher of 51 remaining → mult = 0.97 * 51 / 24
+    expect(getHiloWinMultiplier(8, 'higher', 0.03)).toBeCloseTo(
+      (0.97 * 51) / 24,
+      5
+    )
+    expect(getHiloWinMultiplier(8, 'lower', 0.03)).toBeCloseTo(
+      (0.97 * 51) / 24,
+      5
+    )
     // King: 4 aces higher, 44 lower
     expect(getHiloWinMultiplier(13, 'higher', 0.03)).toBeCloseTo(
-      (0.97 * 48) / 4,
+      (0.97 * 51) / 4,
       5
     )
     expect(getHiloWinMultiplier(13, 'lower', 0.03)).toBeCloseTo(
-      (0.97 * 48) / 44,
+      (0.97 * 51) / 44,
       5
     )
     expect(getHiloWinMultiplier(14, 'higher', 0.03)).toBeNull()
@@ -545,32 +548,25 @@ describe('hilo odds', () => {
     )
   })
 
-  it('resolves win lose push', () => {
+  it('resolves win lose (draw is only a win on same)', () => {
     expect(resolveHiloRound(8, 10, 'higher')).toBe('win')
     expect(resolveHiloRound(8, 5, 'higher')).toBe('lose')
-    expect(resolveHiloRound(8, 8, 'higher')).toBe('push')
+    expect(resolveHiloRound(8, 8, 'higher')).toBe('lose')
     expect(resolveHiloRound(8, 5, 'lower')).toBe('win')
+    expect(resolveHiloRound(8, 8, 'lower')).toBe('lose')
     expect(resolveHiloRound(8, 8, 'same')).toBe('win')
     expect(resolveHiloRound(8, 10, 'same')).toBe('lose')
   })
-})
 
-describe('getHiloTimeoutRefund', () => {
-  it('refunds 90% when timeout fee is 10%', () => {
-    expect(getHiloTimeoutRefund(1000, 0.1)).toBe(900)
-  })
-
-  it('refunds the full bet when fee is 0', () => {
-    expect(getHiloTimeoutRefund(1000, 0)).toBe(1000)
-  })
-
-  it('refunds nothing when fee is 1', () => {
-    expect(getHiloTimeoutRefund(1000, 1)).toBe(0)
-  })
-
-  it('clamps out-of-range fees', () => {
-    expect(getHiloTimeoutRefund(1000, -0.5)).toBe(1000)
-    expect(getHiloTimeoutRefund(1000, 1.5)).toBe(0)
+  it('picks the lowest-multiplier side as safest on timeout', () => {
+    // Ace: only lower / same; lower has far more favorable cards.
+    expect(pickSafestHiloGuess(14, 0.03)).toBe('lower')
+    // Two: only higher / same.
+    expect(pickSafestHiloGuess(2, 0.03)).toBe('higher')
+    // King: lower (~1.1x) beats higher (~12x) and same (~16x).
+    expect(pickSafestHiloGuess(13, 0.03)).toBe('lower')
+    // Middle 8: higher and lower tie; prefer higher (iteration order).
+    expect(pickSafestHiloGuess(8, 0.03)).toBe('higher')
   })
 })
 

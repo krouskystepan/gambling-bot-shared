@@ -11,6 +11,16 @@ const hiloCardSchema = new Schema(
   { _id: false }
 )
 
+const sessionStatsSchema = new Schema(
+  {
+    roundsPlayed: { type: Number, required: true, default: 0 },
+    totalWagered: { type: Number, required: true, default: 0 },
+    totalPayout: { type: Number, required: true, default: 0 },
+    netProfit: { type: Number, required: true, default: 0 }
+  },
+  { _id: false }
+)
+
 export const HiloGameSchema = new Schema<THiloGame>(
   {
     userId: { type: String, required: true, index: true },
@@ -18,20 +28,29 @@ export const HiloGameSchema = new Schema<THiloGame>(
     channelId: { type: String, required: true },
     messageId: { type: String, required: true },
     gameId: { type: String, required: true, index: true },
-    activeBetId: { type: String, required: true, index: true },
+    activeBetId: { type: String, default: null, index: true },
 
-    betAmount: { type: Number, required: true },
-    firstCard: { type: hiloCardSchema, required: true },
+    betAmount: { type: Number, default: null },
+    firstCard: { type: hiloCardSchema, default: null },
     remainingDeck: { type: [hiloCardSchema], required: true, default: [] },
-    houseEdgeSnapshot: { type: Number, required: true },
-    timeoutFeeSnapshot: { type: Number, required: true },
+    houseEdgeSnapshot: { type: Number, required: true, default: 0 },
     showBalance: { type: Boolean, required: true, default: false },
 
     status: {
       type: String,
-      enum: ['WAITING', 'SETTLING'],
+      enum: ['BETTING', 'WAITING', 'SETTLING', 'RESULT'],
       required: true,
-      default: 'WAITING'
+      default: 'BETTING'
+    },
+    sessionStats: {
+      type: sessionStatsSchema,
+      required: true,
+      default: () => ({
+        roundsPlayed: 0,
+        totalWagered: 0,
+        totalPayout: 0,
+        netProfit: 0
+      })
     },
 
     idleNudgeSentAt: { type: Date, default: null }
@@ -41,3 +60,4 @@ export const HiloGameSchema = new Schema<THiloGame>(
 
 HiloGameSchema.index({ userId: 1, guildId: 1 }, { unique: true })
 HiloGameSchema.index({ status: 1, createdAt: 1 })
+HiloGameSchema.index({ status: 1, updatedAt: 1 })

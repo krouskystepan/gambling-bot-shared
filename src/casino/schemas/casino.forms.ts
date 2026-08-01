@@ -23,7 +23,6 @@ export const casinoSettingsSchema = z.object({
 
   hilo: z.object({
     houseEdge: num,
-    timeoutFee: num,
     minBet: num,
     maxBet: num
   }),

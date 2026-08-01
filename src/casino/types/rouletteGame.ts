@@ -1,4 +1,5 @@
 import type { RouletteBetType } from '../utils/calculateRouletteWin'
+import type { CasinoSessionStats } from './casinoSessionStats'
 
 export type TRouletteSlipBet = {
   amount: number
@@ -26,6 +27,7 @@ export type TRouletteGame = {
   /** Set only while a spin is reserved and not yet settled. */
   activeBetId?: string | null
   lockedAmount?: number | null
+  sessionStats: CasinoSessionStats
   idleNudgeSentAt?: Date | null
   createdAt: Date
   updatedAt: Date

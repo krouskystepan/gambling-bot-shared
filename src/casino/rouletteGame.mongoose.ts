@@ -34,6 +34,24 @@ export const RouletteGameSchema = new Schema<TRouletteGame>(
     lastNetResult: { type: Number, default: null },
     activeBetId: { type: String, default: null, index: true },
     lockedAmount: { type: Number, default: null },
+    sessionStats: {
+      type: new Schema(
+        {
+          roundsPlayed: { type: Number, required: true, default: 0 },
+          totalWagered: { type: Number, required: true, default: 0 },
+          totalPayout: { type: Number, required: true, default: 0 },
+          netProfit: { type: Number, required: true, default: 0 }
+        },
+        { _id: false }
+      ),
+      required: true,
+      default: () => ({
+        roundsPlayed: 0,
+        totalWagered: 0,
+        totalPayout: 0,
+        netProfit: 0
+      })
+    },
     idleNudgeSentAt: { type: Date, default: null }
   },
   { timestamps: true }

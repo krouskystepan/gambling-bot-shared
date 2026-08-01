@@ -1,11 +1,15 @@
-export type MinesGameStatus = 'ACTIVE' | 'FINISHED'
+import type { CasinoSessionStats } from './casinoSessionStats'
+
+export type MinesGameStatus = 'ACTIVE' | 'RESULT'
 
 export type TMinesGame = {
   userId: string
   guildId: string
   channelId: string
   messageId: string
-  betId: string
+  gameId: string
+  /** Set only while a board is reserved and not yet settled. */
+  activeBetId?: string | null
 
   betAmount: number
   mineCount: number
@@ -17,6 +21,8 @@ export type TMinesGame = {
   houseEdgeSnapshot: number
 
   status: MinesGameStatus
+  sessionStats: CasinoSessionStats
+  showBalance: boolean
 
   idleNudgeSentAt?: Date | null
 

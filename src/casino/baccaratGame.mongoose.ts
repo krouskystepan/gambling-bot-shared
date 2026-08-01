@@ -10,20 +10,32 @@ const baccaratCardSchema = new Schema(
   { _id: false }
 )
 
+const sessionStatsSchema = new Schema(
+  {
+    roundsPlayed: { type: Number, required: true, default: 0 },
+    totalWagered: { type: Number, required: true, default: 0 },
+    totalPayout: { type: Number, required: true, default: 0 },
+    netProfit: { type: Number, required: true, default: 0 }
+  },
+  { _id: false }
+)
+
 export const BaccaratGameSchema = new Schema<TBaccaratGame>(
   {
     userId: { type: String, required: true, index: true },
     guildId: { type: String, required: true, index: true },
     channelId: { type: String, required: true },
     messageId: { type: String, required: true },
-    betId: { type: String, required: true, index: true },
+    gameId: { type: String, required: true, index: true },
+    activeBetId: { type: String, default: null, index: true },
     betAmount: { type: Number, required: true },
+    lastSide: { type: String, default: null },
     showBalance: { type: Boolean, required: true, default: false },
     skipAnimations: { type: Boolean, required: true, default: false },
     phase: {
       type: String,
       required: true,
-      enum: ['waiting', 'dealing'],
+      enum: ['waiting', 'dealing', 'result'],
       default: 'waiting'
     },
     pendingDeal: {
@@ -44,6 +56,16 @@ export const BaccaratGameSchema = new Schema<TBaccaratGame>(
         { _id: false }
       ),
       default: null
+    },
+    sessionStats: {
+      type: sessionStatsSchema,
+      required: true,
+      default: () => ({
+        roundsPlayed: 0,
+        totalWagered: 0,
+        totalPayout: 0,
+        netProfit: 0
+      })
     },
 
     idleNudgeSentAt: { type: Date, default: null }

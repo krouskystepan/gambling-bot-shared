@@ -1,3 +1,5 @@
+import type { CasinoSessionStats } from './casinoSessionStats'
+
 export type SlotsSessionPhase = 'ready' | 'spinning' | 'result'
 
 export type TSlotsGame = {
@@ -23,6 +25,7 @@ export type TSlotsGame = {
   /** Set only while a batch is reserved and not yet settled. */
   activeBetId?: string | null
   lockedAmount?: number | null
+  sessionStats: CasinoSessionStats
   idleNudgeSentAt?: Date | null
   createdAt: Date
   updatedAt: Date

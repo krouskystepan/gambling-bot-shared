@@ -125,9 +125,7 @@ describe('isGlobalFeatureDisabled', () => {
       disablePeerTransfers: true,
       disableCasinoGames: true,
       disableCasinoGamesForMods: true,
-      disablePredictions: true,
       disablePredictionManagement: true,
-      disableRaffles: true,
       disableRaffleManagement: true,
       disableDailyBonus: true,
       disableVip: true,
@@ -141,9 +139,7 @@ describe('isGlobalFeatureDisabled', () => {
     expect(isGlobalFeatureDisabled(config, 'peerTransfers')).toBe(true)
     expect(isGlobalFeatureDisabled(config, 'casinoGames')).toBe(true)
     expect(isGlobalFeatureDisabled(config, 'casinoGamesForMods')).toBe(true)
-    expect(isGlobalFeatureDisabled(config, 'predictions')).toBe(true)
     expect(isGlobalFeatureDisabled(config, 'predictionManagement')).toBe(true)
-    expect(isGlobalFeatureDisabled(config, 'raffles')).toBe(true)
     expect(isGlobalFeatureDisabled(config, 'raffleManagement')).toBe(true)
     expect(isGlobalFeatureDisabled(config, 'dailyBonus')).toBe(true)
     expect(isGlobalFeatureDisabled(config, 'vip')).toBe(true)

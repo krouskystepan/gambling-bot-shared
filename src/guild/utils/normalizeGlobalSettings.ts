@@ -57,17 +57,9 @@ export const normalizeGlobalSettings = (
     settings?.disableCasinoGamesForMods,
     defaultGlobalSettings.disableCasinoGamesForMods
   ),
-  disablePredictions: coerceBool(
-    settings?.disablePredictions,
-    defaultGlobalSettings.disablePredictions
-  ),
   disablePredictionManagement: coerceBool(
     settings?.disablePredictionManagement,
     defaultGlobalSettings.disablePredictionManagement
-  ),
-  disableRaffles: coerceBool(
-    settings?.disableRaffles,
-    defaultGlobalSettings.disableRaffles
   ),
   disableRaffleManagement: coerceBool(
     settings?.disableRaffleManagement,

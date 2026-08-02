@@ -1,4 +1,5 @@
 import { defaultCasinoSettings } from '../constants'
+import { normalizeBlackjackDeckCount } from '../constants/blackjack'
 import { normalizePlinkoBinMultipliers } from '../constants/plinkoConfig'
 import type { TCasinoSettings } from '../types/casinoSettings'
 
@@ -72,6 +73,10 @@ export const normalizeCasinoSettings = (
         raw?.raffle,
         defaultCasinoSettings.raffle.houseEdge
       )
+    },
+    blackjack: {
+      ...merged.blackjack,
+      deckCount: normalizeBlackjackDeckCount(merged.blackjack.deckCount)
     },
     plinko: {
       ...merged.plinko,

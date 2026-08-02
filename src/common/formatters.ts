@@ -91,12 +91,27 @@ export const formatNumberToPercentage = (num: number): string => {
   return (num * 100).toFixed(2) + '%'
 }
 
+/** Title-case camelCase / snake_case keys; leave symbol-only keys unchanged. */
+export const humanizeSettingKey = (key: string): string => {
+  if (!/[A-Za-z]/.test(key)) return key
+
+  return key
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .split(' ')
+    .filter((word) => word.length > 0)
+    .map((word) => word[0]!.toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
 export const getReadableName = (
   key: string,
   map: { name: string; value: string }[]
 ): string => {
   const found = map.find((item) => item.value === key)
-  return found ? found.name : key
+  return found ? found.name : humanizeSettingKey(key)
 }
 
 export const formatCasinoGameLabel = (gameId: string): string =>

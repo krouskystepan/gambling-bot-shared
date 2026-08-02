@@ -67,8 +67,10 @@ describe('labels', () => {
     expect(formatTransactionTypeLabel('bet')).toBe('BET')
     expect(getReadableName('dice', readableGameNames)).toBe('Dice')
     expect(getReadableName('unknown-game', readableGameNames)).toBe(
-      'unknown-game'
+      'Unknown Game'
     )
+    expect(getReadableName('suitedTrips', [])).toBe('Suited Trips')
+    expect(getReadableName('🍒🍒🍒', [])).toBe('🍒🍒🍒')
     expect(formatCasinoGameLabel('dice')).toBe('DICE')
   })
 })

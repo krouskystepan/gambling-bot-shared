@@ -46,26 +46,31 @@ export const readableGameNames = [
 
 export const defaultCasinoSettings = {
   dice: {
+    enabled: true,
     winMultiplier: 5,
     maxBet: 0,
     minBet: 0
   },
   coinflip: {
+    enabled: true,
     winMultiplier: 1.9,
     maxBet: 0,
     minBet: 0
   },
   hilo: {
+    enabled: true,
     houseEdge: 0.03,
     maxBet: 0,
     minBet: 0
   },
   limbo: {
+    enabled: true,
     houseEdge: 0.03,
     maxBet: 0,
     minBet: 0
   },
   slots: {
+    enabled: true,
     winMultipliers: {
       '🍒🍒🍒': 5,
       '🫐🫐🫐': 10,
@@ -84,6 +89,7 @@ export const defaultCasinoSettings = {
     minBet: 0
   },
   lottery: {
+    enabled: true,
     winMultipliers: {
       4: 100,
       3: 40,
@@ -95,6 +101,7 @@ export const defaultCasinoSettings = {
     minBet: 0
   },
   roulette: {
+    enabled: true,
     winMultipliers: {
       number: 18,
       color: 2,
@@ -107,6 +114,7 @@ export const defaultCasinoSettings = {
     minBet: 0
   },
   baccarat: {
+    enabled: true,
     winMultipliers: {
       player: 2,
       banker: 1.95,
@@ -118,17 +126,20 @@ export const defaultCasinoSettings = {
     minBet: 0
   },
   rps: {
+    enabled: true,
     houseEdge: 0.025,
     maxBet: 0,
     minBet: 0
   },
   goldenJackpot: {
+    enabled: true,
     winMultiplier: 10_000,
     oneInChance: 12_000,
     maxBet: 0,
     minBet: 0
   },
   blackjack: {
+    enabled: true,
     winMultipliers: {
       win: 2,
       blackjack: 2.5,
@@ -138,6 +149,7 @@ export const defaultCasinoSettings = {
     minBet: 0
   },
   mines: {
+    enabled: true,
     houseEdge: 0.03,
     maxBet: 0,
     minBet: 0,
@@ -145,13 +157,16 @@ export const defaultCasinoSettings = {
     maxMines: 10
   },
   prediction: {
+    enabled: true,
     maxBet: 0,
     minBet: 0
   },
   raffle: {
+    enabled: true,
     houseEdge: 0.01
   },
   plinko: {
+    enabled: true,
     binMultipliers: {
       1: 8,
       2: 6,

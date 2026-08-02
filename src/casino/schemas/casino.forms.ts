@@ -10,30 +10,35 @@ export const casinoChannelsFormSchema = z.object({
 
 export const casinoSettingsSchema = z.object({
   dice: z.object({
+    enabled: z.boolean(),
     winMultiplier: num,
     minBet: num,
     maxBet: num
   }),
 
   coinflip: z.object({
+    enabled: z.boolean(),
     winMultiplier: num,
     minBet: num,
     maxBet: num
   }),
 
   hilo: z.object({
+    enabled: z.boolean(),
     houseEdge: num,
     minBet: num,
     maxBet: num
   }),
 
   limbo: z.object({
+    enabled: z.boolean(),
     houseEdge: num,
     minBet: num,
     maxBet: num
   }),
 
   slots: z.object({
+    enabled: z.boolean(),
     winMultipliers: z.record(z.string(), num),
     symbolWeights: z.record(z.string(), num),
     minBet: num,
@@ -41,30 +46,35 @@ export const casinoSettingsSchema = z.object({
   }),
 
   lottery: z.object({
+    enabled: z.boolean(),
     winMultipliers: z.record(z.string(), num),
     minBet: num,
     maxBet: num
   }),
 
   roulette: z.object({
+    enabled: z.boolean(),
     winMultipliers: z.record(z.string(), num),
     minBet: num,
     maxBet: num
   }),
 
   baccarat: z.object({
+    enabled: z.boolean(),
     winMultipliers: z.record(z.string(), num),
     minBet: num,
     maxBet: num
   }),
 
   rps: z.object({
+    enabled: z.boolean(),
     houseEdge: num,
     minBet: num,
     maxBet: num
   }),
 
   goldenJackpot: z.object({
+    enabled: z.boolean(),
     winMultiplier: num,
     oneInChance: num,
     minBet: num,
@@ -72,12 +82,14 @@ export const casinoSettingsSchema = z.object({
   }),
 
   blackjack: z.object({
+    enabled: z.boolean(),
     winMultipliers: z.record(z.string(), num),
     minBet: num,
     maxBet: num
   }),
 
   mines: z.object({
+    enabled: z.boolean(),
     houseEdge: num,
     minBet: num,
     maxBet: num,
@@ -86,15 +98,18 @@ export const casinoSettingsSchema = z.object({
   }),
 
   prediction: z.object({
+    enabled: z.boolean(),
     minBet: num,
     maxBet: num
   }),
 
   raffle: z.object({
+    enabled: z.boolean(),
     houseEdge: num
   }),
 
   plinko: z.object({
+    enabled: z.boolean(),
     binMultipliers: z
       .record(z.string(), num)
       .transform(normalizePlinkoBinMultipliers),

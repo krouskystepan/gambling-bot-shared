@@ -20,3 +20,4 @@ export const UserBanSchema = new Schema<TUserBan>(
 UserBanSchema.index({ banId: 1, guildId: 1 }, { unique: true })
 UserBanSchema.index({ guildId: 1, userId: 1, bannedAt: -1 })
 UserBanSchema.index({ guildId: 1, userId: 1, unbannedAt: 1 })
+UserBanSchema.index({ guildId: 1, bannedAt: -1 })

@@ -34,6 +34,7 @@ import {
   hoursUntilMinesIdleClose,
   hoursUntilRouletteIdleClose,
   hoursUntilSlotsIdleClose,
+  isCasinoGameEnabled,
   isLimboWin,
   isPair,
   isValidBaccaratBetSide,
@@ -136,6 +137,44 @@ describe('normalizeCasinoSettings', () => {
     expect('casinoCut' in (normalized.rps as Record<string, unknown>)).toBe(
       false
     )
+  })
+
+  it('fills enabled: true when omitted from stored settings', () => {
+    const { enabled: _ignored, ...diceWithoutEnabled } =
+      defaultCasinoSettings.dice
+
+    const normalized = normalizeCasinoSettings({
+      dice: diceWithoutEnabled as never
+    })
+
+    expect(normalized.dice.enabled).toBe(true)
+    for (const gameId of CASINO_GAME_IDS) {
+      expect(normalized[gameId].enabled).toBe(true)
+    }
+  })
+
+  it('preserves enabled: false through normalize', () => {
+    const normalized = normalizeCasinoSettings({
+      dice: { ...defaultCasinoSettings.dice, enabled: false },
+      raffle: { ...defaultCasinoSettings.raffle, enabled: false }
+    })
+    expect(normalized.dice.enabled).toBe(false)
+    expect(normalized.raffle.enabled).toBe(false)
+  })
+})
+
+describe('isCasinoGameEnabled', () => {
+  it('returns true for enabled games and false when disabled', () => {
+    expect(isCasinoGameEnabled(defaultCasinoSettings, 'dice')).toBe(true)
+    expect(
+      isCasinoGameEnabled(
+        {
+          ...defaultCasinoSettings,
+          dice: { ...defaultCasinoSettings.dice, enabled: false }
+        },
+        'dice'
+      )
+    ).toBe(false)
   })
 })
 
@@ -857,5 +896,15 @@ describe('casinoSettingsSchema', () => {
   it('accepts default casino settings shape', () => {
     const result = casinoSettingsSchema.safeParse(defaultCasinoSettings)
     expect(result.success).toBe(true)
+  })
+
+  it('requires enabled on each playable game', () => {
+    const { enabled: _ignored, ...diceWithoutEnabled } =
+      defaultCasinoSettings.dice
+    const result = casinoSettingsSchema.safeParse({
+      ...defaultCasinoSettings,
+      dice: diceWithoutEnabled
+    })
+    expect(result.success).toBe(false)
   })
 })

@@ -58,6 +58,7 @@ export const normalizeCasinoSettings = (
   return {
     ...merged,
     rps: {
+      enabled: merged.rps.enabled,
       houseEdge: resolveHouseEdge(
         raw?.rps,
         defaultCasinoSettings.rps.houseEdge
@@ -66,6 +67,7 @@ export const normalizeCasinoSettings = (
       minBet: merged.rps.minBet
     },
     raffle: {
+      enabled: merged.raffle.enabled,
       houseEdge: resolveHouseEdge(
         raw?.raffle,
         defaultCasinoSettings.raffle.houseEdge

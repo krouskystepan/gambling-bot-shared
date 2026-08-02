@@ -7,9 +7,7 @@ export type GlobalSettings = {
   disablePeerTransfers: boolean
   disableCasinoGames: boolean
   disableCasinoGamesForMods: boolean
-  disablePredictions: boolean
   disablePredictionManagement: boolean
-  disableRaffles: boolean
   disableRaffleManagement: boolean
   disableDailyBonus: boolean
   disableVip: boolean
@@ -28,9 +26,7 @@ export const defaultGlobalSettings: GlobalSettings = {
   disablePeerTransfers: false,
   disableCasinoGames: false,
   disableCasinoGamesForMods: false,
-  disablePredictions: false,
   disablePredictionManagement: false,
-  disableRaffles: false,
   disableRaffleManagement: false,
   disableDailyBonus: false,
   disableVip: false,

@@ -12,9 +12,7 @@ export type GlobalFeature =
   | 'peerTransfers'
   | 'casinoGames'
   | 'casinoGamesForMods'
-  | 'predictions'
   | 'predictionManagement'
-  | 'raffles'
   | 'raffleManagement'
   | 'dailyBonus'
   | 'vip'
@@ -41,12 +39,8 @@ export function isGlobalFeatureDisabled(
       return settings.disableCasinoGames
     case 'casinoGamesForMods':
       return settings.disableCasinoGamesForMods
-    case 'predictions':
-      return settings.disablePredictions
     case 'predictionManagement':
       return settings.disablePredictionManagement
-    case 'raffles':
-      return settings.disableRaffles
     case 'raffleManagement':
       return settings.disableRaffleManagement
     case 'dailyBonus':

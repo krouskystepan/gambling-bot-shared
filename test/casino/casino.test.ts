@@ -1,4 +1,6 @@
 import {
+  BLACKJACK_DECK_MAX,
+  BLACKJACK_DECK_MIN,
   CASINO_GAME_IDS,
   COINFLIP_MAX_SIMULATE_FLIPS,
   DICE_MAX_SIMULATE_ROLLS,
@@ -44,6 +46,7 @@ import {
   minesAutoResolveIdleMs,
   minesIdleCloseMs,
   minesIdleNudgeThresholdMs,
+  normalizeBlackjackDeckCount,
   normalizeCasinoSettings,
   normalizePlinkoBinMultipliers,
   pathIndexToPlinkoBin,
@@ -213,20 +216,68 @@ describe('calculateRTP', () => {
     expect(
       calculateRTP('raffle', defaultCasinoSettings.raffle)
     ).toBeGreaterThan(0)
+    const defaultBlackjackRtp = calculateRTP(
+      'blackjack',
+      defaultCasinoSettings.blackjack
+    ) as Record<string, number>
+    expect(defaultBlackjackRtp.main).toBeCloseTo(99.5, 5)
+    expect(defaultBlackjackRtp.pairs).toBeGreaterThan(0)
+    {
+      const decks = defaultCasinoSettings.blackjack.deckCount
+      const pDealerBj = (16 * decks) / (52 * decks - 1)
+      expect(defaultBlackjackRtp.insurance).toBeCloseTo(
+        pDealerBj *
+          defaultCasinoSettings.blackjack.winMultipliers.insurance *
+          100,
+        5
+      )
+    }
+    expect(defaultBlackjackRtp['21+3']).toBeGreaterThan(0)
+    const disabledPlusThreeRtp = calculateRTP('blackjack', {
+      ...defaultCasinoSettings.blackjack,
+      plusThreeMultipliers: {
+        suitedTrips: 0,
+        straightFlush: 0,
+        threeOfAKind: 0,
+        straight: 0,
+        flush: 0
+      }
+    }) as Record<string, number>
+    expect(disabledPlusThreeRtp.main).toBeCloseTo(99.5, 5)
+    expect(disabledPlusThreeRtp).not.toHaveProperty('21+3')
+    const disabledInsuranceRtp = calculateRTP('blackjack', {
+      ...defaultCasinoSettings.blackjack,
+      winMultipliers: {
+        ...defaultCasinoSettings.blackjack.winMultipliers,
+        insurance: 0
+      }
+    }) as Record<string, number>
+    expect(disabledInsuranceRtp).not.toHaveProperty('insurance')
+    const disabledPairsRtp = calculateRTP('blackjack', {
+      ...defaultCasinoSettings.blackjack,
+      pairsMultipliers: { perfect: 0, colored: 0, mixed: 0 }
+    }) as Record<string, number>
+    expect(disabledPairsRtp).not.toHaveProperty('pairs')
     expect(
-      calculateRTP('blackjack', defaultCasinoSettings.blackjack)
-    ).toBeCloseTo(99.5, 5)
-    expect(
-      calculateRTP('blackjack', {
-        ...defaultCasinoSettings.blackjack,
-        winMultipliers: { win: 1.8, blackjack: 2, push: 1 }
-      })
+      (
+        calculateRTP('blackjack', {
+          ...defaultCasinoSettings.blackjack,
+          winMultipliers: {
+            ...defaultCasinoSettings.blackjack.winMultipliers,
+            win: 1.8,
+            blackjack: 2,
+            push: 1
+          }
+        }) as Record<string, number>
+      ).main
     ).toBeLessThan(99.5)
     expect(
-      calculateRTP('blackjack', {
-        maxBet: 0,
-        minBet: 0
-      } as never)
+      (
+        calculateRTP('blackjack', {
+          maxBet: 0,
+          minBet: 0
+        } as never) as Record<string, number>
+      ).main
     ).toBeCloseTo(99.5, 5)
     expect(calculateRTP('prediction', defaultCasinoSettings.prediction)).toBe(0)
     expect(
@@ -425,6 +476,16 @@ describe('casino constants', () => {
     expect(GOLDEN_JACKPOT_MAX_SIMULATE_ENTRIES).toBeGreaterThan(0)
   })
 
+  it('exports blackjack deck count bounds', () => {
+    expect(BLACKJACK_DECK_MIN).toBe(2)
+    expect(BLACKJACK_DECK_MAX).toBe(8)
+    expect(normalizeBlackjackDeckCount(1)).toBe(2)
+    expect(normalizeBlackjackDeckCount(9)).toBe(8)
+    expect(normalizeBlackjackDeckCount('6')).toBe(6)
+    expect(normalizeBlackjackDeckCount('nope')).toBe(2)
+    expect(normalizeBlackjackDeckCount(Number.NaN)).toBe(2)
+  })
+
   it('exports blackjack card constants', () => {
     expect(SUITES.length).toBe(4)
     expect(VALUES[0].value).toBe(11)
@@ -519,6 +580,8 @@ describe('casino constants', () => {
 
   it('includes blackjack winMultipliers in record fields', () => {
     expect(GAME_RECORD_FIELDS.blackjack).toContain('winMultipliers')
+    expect(GAME_RECORD_FIELDS.blackjack).toContain('pairsMultipliers')
+    expect(GAME_RECORD_FIELDS.blackjack).toContain('plusThreeMultipliers')
   })
 
   it('exports blackjack worker timing constants', () => {

@@ -5,12 +5,20 @@ import {
   LOTTERY_TOTAL_NUMBERS,
   MINI_NUMBERS,
   PLINKO_ROW_COUNT,
+  calculateBlackjackInsuranceRtp,
+  calculateBlackjackPairsRtp,
   calculateHiloRtp,
   defaultCasinoSettings,
   getPlinkoMultiplierAtPathIndex,
   normalizePlinkoBinMultipliers
 } from '../constants'
 import type { TCasinoSettings } from '../types/casinoSettings'
+import { calculateBlackjackPlusThreeRtp } from './blackjackPlusThreeRtp'
+import {
+  isBlackjackInsuranceEnabled,
+  isBlackjackPairsEnabled,
+  isBlackjackPlusThreeEnabled
+} from './getBlackjackPayout'
 
 const combination = (n: number, k: number): number => {
   let result = 1
@@ -202,19 +210,47 @@ export const calculateRTP = (
     }
 
     case 'blackjack': {
-      const { winMultipliers } = settings as TCasinoSettings['blackjack']
+      const blackjack = settings as TCasinoSettings['blackjack']
       const multipliers = {
         ...defaultCasinoSettings.blackjack.winMultipliers,
-        ...winMultipliers
+        ...blackjack.winMultipliers
+      }
+      const pairsMultipliers = {
+        ...defaultCasinoSettings.blackjack.pairsMultipliers,
+        ...blackjack.pairsMultipliers
+      }
+      const plusThreeMultipliers = {
+        ...defaultCasinoSettings.blackjack.plusThreeMultipliers,
+        ...blackjack.plusThreeMultipliers
       }
       const p = BLACKJACK_OUTCOME_PROBS
 
-      return (
+      const main =
         (p.win * toNumber(multipliers.win) +
           p.blackjack * toNumber(multipliers.blackjack) +
           p.push * toNumber(multipliers.push)) *
         100
-      )
+
+      const rtp: Record<string, number> = { main }
+      if (isBlackjackPairsEnabled(pairsMultipliers)) {
+        rtp.pairs = calculateBlackjackPairsRtp(
+          blackjack.deckCount,
+          pairsMultipliers
+        )
+      }
+      if (isBlackjackInsuranceEnabled(multipliers)) {
+        rtp.insurance = calculateBlackjackInsuranceRtp(
+          blackjack.deckCount,
+          multipliers.insurance
+        )
+      }
+      if (isBlackjackPlusThreeEnabled(plusThreeMultipliers)) {
+        rtp['21+3'] = calculateBlackjackPlusThreeRtp(
+          blackjack.deckCount,
+          plusThreeMultipliers
+        )
+      }
+      return rtp
     }
 
     case 'prediction':

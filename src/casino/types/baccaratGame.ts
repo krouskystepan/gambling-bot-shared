@@ -1,10 +1,10 @@
-import type { BaccaratBetSide, BaccaratCard } from '../constants/baccaratConfig'
+import type { BaccaratCard, BaccaratSlipBet } from '../constants/baccaratConfig'
 import type { CasinoSessionStats } from './casinoSessionStats'
 
 export type BaccaratSessionPhase = 'waiting' | 'dealing' | 'result'
 
+/** Cards only - the reserved slip lives on `bets` while dealing. */
 export type TBaccaratPendingDeal = {
-  side: BaccaratBetSide
   playerCards: BaccaratCard[]
   bankerCards: BaccaratCard[]
 }
@@ -17,9 +17,10 @@ export type TBaccaratGame = {
   gameId: string
   /** Set only while a round is reserved and not yet settled. */
   activeBetId?: string | null
-  betAmount: number | null
-  /** Last settled side; used for Rebet. */
-  lastSide?: BaccaratBetSide | null
+  bets: BaccaratSlipBet[]
+  lastBets: BaccaratSlipBet[]
+  /** Reserved stake while dealing; prefer over summing `bets`. */
+  lockedAmount?: number | null
   showBalance: boolean
   skipAnimations: boolean
   phase: BaccaratSessionPhase

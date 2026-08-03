@@ -170,10 +170,12 @@ export const calculateRTP = (
     }
 
     case 'baccarat': {
-      const { winMultipliers } = settings as TCasinoSettings['baccarat']
+      const baccarat = settings as TCasinoSettings['baccarat']
+      const { winMultipliers, dragonBonusMultipliers, lucky6Multipliers } =
+        baccarat
       const p = BACCARAT_8_DECK_PROBS
 
-      // Player/banker push on tie (return stake = 1x). Pair bets are independent.
+      // Player/banker push on tie (return stake = 1x). Side bets are independent.
       const playerRTP =
         (p.player * toNumber(winMultipliers.player) + p.tie * 1) * 100
       const bankerRTP =
@@ -183,13 +185,60 @@ export const calculateRTP = (
         p.playerPair * toNumber(winMultipliers.playerPair) * 100
       const bankerPairRTP =
         p.bankerPair * toNumber(winMultipliers.bankerPair) * 100
+      const eitherPairRTP =
+        p.eitherPair * toNumber(winMultipliers.eitherPair) * 100
+      const perfectPairRTP =
+        p.perfectPair * toNumber(winMultipliers.perfectPair) * 100
+      const bigRTP = p.big * toNumber(winMultipliers.big) * 100
+      const smallRTP = p.small * toNumber(winMultipliers.small) * 100
+
+      const dragonRtp = (
+        events: {
+          winBy9: number
+          winBy8: number
+          winBy7: number
+          winBy6: number
+          winBy5: number
+          winBy4: number
+          naturalWin: number
+          naturalTie: number
+        },
+        mults: typeof dragonBonusMultipliers
+      ) =>
+        (events.winBy9 * toNumber(mults.winBy9) +
+          events.winBy8 * toNumber(mults.winBy8) +
+          events.winBy7 * toNumber(mults.winBy7) +
+          events.winBy6 * toNumber(mults.winBy6) +
+          events.winBy5 * toNumber(mults.winBy5) +
+          events.winBy4 * toNumber(mults.winBy4) +
+          events.naturalWin * toNumber(mults.naturalWin) +
+          events.naturalTie * 1) *
+        100
+
+      const lucky6RTP =
+        (p.lucky6.twoCard * toNumber(lucky6Multipliers.twoCard) +
+          p.lucky6.threeCard * toNumber(lucky6Multipliers.threeCard)) *
+        100
 
       return {
         player: playerRTP,
         banker: bankerRTP,
         tie: tieRTP,
         playerPair: playerPairRTP,
-        bankerPair: bankerPairRTP
+        bankerPair: bankerPairRTP,
+        eitherPair: eitherPairRTP,
+        perfectPair: perfectPairRTP,
+        big: bigRTP,
+        small: smallRTP,
+        playerDragonBonus: dragonRtp(
+          p.playerDragonBonus,
+          dragonBonusMultipliers
+        ),
+        bankerDragonBonus: dragonRtp(
+          p.bankerDragonBonus,
+          dragonBonusMultipliers
+        ),
+        lucky6: lucky6RTP
       }
     }
 

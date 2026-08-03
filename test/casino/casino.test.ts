@@ -36,9 +36,12 @@ import {
   hoursUntilMinesIdleClose,
   hoursUntilRouletteIdleClose,
   hoursUntilSlotsIdleClose,
+  isBaccaratFlatBetSide,
   isCasinoGameEnabled,
   isLimboWin,
+  isNaturalHand,
   isPair,
+  isPerfectPair,
   isValidBaccaratBetSide,
   isValidLimboTarget,
   isValidMineCount,
@@ -53,6 +56,7 @@ import {
   pickSafestHiloGuess,
   plinkoBinToPathIndex,
   resolveBaccaratBet,
+  resolveBaccaratSlip,
   resolveHiloRound,
   rollLimboResult,
   rouletteIdleCloseMs,
@@ -206,7 +210,14 @@ describe('calculateRTP', () => {
         banker: expect.any(Number),
         tie: expect.any(Number),
         playerPair: expect.any(Number),
-        bankerPair: expect.any(Number)
+        bankerPair: expect.any(Number),
+        eitherPair: expect.any(Number),
+        perfectPair: expect.any(Number),
+        big: expect.any(Number),
+        small: expect.any(Number),
+        playerDragonBonus: expect.any(Number),
+        bankerDragonBonus: expect.any(Number),
+        lucky6: expect.any(Number)
       })
     )
     expect(calculateRTP('rps', defaultCasinoSettings.rps)).toBeGreaterThan(0)
@@ -576,6 +587,8 @@ describe('casino constants', () => {
   it('includes baccarat in casino game ids and record fields', () => {
     expect(CASINO_GAME_IDS).toContain('baccarat')
     expect(GAME_RECORD_FIELDS.baccarat).toContain('winMultipliers')
+    expect(GAME_RECORD_FIELDS.baccarat).toContain('dragonBonusMultipliers')
+    expect(GAME_RECORD_FIELDS.baccarat).toContain('lucky6Multipliers')
   })
 
   it('includes blackjack winMultipliers in record fields', () => {
@@ -708,7 +721,38 @@ describe('limbo math', () => {
 
 describe('baccarat math', () => {
   const card = (label: string, suite = '♠️') => ({ label, suite })
-  const mult = defaultCasinoSettings.baccarat.winMultipliers
+  const payouts = {
+    winMultipliers: defaultCasinoSettings.baccarat.winMultipliers,
+    dragonBonusMultipliers:
+      defaultCasinoSettings.baccarat.dragonBonusMultipliers,
+    lucky6Multipliers: defaultCasinoSettings.baccarat.lucky6Multipliers
+  }
+  const flags = (
+    overrides: Partial<{
+      outcome: 'player' | 'banker' | 'tie'
+      playerPair: boolean
+      bankerPair: boolean
+      perfectPlayerPair: boolean
+      perfectBankerPair: boolean
+      cardCount: number
+      playerTotal: number
+      bankerTotal: number
+      playerCards: ReturnType<typeof card>[]
+      bankerCards: ReturnType<typeof card>[]
+    }> = {}
+  ) => ({
+    outcome: 'player' as const,
+    playerPair: false,
+    bankerPair: false,
+    perfectPlayerPair: false,
+    perfectBankerPair: false,
+    cardCount: 4,
+    playerTotal: 7,
+    bankerTotal: 5,
+    playerCards: [card('K'), card('7')],
+    bankerCards: [card('K'), card('5')],
+    ...overrides
+  })
 
   it('maps face values (A=1, 10/JQK=0)', () => {
     expect(baccaratCardValue('A')).toBe(1)
@@ -726,6 +770,8 @@ describe('baccarat math', () => {
     expect(isPair([card('7', '♠️'), card('7', '♥️')])).toBe(true)
     expect(isPair([card('7'), card('8')])).toBe(false)
     expect(isPair([card('7')])).toBe(false)
+    expect(isPerfectPair([card('7', '♠️'), card('7', '♠️')])).toBe(true)
+    expect(isPerfectPair([card('7', '♠️'), card('7', '♥️')])).toBe(false)
   })
 
   it('applies natural stand and player third-card rule', () => {
@@ -776,6 +822,7 @@ describe('baccarat math', () => {
     expect(round.outcome).toBe('tie')
     expect(round.playerTotal).toBe(9)
     expect(round.bankerTotal).toBe(9)
+    expect(round.cardCount).toBe(4)
   })
 
   it('deals player third then banker tableau', () => {
@@ -794,6 +841,7 @@ describe('baccarat math', () => {
     expect(round.playerTotal).toBe(2)
     expect(round.bankerTotal).toBe(3)
     expect(round.outcome).toBe('banker')
+    expect(round.cardCount).toBe(5)
   })
 
   it('deals when player stands and banker draws', () => {
@@ -811,91 +859,360 @@ describe('baccarat math', () => {
     expect(round.playerTotal).toBe(6)
     expect(round.bankerTotal).toBe(5)
     expect(round.outcome).toBe('player')
+    expect(round.cardCount).toBe(5)
+  })
+
+  it('flags suited pairs on deal', () => {
+    const shoe = [
+      card('9', '♠️'),
+      card('9', '♠️'), // perfect player pair, natural 8
+      card('K', '♥️'),
+      card('A', '♦️') // banker 1
+    ]
+    const round = dealBaccaratRound(() => shoe.shift()!)
+    expect(round.playerPair).toBe(true)
+    expect(round.perfectPlayerPair).toBe(true)
+    expect(round.bankerPair).toBe(false)
+    expect(round.perfectBankerPair).toBe(false)
+    expect(round.cardCount).toBe(4)
   })
 
   it('resolves main bets with push on tie and pair sides', () => {
     expect(
-      resolveBaccaratBet(
-        'player',
-        { outcome: 'player', playerPair: false, bankerPair: false },
-        mult
-      )
+      resolveBaccaratBet('player', flags({ outcome: 'player' }), payouts)
     ).toEqual({ won: true, push: false, multiplier: 2 })
 
     expect(
-      resolveBaccaratBet(
-        'banker',
-        { outcome: 'banker', playerPair: false, bankerPair: false },
-        mult
-      )
+      resolveBaccaratBet('banker', flags({ outcome: 'banker' }), payouts)
     ).toEqual({ won: true, push: false, multiplier: 1.95 })
 
     expect(
-      resolveBaccaratBet(
-        'player',
-        { outcome: 'banker', playerPair: false, bankerPair: false },
-        mult
-      )
+      resolveBaccaratBet('player', flags({ outcome: 'banker' }), payouts)
     ).toEqual({ won: false, push: false, multiplier: 0 })
 
     expect(
-      resolveBaccaratBet(
-        'player',
-        { outcome: 'tie', playerPair: false, bankerPair: false },
-        mult
-      )
+      resolveBaccaratBet('player', flags({ outcome: 'tie' }), payouts)
     ).toEqual({ won: false, push: true, multiplier: 1 })
 
     expect(
-      resolveBaccaratBet(
-        'tie',
-        { outcome: 'tie', playerPair: false, bankerPair: false },
-        mult
-      )
-    ).toEqual({ won: true, push: false, multiplier: 9.5 })
+      resolveBaccaratBet('tie', flags({ outcome: 'tie' }), payouts)
+    ).toEqual({
+      won: true,
+      push: false,
+      multiplier: 9.5
+    })
 
     expect(
-      resolveBaccaratBet(
-        'tie',
-        { outcome: 'player', playerPair: false, bankerPair: false },
-        mult
-      )
+      resolveBaccaratBet('tie', flags({ outcome: 'player' }), payouts)
     ).toEqual({ won: false, push: false, multiplier: 0 })
 
     expect(
-      resolveBaccaratBet(
-        'playerPair',
-        { outcome: 'banker', playerPair: true, bankerPair: false },
-        mult
-      )
+      resolveBaccaratBet('playerPair', flags({ playerPair: true }), payouts)
     ).toEqual({ won: true, push: false, multiplier: 12.5 })
 
     expect(
-      resolveBaccaratBet(
-        'playerPair',
-        { outcome: 'player', playerPair: false, bankerPair: false },
-        mult
-      )
+      resolveBaccaratBet('playerPair', flags({ playerPair: false }), payouts)
     ).toEqual({ won: false, push: false, multiplier: 0 })
 
     expect(
       resolveBaccaratBet(
         'bankerPair',
-        { outcome: 'tie', playerPair: false, bankerPair: true },
-        mult
+        flags({ outcome: 'tie', bankerPair: true }),
+        payouts
       )
     ).toEqual({ won: true, push: false, multiplier: 12.5 })
 
     expect(
       resolveBaccaratBet(
         'bankerPair',
-        { outcome: 'tie', playerPair: false, bankerPair: false },
-        mult
+        flags({ outcome: 'tie', bankerPair: false }),
+        payouts
       )
     ).toEqual({ won: false, push: false, multiplier: 0 })
 
     expect(isValidBaccaratBetSide('bankerPair')).toBe(true)
+    expect(isValidBaccaratBetSide('eitherPair')).toBe(true)
     expect(isValidBaccaratBetSide('side')).toBe(false)
+  })
+
+  it('resolves either / perfect / big / small sides', () => {
+    expect(
+      resolveBaccaratBet('eitherPair', flags({ playerPair: true }), payouts)
+    ).toEqual({ won: true, push: false, multiplier: 6.5 })
+
+    expect(
+      resolveBaccaratBet('eitherPair', flags({ bankerPair: true }), payouts)
+    ).toEqual({ won: true, push: false, multiplier: 6.5 })
+
+    expect(resolveBaccaratBet('eitherPair', flags(), payouts)).toEqual({
+      won: false,
+      push: false,
+      multiplier: 0
+    })
+
+    expect(
+      resolveBaccaratBet(
+        'perfectPair',
+        flags({ perfectPlayerPair: true }),
+        payouts
+      )
+    ).toEqual({ won: true, push: false, multiplier: 26 })
+
+    expect(
+      resolveBaccaratBet(
+        'perfectPair',
+        flags({ playerPair: true, perfectPlayerPair: false }),
+        payouts
+      )
+    ).toEqual({ won: false, push: false, multiplier: 0 })
+
+    expect(resolveBaccaratBet('big', flags({ cardCount: 5 }), payouts)).toEqual(
+      {
+        won: true,
+        push: false,
+        multiplier: 1.55
+      }
+    )
+
+    expect(resolveBaccaratBet('big', flags({ cardCount: 6 }), payouts)).toEqual(
+      {
+        won: true,
+        push: false,
+        multiplier: 1.55
+      }
+    )
+
+    expect(resolveBaccaratBet('big', flags({ cardCount: 4 }), payouts)).toEqual(
+      {
+        won: false,
+        push: false,
+        multiplier: 0
+      }
+    )
+
+    expect(
+      resolveBaccaratBet('small', flags({ cardCount: 4 }), payouts)
+    ).toEqual({
+      won: true,
+      push: false,
+      multiplier: 2.5
+    })
+
+    expect(
+      resolveBaccaratBet('small', flags({ cardCount: 5 }), payouts)
+    ).toEqual({
+      won: false,
+      push: false,
+      multiplier: 0
+    })
+  })
+
+  it('resolves Dragon Bonus and Lucky 6 tiers', () => {
+    expect(isNaturalHand([card('9'), card('K')], 9)).toBe(true)
+    expect(isNaturalHand([card('4'), card('4'), card('A')], 9)).toBe(false)
+
+    // Natural player win → 1:1 (2x total return)
+    expect(
+      resolveBaccaratBet(
+        'playerDragonBonus',
+        flags({
+          outcome: 'player',
+          playerTotal: 9,
+          bankerTotal: 1,
+          playerCards: [card('9'), card('K')],
+          bankerCards: [card('A'), card('K')]
+        }),
+        payouts
+      )
+    ).toEqual({ won: true, push: false, multiplier: 2 })
+
+    // Non-natural win by 9 → 30:1 (31x)
+    expect(
+      resolveBaccaratBet(
+        'playerDragonBonus',
+        flags({
+          outcome: 'player',
+          playerTotal: 9,
+          bankerTotal: 0,
+          playerCards: [card('4'), card('5'), card('K')],
+          bankerCards: [card('K'), card('K'), card('K')],
+          cardCount: 6
+        }),
+        payouts
+      )
+    ).toEqual({ won: true, push: false, multiplier: 31 })
+
+    // Win by 3 does not pay Dragon Bonus
+    expect(
+      resolveBaccaratBet(
+        'playerDragonBonus',
+        flags({
+          outcome: 'player',
+          playerTotal: 7,
+          bankerTotal: 4,
+          playerCards: [card('3'), card('4')],
+          bankerCards: [card('2'), card('2')],
+          cardCount: 4
+        }),
+        payouts
+      )
+    ).toEqual({ won: false, push: false, multiplier: 0 })
+
+    // Natural tie pushes Dragon Bonus
+    expect(
+      resolveBaccaratBet(
+        'bankerDragonBonus',
+        flags({
+          outcome: 'tie',
+          playerTotal: 9,
+          bankerTotal: 9,
+          playerCards: [card('9'), card('K')],
+          bankerCards: [card('8'), card('A')]
+        }),
+        payouts
+      )
+    ).toEqual({ won: false, push: true, multiplier: 1 })
+
+    // Lucky 6: banker wins with two-card 6
+    expect(
+      resolveBaccaratBet(
+        'lucky6',
+        flags({
+          outcome: 'banker',
+          playerTotal: 4,
+          bankerTotal: 6,
+          playerCards: [card('2'), card('2')],
+          bankerCards: [card('3'), card('3')],
+          cardCount: 4
+        }),
+        payouts
+      )
+    ).toEqual({ won: true, push: false, multiplier: 13 })
+
+    // Lucky 6: banker wins with three-card 6
+    expect(
+      resolveBaccaratBet(
+        'lucky6',
+        flags({
+          outcome: 'banker',
+          playerTotal: 5,
+          bankerTotal: 6,
+          playerCards: [card('2'), card('3')],
+          bankerCards: [card('2'), card('2'), card('2')],
+          cardCount: 5
+        }),
+        payouts
+      )
+    ).toEqual({ won: true, push: false, multiplier: 24 })
+
+    expect(
+      resolveBaccaratBet(
+        'lucky6',
+        flags({
+          outcome: 'banker',
+          playerTotal: 4,
+          bankerTotal: 7,
+          playerCards: [card('2'), card('2')],
+          bankerCards: [card('3'), card('4')],
+          cardCount: 4
+        }),
+        payouts
+      )
+    ).toEqual({ won: false, push: false, multiplier: 0 })
+
+    // Chosen side loses → Dragon Bonus loses
+    expect(
+      resolveBaccaratBet(
+        'playerDragonBonus',
+        flags({
+          outcome: 'banker',
+          playerTotal: 4,
+          bankerTotal: 7,
+          playerCards: [card('2'), card('2')],
+          bankerCards: [card('3'), card('4')]
+        }),
+        payouts
+      )
+    ).toEqual({ won: false, push: false, multiplier: 0 })
+
+    // Non-natural tie loses Dragon Bonus
+    expect(
+      resolveBaccaratBet(
+        'playerDragonBonus',
+        flags({
+          outcome: 'tie',
+          playerTotal: 6,
+          bankerTotal: 6,
+          playerCards: [card('3'), card('3')],
+          bankerCards: [card('2'), card('4')]
+        }),
+        payouts
+      )
+    ).toEqual({ won: false, push: false, multiplier: 0 })
+
+    expect(isValidBaccaratBetSide('playerDragonBonus')).toBe(true)
+    expect(isValidBaccaratBetSide('lucky6')).toBe(true)
+    expect(isBaccaratFlatBetSide('player')).toBe(true)
+    expect(isBaccaratFlatBetSide('lucky6')).toBe(false)
+  })
+
+  it('sums slip line payouts including push with pairs on the same round', () => {
+    const slip = resolveBaccaratSlip(
+      [
+        { side: 'player', amount: 100 },
+        { side: 'playerPair', amount: 20 },
+        { side: 'big', amount: 50 }
+      ],
+      flags({
+        outcome: 'tie',
+        playerPair: true,
+        cardCount: 4
+      }),
+      payouts
+    )
+
+    // player pushes (100), playerPair wins (20 * 12.5), big loses
+    expect(slip.totalWinnings).toBe(100 + 20 * 12.5)
+    expect(slip.lines[0]).toMatchObject({
+      side: 'player',
+      push: true,
+      winnings: 100
+    })
+    expect(slip.lines[1]).toMatchObject({
+      side: 'playerPair',
+      won: true,
+      winnings: 250
+    })
+    expect(slip.lines[2]).toMatchObject({
+      side: 'big',
+      won: false,
+      winnings: 0
+    })
+  })
+
+  it('keeps side/amount when bet fields are non-enumerable (mongoose-like)', () => {
+    const bet = Object.defineProperties(
+      {} as { side: 'player'; amount: number },
+      {
+        side: { get: () => 'player' as const, enumerable: false },
+        amount: { get: () => 100, enumerable: false }
+      }
+    )
+
+    expect({ ...bet }).toEqual({})
+
+    const slip = resolveBaccaratSlip(
+      [bet],
+      flags({ outcome: 'player' }),
+      payouts
+    )
+
+    expect(slip.lines[0]).toMatchObject({
+      side: 'player',
+      amount: 100,
+      won: true,
+      winnings: 100 * payouts.winMultipliers.player
+    })
   })
 
   it('reports ~98–99% RTP for player/banker defaults', () => {
@@ -910,6 +1227,16 @@ describe('baccarat math', () => {
     expect(rtp.banker).toBeLessThan(99.5)
     expect(rtp.tie).toBeGreaterThan(80)
     expect(rtp.playerPair).toBeGreaterThan(80)
+    expect(rtp.eitherPair).toBeGreaterThan(80)
+    expect(rtp.perfectPair).toBeGreaterThan(80)
+    expect(rtp.big).toBeGreaterThan(90)
+    expect(rtp.small).toBeGreaterThan(90)
+    expect(rtp.playerDragonBonus).toBeGreaterThan(95)
+    expect(rtp.playerDragonBonus).toBeLessThan(100)
+    expect(rtp.bankerDragonBonus).toBeGreaterThan(85)
+    expect(rtp.bankerDragonBonus).toBeLessThan(95)
+    expect(rtp.lucky6).toBeGreaterThan(80)
+    expect(rtp.lucky6).toBeLessThan(95)
   })
 })
 

@@ -5,6 +5,8 @@ export const readableGameValueNames = [
   { name: 'Win Multipliers (x)', value: 'winMultipliers' },
   { name: 'Pairs Payouts (x)', value: 'pairsMultipliers' },
   { name: '21+3 Payouts (x)', value: 'plusThreeMultipliers' },
+  { name: 'Dragon Bonus Payouts (x)', value: 'dragonBonusMultipliers' },
+  { name: 'Lucky 6 Payouts (x)', value: 'lucky6Multipliers' },
   { name: 'Bin Payouts (x)', value: 'binMultipliers' },
   { name: 'House Edge (%)', value: 'houseEdge' },
   { name: 'One-In Chance (e.g. 1 in 10,000)', value: 'oneInChance' },
@@ -59,6 +61,22 @@ export const readableGameValueNames = [
   { name: 'Tie', value: 'tie' },
   { name: 'Player Pair', value: 'playerPair' },
   { name: 'Banker Pair', value: 'bankerPair' },
+  { name: 'Either Pair', value: 'eitherPair' },
+  { name: 'Perfect Pair', value: 'perfectPair' },
+  { name: 'Big', value: 'big' },
+  { name: 'Small', value: 'small' },
+  { name: 'Player Dragon Bonus', value: 'playerDragonBonus' },
+  { name: 'Banker Dragon Bonus', value: 'bankerDragonBonus' },
+  { name: 'Lucky 6', value: 'lucky6' },
+  { name: 'Win by 9', value: 'winBy9' },
+  { name: 'Win by 8', value: 'winBy8' },
+  { name: 'Win by 7', value: 'winBy7' },
+  { name: 'Win by 6', value: 'winBy6' },
+  { name: 'Win by 5', value: 'winBy5' },
+  { name: 'Win by 4', value: 'winBy4' },
+  { name: 'Natural Win', value: 'naturalWin' },
+  { name: '2-Card', value: 'twoCard' },
+  { name: '3-Card', value: 'threeCard' },
 
   // Lottery match counts
   { name: '0 Matches', value: '0' },
@@ -163,7 +181,26 @@ export const defaultCasinoSettings = {
       banker: 1.95,
       tie: 9.5,
       playerPair: 12.5,
-      bankerPair: 12.5
+      bankerPair: 12.5,
+      eitherPair: 6.5,
+      perfectPair: 26,
+      big: 1.55,
+      small: 2.5
+    },
+    /** Total-return multipliers (stake included). Standard Dragon Bonus table. */
+    dragonBonusMultipliers: {
+      winBy9: 31, // 30:1
+      winBy8: 11, // 10:1
+      winBy7: 7, // 6:1
+      winBy6: 5, // 4:1
+      winBy5: 3, // 2:1
+      winBy4: 2, // 1:1
+      naturalWin: 2 // 1:1
+    },
+    /** Total-return multipliers. Liberal Lucky 6 (12:1 / 23:1). */
+    lucky6Multipliers: {
+      twoCard: 13,
+      threeCard: 24
     },
     maxBet: 0,
     minBet: 0

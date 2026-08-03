@@ -10,6 +10,14 @@ const baccaratCardSchema = new Schema(
   { _id: false }
 )
 
+const baccaratSlipBetSchema = new Schema(
+  {
+    side: { type: String, required: true },
+    amount: { type: Number, required: true }
+  },
+  { _id: false }
+)
+
 const sessionStatsSchema = new Schema(
   {
     roundsPlayed: { type: Number, required: true, default: 0 },
@@ -28,8 +36,9 @@ export const BaccaratGameSchema = new Schema<TBaccaratGame>(
     messageId: { type: String, required: true },
     gameId: { type: String, required: true, index: true },
     activeBetId: { type: String, default: null, index: true },
-    betAmount: { type: Number, default: null },
-    lastSide: { type: String, default: null },
+    bets: { type: [baccaratSlipBetSchema], required: true, default: [] },
+    lastBets: { type: [baccaratSlipBetSchema], required: true, default: [] },
+    lockedAmount: { type: Number, default: null },
     showBalance: { type: Boolean, required: true, default: false },
     skipAnimations: { type: Boolean, required: true, default: false },
     phase: {
@@ -41,7 +50,6 @@ export const BaccaratGameSchema = new Schema<TBaccaratGame>(
     pendingDeal: {
       type: new Schema(
         {
-          side: { type: String, required: true },
           playerCards: {
             type: [baccaratCardSchema],
             required: true,

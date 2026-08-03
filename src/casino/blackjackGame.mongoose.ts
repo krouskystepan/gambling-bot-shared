@@ -37,6 +37,28 @@ export const BlackjackGameSchema = new Schema<TBlackjackGame>(
     gameId: { type: String, required: true, index: true },
     activeBetId: { type: String, default: null, index: true },
     baseBetAmount: { type: Number, default: null },
+    basePairsBetAmount: { type: Number, default: null },
+    activePairsBetAmount: { type: Number, default: null },
+    basePlusThreeBetAmount: { type: Number, default: null },
+    activePlusThreeBetAmount: { type: Number, default: null },
+    insuranceBetAmount: { type: Number, default: null },
+    pairsOutcome: {
+      type: String,
+      enum: ['perfect', 'colored', 'mixed', 'loss'],
+      default: null
+    },
+    plusThreeOutcome: {
+      type: String,
+      enum: [
+        'suitedTrips',
+        'straightFlush',
+        'threeOfAKind',
+        'straight',
+        'flush',
+        'loss'
+      ],
+      default: null
+    },
     showBalance: { type: Boolean, required: true, default: false },
     skipAnimations: { type: Boolean, required: true, default: false },
 
@@ -46,7 +68,7 @@ export const BlackjackGameSchema = new Schema<TBlackjackGame>(
     hands: { type: [handSchema], required: true, default: [] },
     phase: {
       type: String,
-      enum: ['BETTING', 'PLAYER', 'DEALER', 'RESULT'],
+      enum: ['BETTING', 'INSURANCE', 'PLAYER', 'DEALER', 'RESULT'],
       required: true,
       default: 'BETTING'
     },

@@ -62,6 +62,8 @@ export const casinoSettingsSchema = z.object({
   baccarat: z.object({
     enabled: z.boolean(),
     winMultipliers: z.record(z.string(), num),
+    dragonBonusMultipliers: z.record(z.string(), num),
+    lucky6Multipliers: z.record(z.string(), num),
     minBet: num,
     maxBet: num
   }),
@@ -84,6 +86,9 @@ export const casinoSettingsSchema = z.object({
   blackjack: z.object({
     enabled: z.boolean(),
     winMultipliers: z.record(z.string(), num),
+    pairsMultipliers: z.record(z.string(), num),
+    plusThreeMultipliers: z.record(z.string(), num),
+    deckCount: num,
     minBet: num,
     maxBet: num
   }),

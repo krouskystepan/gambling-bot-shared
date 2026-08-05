@@ -33,8 +33,11 @@ export const HiloGameSchema = new Schema<THiloGame>(
     betAmount: { type: Number, default: null },
     firstCard: { type: hiloCardSchema, default: null },
     remainingDeck: { type: [hiloCardSchema], required: true, default: [] },
+    currentMultiplier: { type: Number, required: true, default: 1 },
+    streak: { type: Number, required: true, default: 0 },
     houseEdgeSnapshot: { type: Number, required: true, default: 0 },
     showBalance: { type: Boolean, required: true, default: false },
+    skipAnimations: { type: Boolean, required: true, default: false },
 
     status: {
       type: String,

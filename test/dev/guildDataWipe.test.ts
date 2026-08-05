@@ -30,6 +30,7 @@ function createMockModels(
     minesGames: deleteModel('minesGames'),
     rouletteGames: deleteModel('rouletteGames'),
     slotsGames: deleteModel('slotsGames'),
+    plinkoGames: deleteModel('plinkoGames'),
     userQuestProgress: deleteModel('userQuestProgress'),
     userBans: deleteModel('userBans'),
     users: deleteModel('users'),
@@ -52,6 +53,7 @@ describe('normalizeGuildWipeEntities', () => {
       'mines',
       'roulette',
       'slots',
+      'plinko',
       'quests',
       'users'
     ])
@@ -77,6 +79,7 @@ describe('normalizeGuildWipeEntities', () => {
       'mines',
       'roulette',
       'slots',
+      'plinko',
       'quests',
       'users'
     ])
@@ -258,6 +261,7 @@ describe('runGuildDataWipe', () => {
       'minesGames',
       'rouletteGames',
       'slotsGames',
+      'plinkoGames',
       'userQuestProgress',
       'userQuestStreaks',
       'userBans',

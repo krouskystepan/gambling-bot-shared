@@ -13,6 +13,7 @@ export type GuildWipeEntity =
   | 'mines'
   | 'roulette'
   | 'slots'
+  | 'plinko'
   | 'quests'
 
 export type GuildDataWipeDeleteResult = {
@@ -44,6 +45,7 @@ export type GuildDataWipeModels = {
   minesGames: GuildDataWipeModel
   rouletteGames: GuildDataWipeModel
   slotsGames: GuildDataWipeModel
+  plinkoGames: GuildDataWipeModel
   userQuestProgress: GuildDataWipeModel
   userQuestStreaks: GuildDataWipeQuestStreakModel
   userBans: GuildDataWipeModel
@@ -73,6 +75,7 @@ const WIPE_ENTITY_ORDER: Exclude<GuildWipeEntity, 'all'>[] = [
   'mines',
   'roulette',
   'slots',
+  'plinko',
   'quests',
   'users'
 ]
@@ -96,6 +99,7 @@ const ENTITY_TO_MODEL_KEY: Record<
   mines: 'minesGames',
   roulette: 'rouletteGames',
   slots: 'slotsGames',
+  plinko: 'plinkoGames',
   users: 'users'
 }
 
@@ -110,6 +114,7 @@ const WIPE_LABELS: Record<keyof GuildDataWipeModels, string> = {
   minesGames: 'Mines games',
   rouletteGames: 'Roulette games',
   slotsGames: 'Slots games',
+  plinkoGames: 'Plinko games',
   userQuestProgress: 'Quest progress',
   userQuestStreaks: 'Quest streaks',
   userBans: 'User bans',

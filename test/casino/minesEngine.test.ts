@@ -1,5 +1,5 @@
 import {
-  cashOutPayout,
+  cashOutMinesPayout,
   createMinesEngine,
   currentMinesMultiplier,
   docToMinesEngine,
@@ -66,13 +66,13 @@ describe('mines engine', () => {
     )
     expect(isMinesFinished(state)).toBe(true)
     expect(isMinesBust(state)).toBe(true)
-    expect(cashOutPayout(state).kind).toBe('IGNORED')
+    expect(cashOutMinesPayout(state).kind).toBe('IGNORED')
   })
 
   it('cashes out after at least one safe reveal', () => {
     const state = start()
     revealCell(state, 2)
-    const cash = cashOutPayout(state)
+    const cash = cashOutMinesPayout(state)
     expect(cash.kind).toBe('OK')
     if (cash.kind !== 'OK') return
     expect(cash.payout).toBeCloseTo(100 * cash.multiplier, 10)
@@ -82,7 +82,7 @@ describe('mines engine', () => {
 
   it('ignores cash out with zero reveals', () => {
     const state = start()
-    expect(cashOutPayout(state)).toEqual({
+    expect(cashOutMinesPayout(state)).toEqual({
       kind: 'IGNORED',
       reason: 'NO_REVEALS'
     })
@@ -112,7 +112,7 @@ describe('mines engine', () => {
       kind: 'IGNORED',
       reason: 'RESULT'
     })
-    expect(cashOutPayout(state)).toEqual({
+    expect(cashOutMinesPayout(state)).toEqual({
       kind: 'IGNORED',
       reason: 'RESULT'
     })
@@ -215,7 +215,7 @@ describe('mines engine', () => {
     expect(result.kind).toBe('SAFE')
     if (result.kind !== 'SAFE') return
     expect(result.boardCleared).toBe(true)
-    const cash = cashOutPayout(state)
+    const cash = cashOutMinesPayout(state)
     expect(cash.kind).toBe('OK')
   })
 

@@ -10,8 +10,8 @@ export type HiloStoredCard = {
 /**
  * Durable Hi-Lo table session:
  * - BETTING: set stake, then Deal
- * - WAITING: first card shown, stake locked until guess / timeout
- * - SETTLING: claim lock while resolving a guess or timeout
+ * - WAITING: card-to-beat shown, stake locked until guess / cash-out / timeout
+ * - SETTLING: claim lock while resolving a guess, cash-out, or timeout
  * - RESULT: between rounds (Rebet / Change / Close)
  */
 export type HiloGameStatus = 'BETTING' | 'WAITING' | 'SETTLING' | 'RESULT'
@@ -26,11 +26,17 @@ export type THiloGame = {
   activeBetId?: string | null
 
   betAmount: number | null
+  /** Card currently being guessed against (updates after each correct guess). */
   firstCard?: HiloStoredCard | null
-  /** Remaining deck after the first card was drawn (no replacement). */
+  /** Remaining deck after cards drawn this streak (no replacement). */
   remainingDeck: HiloStoredCard[]
+  /** Compound payout multiplier for the locked streak (starts at 1). */
+  currentMultiplier: number
+  /** Successful guesses this locked round. */
+  streak: number
   houseEdgeSnapshot: number
   showBalance: boolean
+  skipAnimations: boolean
 
   status: HiloGameStatus
   sessionStats: CasinoSessionStats

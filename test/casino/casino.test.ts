@@ -10,6 +10,7 @@ import {
   SLOT_MAX_SIMULATE_SPINS,
   SUITES,
   VALUES,
+  applyHiloGuess,
   baccaratCardValue,
   baccaratIdleCloseMs,
   baccaratIdleNudgeThresholdMs,
@@ -17,9 +18,12 @@ import {
   blackjackIdleCloseMs,
   blackjackIdleNudgeThresholdMs,
   calculateRTP,
+  cashOutHiloPayout,
   casinoSettingsSchema,
+  createHiloEngine,
   dealBaccaratRound,
   defaultCasinoSettings,
+  docToHiloEngine,
   expandPlinkoBinMultipliers,
   formatPlinkoBinMultipliersForDisplay,
   getHiloWinMultiplier,
@@ -28,12 +32,14 @@ import {
   getPlinkoMirrorBin,
   getPlinkoMultiplierAtPathIndex,
   handTotal,
+  hiloFullDeckRemaining,
   hiloRankFromLabel,
   hoursUntilBaccaratIdleClose,
   hoursUntilBlackjackAutostand,
   hoursUntilBlackjackIdleClose,
   hoursUntilMinesAutoResolve,
   hoursUntilMinesIdleClose,
+  hoursUntilPlinkoIdleClose,
   hoursUntilRouletteIdleClose,
   hoursUntilSlotsIdleClose,
   isBaccaratFlatBetSide,
@@ -55,9 +61,12 @@ import {
   pathIndexToPlinkoBin,
   pickSafestHiloGuess,
   plinkoBinToPathIndex,
+  plinkoIdleCloseMs,
+  plinkoIdleNudgeThresholdMs,
   resolveBaccaratBet,
   resolveBaccaratSlip,
   resolveHiloRound,
+  resolveIdleHilo,
   rollLimboResult,
   rouletteIdleCloseMs,
   rouletteIdleNudgeThresholdMs,
@@ -580,6 +589,18 @@ describe('casino constants', () => {
     expect(slotsIdleCloseMs()).toBe(24 * 60 * 60 * 1000)
   })
 
+  it('computes hours until plinko idle close', () => {
+    const now = Date.parse('2024-06-15T12:00:00Z')
+    const updatedAt = new Date(now - 6 * 60 * 60 * 1000)
+
+    expect(hoursUntilPlinkoIdleClose(updatedAt, now)).toBe(18)
+    expect(
+      hoursUntilPlinkoIdleClose(new Date(now - 23 * 60 * 60 * 1000), now)
+    ).toBe(1)
+    expect(plinkoIdleNudgeThresholdMs()).toBe(3 * 60 * 60 * 1000)
+    expect(plinkoIdleCloseMs()).toBe(24 * 60 * 60 * 1000)
+  })
+
   it('includes mines in casino game ids', () => {
     expect(CASINO_GAME_IDS).toContain('mines')
   })
@@ -633,34 +654,60 @@ describe('hiloRankFromLabel', () => {
 describe('hilo odds', () => {
   it('pays full-deck odds with house edge (same rank loses for higher/lower)', () => {
     // Middle card (8): 24 higher of 51 remaining → mult = 0.97 * 51 / 24
-    expect(getHiloWinMultiplier(8, 'higher', 0.03)).toBeCloseTo(
-      (0.97 * 51) / 24,
-      5
-    )
-    expect(getHiloWinMultiplier(8, 'lower', 0.03)).toBeCloseTo(
-      (0.97 * 51) / 24,
-      5
-    )
+    expect(
+      getHiloWinMultiplier(8, 'higher', 0.03, hiloFullDeckRemaining(8))
+    ).toBeCloseTo((0.97 * 51) / 24, 5)
+    expect(
+      getHiloWinMultiplier(8, 'lower', 0.03, hiloFullDeckRemaining(8))
+    ).toBeCloseTo((0.97 * 51) / 24, 5)
     // King: 4 aces higher, 44 lower
-    expect(getHiloWinMultiplier(13, 'higher', 0.03)).toBeCloseTo(
-      (0.97 * 51) / 4,
-      5
-    )
-    expect(getHiloWinMultiplier(13, 'lower', 0.03)).toBeCloseTo(
-      (0.97 * 51) / 44,
-      5
-    )
-    expect(getHiloWinMultiplier(14, 'higher', 0.03)).toBeNull()
-    expect(getHiloWinMultiplier(2, 'lower', 0.03)).toBeNull()
+    expect(
+      getHiloWinMultiplier(13, 'higher', 0.03, hiloFullDeckRemaining(13))
+    ).toBeCloseTo((0.97 * 51) / 4, 5)
+    expect(
+      getHiloWinMultiplier(13, 'lower', 0.03, hiloFullDeckRemaining(13))
+    ).toBeCloseTo((0.97 * 51) / 44, 5)
+    expect(
+      getHiloWinMultiplier(14, 'higher', 0.03, hiloFullDeckRemaining(14))
+    ).toBeNull()
+    expect(
+      getHiloWinMultiplier(2, 'lower', 0.03, hiloFullDeckRemaining(2))
+    ).toBeNull()
+    expect(getHiloWinMultiplier(8, 'higher', 0.03, [])).toBeNull()
     // Same rank: 3 of 51 remaining
-    expect(getHiloWinMultiplier(2, 'same', 0.03)).toBeCloseTo(
-      (0.97 * 51) / 3,
+    expect(
+      getHiloWinMultiplier(2, 'same', 0.03, hiloFullDeckRemaining(2))
+    ).toBeCloseTo((0.97 * 51) / 3, 5)
+    expect(
+      getHiloWinMultiplier(14, 'same', 0.03, hiloFullDeckRemaining(14))
+    ).toBeCloseTo((0.97 * 51) / 3, 5)
+  })
+
+  it('recomputes odds from the actual remaining deck mid-streak', () => {
+    // After some cards are gone, favorable counts shrink with the deck.
+    const remaining = [
+      { rank: 10 },
+      { rank: 10 },
+      { rank: 14 },
+      { rank: 3 },
+      { rank: 3 }
+    ]
+    // Higher than 8: tens + ace → 0.97 * 5 / 3
+    expect(getHiloWinMultiplier(8, 'higher', 0.03, remaining)).toBeCloseTo(
+      (0.97 * 5) / 3,
       5
     )
-    expect(getHiloWinMultiplier(14, 'same', 0.03)).toBeCloseTo(
-      (0.97 * 51) / 3,
+    // Lower: two threes → 0.97 * 5 / 2
+    expect(getHiloWinMultiplier(8, 'lower', 0.03, remaining)).toBeCloseTo(
+      (0.97 * 5) / 2,
       5
     )
+    // Same as 10: two tens
+    expect(getHiloWinMultiplier(10, 'same', 0.03, remaining)).toBeCloseTo(
+      (0.97 * 5) / 2,
+      5
+    )
+    expect(getHiloWinMultiplier(8, 'same', 0.03, remaining)).toBeNull()
   })
 
   it('resolves win lose (draw is only a win on same)', () => {
@@ -675,13 +722,223 @@ describe('hilo odds', () => {
 
   it('picks the lowest-multiplier side as safest on timeout', () => {
     // Ace: only lower / same; lower has far more favorable cards.
-    expect(pickSafestHiloGuess(14, 0.03)).toBe('lower')
+    expect(pickSafestHiloGuess(14, 0.03, hiloFullDeckRemaining(14))).toBe(
+      'lower'
+    )
     // Two: only higher / same.
-    expect(pickSafestHiloGuess(2, 0.03)).toBe('higher')
+    expect(pickSafestHiloGuess(2, 0.03, hiloFullDeckRemaining(2))).toBe(
+      'higher'
+    )
     // King: lower (~1.1x) beats higher (~12x) and same (~16x).
-    expect(pickSafestHiloGuess(13, 0.03)).toBe('lower')
+    expect(pickSafestHiloGuess(13, 0.03, hiloFullDeckRemaining(13))).toBe(
+      'lower'
+    )
     // Middle 8: higher and lower tie; prefer higher (iteration order).
-    expect(pickSafestHiloGuess(8, 0.03)).toBe('higher')
+    expect(pickSafestHiloGuess(8, 0.03, hiloFullDeckRemaining(8))).toBe(
+      'higher'
+    )
+  })
+})
+
+describe('hilo engine', () => {
+  const card = (rank: number, label = String(rank)) => ({
+    label,
+    suite: '♠️' as const,
+    rank
+  })
+
+  it('compounds multipliers on continue and cashes out after a streak', () => {
+    const state = createHiloEngine({
+      betAmount: 100,
+      firstCard: card(7),
+      remainingDeck: [card(10), card(12, 'Q')],
+      houseEdgeSnapshot: 0.03
+    })
+
+    const first = applyHiloGuess(state, 'higher')
+    expect(first.kind).toBe('CONTINUE')
+    if (first.kind !== 'CONTINUE') return
+
+    const step1 = getHiloWinMultiplier(7, 'higher', 0.03, [
+      card(10),
+      card(12, 'Q')
+    ])!
+    expect(first.currentMultiplier).toBeCloseTo(step1, 10)
+    expect(first.streak).toBe(1)
+    expect(state.firstCard.rank).toBe(12)
+
+    const cash = cashOutHiloPayout(state)
+    expect(cash.kind).toBe('OK')
+    if (cash.kind !== 'OK') return
+    expect(cash.payout).toBeCloseTo(100 * step1, 10)
+    expect(state.status).toBe('RESULT')
+  })
+
+  it('busts on a wrong guess', () => {
+    const state = createHiloEngine({
+      betAmount: 50,
+      firstCard: card(10),
+      // Next reveal is the trailing card (2); 12 keeps "higher" possible.
+      remainingDeck: [card(12), card(2)],
+      houseEdgeSnapshot: 0.03
+    })
+
+    const result = applyHiloGuess(state, 'higher')
+    expect(result.kind).toBe('BUST')
+    expect(state.status).toBe('RESULT')
+  })
+
+  it('rejects impossible guesses with no favorable cards', () => {
+    const state = createHiloEngine({
+      betAmount: 50,
+      firstCard: card(14, 'A'),
+      remainingDeck: [card(2)],
+      houseEdgeSnapshot: 0.03
+    })
+
+    expect(applyHiloGuess(state, 'higher')).toEqual({
+      kind: 'IMPOSSIBLE',
+      reason: 'NO_FAVORABLE'
+    })
+    expect(state.status).toBe('WAITING')
+  })
+
+  it('ignores guesses when already settled or the deck is empty', () => {
+    const settled = createHiloEngine({
+      betAmount: 50,
+      firstCard: card(10),
+      remainingDeck: [card(12)],
+      houseEdgeSnapshot: 0.03
+    })
+    settled.status = 'RESULT'
+    expect(applyHiloGuess(settled, 'higher')).toEqual({
+      kind: 'IGNORED',
+      reason: 'RESULT'
+    })
+
+    const empty = createHiloEngine({
+      betAmount: 50,
+      firstCard: card(10),
+      remainingDeck: [],
+      houseEdgeSnapshot: 0.03
+    })
+    expect(applyHiloGuess(empty, 'higher')).toEqual({
+      kind: 'IGNORED',
+      reason: 'EMPTY_DECK'
+    })
+  })
+
+  it('maps documents into engine state', () => {
+    const state = docToHiloEngine({
+      status: 'WAITING',
+      betAmount: 100,
+      firstCard: card(8),
+      remainingDeck: [card(10)],
+      currentMultiplier: 1.25,
+      streak: 2,
+      houseEdgeSnapshot: 0.03
+    })
+    expect(state.status).toBe('WAITING')
+    expect(state.streak).toBe(2)
+    expect(state.currentMultiplier).toBe(1.25)
+
+    const settling = docToHiloEngine({
+      status: 'SETTLING',
+      betAmount: 50,
+      firstCard: card(5),
+      remainingDeck: [],
+      currentMultiplier: undefined as unknown as number,
+      streak: undefined as unknown as number,
+      houseEdgeSnapshot: 0.03
+    })
+    expect(settling.status).toBe('WAITING')
+    expect(settling.streak).toBe(0)
+    expect(settling.currentMultiplier).toBe(1)
+
+    expect(() =>
+      docToHiloEngine({
+        status: 'BETTING',
+        betAmount: null,
+        firstCard: null,
+        remainingDeck: [],
+        currentMultiplier: 1,
+        streak: 0,
+        houseEdgeSnapshot: 0.03
+      })
+    ).toThrow(/active or settled round/)
+  })
+
+  it('force cash-outs when the deck empties after a win', () => {
+    const state = createHiloEngine({
+      betAmount: 100,
+      firstCard: card(5),
+      remainingDeck: [card(9)],
+      houseEdgeSnapshot: 0.03
+    })
+
+    const result = applyHiloGuess(state, 'higher')
+    expect(result.kind).toBe('DECK_EMPTY_CASHOUT')
+    if (result.kind !== 'DECK_EMPTY_CASHOUT') return
+    expect(result.streak).toBe(1)
+    // Single favorable card → step mult is (1 - houseEdge)
+    expect(result.payout).toBeCloseTo(97, 10)
+    expect(state.status).toBe('RESULT')
+  })
+
+  it('ignores cash-out before any streak', () => {
+    const state = createHiloEngine({
+      betAmount: 100,
+      firstCard: card(8),
+      remainingDeck: [card(10)],
+      houseEdgeSnapshot: 0.03
+    })
+    expect(cashOutHiloPayout(state).kind).toBe('IGNORED')
+
+    state.status = 'RESULT'
+    expect(cashOutHiloPayout(state)).toEqual({
+      kind: 'IGNORED',
+      reason: 'RESULT'
+    })
+  })
+
+  it('idle resolves to cash-out after a streak, else safest guess', () => {
+    const withStreak = createHiloEngine({
+      betAmount: 100,
+      firstCard: card(8),
+      remainingDeck: [card(10)],
+      houseEdgeSnapshot: 0.03,
+      currentMultiplier: 1.5,
+      streak: 1
+    })
+    const cash = resolveIdleHilo(withStreak)
+    expect(cash).toEqual({
+      kind: 'CASH_OUT',
+      multiplier: 1.5,
+      payout: 150,
+      streak: 1
+    })
+
+    const alreadySettled = createHiloEngine({
+      betAmount: 100,
+      firstCard: card(8),
+      remainingDeck: [card(10)],
+      houseEdgeSnapshot: 0.03
+    })
+    alreadySettled.status = 'RESULT'
+    expect(resolveIdleHilo(alreadySettled).kind).toBe('AUTO_GUESS')
+
+    const fresh = createHiloEngine({
+      betAmount: 100,
+      firstCard: card(14, 'A'),
+      remainingDeck: hiloFullDeckRemaining(14).map((c) =>
+        card(c.rank, String(c.rank))
+      ),
+      houseEdgeSnapshot: 0.03
+    })
+    expect(resolveIdleHilo(fresh)).toEqual({
+      kind: 'AUTO_GUESS',
+      guess: 'lower'
+    })
   })
 })
 

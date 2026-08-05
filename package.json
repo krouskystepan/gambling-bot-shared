@@ -1,6 +1,6 @@
 {
   "name": "gambling-bot-shared",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "license": "MIT",
   "type": "commonjs",
   "repository": {
@@ -59,6 +59,11 @@
       "types": "./dist/slots/index.d.ts",
       "default": "./dist/slots/index.js"
     },
+    "./plinko": {
+      "types": "./dist/plinko/index.d.ts",
+      "default": "./dist/plinko/index.js"
+    },
+
     "./user": {
       "types": "./dist/user/index.d.ts",
       "default": "./dist/user/index.js"

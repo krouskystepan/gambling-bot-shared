@@ -174,7 +174,9 @@ export const revealCell = (
   }
 }
 
-export const cashOutPayout = (state: MinesEngineState): MinesCashOutResult => {
+export const cashOutMinesPayout = (
+  state: MinesEngineState
+): MinesCashOutResult => {
   if (state.status !== 'ACTIVE') {
     return { kind: 'IGNORED', reason: 'RESULT' }
   }

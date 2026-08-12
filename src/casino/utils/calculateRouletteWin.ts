@@ -1,4 +1,4 @@
-import { MINI_NUMBERS } from '../constants/rouletteConfig'
+import { EUROPEAN_NUMBERS } from '../constants/rouletteConfig'
 import type { TCasinoSettings } from '../types/casinoSettings'
 
 export type RouletteBetType =
@@ -27,7 +27,7 @@ export function calculateRouletteWin(
 
     case 'color':
       if (result === '0') return 0
-      return MINI_NUMBERS[result] === bet.value.toLowerCase()
+      return EUROPEAN_NUMBERS[result] === bet.value.toLowerCase()
         ? amount * payouts.color
         : 0
 
@@ -40,13 +40,13 @@ export function calculateRouletteWin(
     case 'range':
       if (result === '0') return 0
       return bet.value.toLowerCase() ===
-        (numResult >= 1 && numResult <= 9 ? 'low' : 'high')
+        (numResult >= 1 && numResult <= 18 ? 'low' : 'high')
         ? amount * payouts.range
         : 0
 
     case 'dozen':
       if (result === '0') return 0
-      return Number(bet.value) === Math.ceil(numResult / 6)
+      return Number(bet.value) === Math.ceil(numResult / 12)
         ? amount * payouts.dozen
         : 0
 

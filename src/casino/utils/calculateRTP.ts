@@ -1,9 +1,9 @@
 import {
   BACCARAT_8_DECK_PROBS,
   BLACKJACK_OUTCOME_PROBS,
+  EUROPEAN_NUMBERS,
   LOTTERY_NUM_TO_DRAW,
   LOTTERY_TOTAL_NUMBERS,
-  MINI_NUMBERS,
   PLINKO_ROW_COUNT,
   calculateBlackjackInsuranceRtp,
   calculateBlackjackPairsRtp,
@@ -114,50 +114,41 @@ export const calculateRTP = (
 
     case 'roulette': {
       const { winMultipliers } = settings as TCasinoSettings['roulette']
-      const numbers = Object.keys(MINI_NUMBERS)
+      const numbers = Object.keys(EUROPEAN_NUMBERS)
       const totalNumbers = numbers.length
-      const greenCount = numbers.filter(
-        (n) => MINI_NUMBERS[n] === 'green'
-      ).length
 
       const numberRTP =
         (1 / totalNumbers) * toNumber(winMultipliers.number) * 100
 
-      const redCount = numbers.filter((n) => MINI_NUMBERS[n] === 'red').length
+      const redCount = numbers.filter(
+        (n) => EUROPEAN_NUMBERS[n] === 'red'
+      ).length
       const colorRTP =
         (redCount / totalNumbers) * toNumber(winMultipliers.color) * 100
 
       const evenCount = numbers.filter(
-        (n) => parseInt(n) % 2 === 0 && MINI_NUMBERS[n] !== 'green'
+        (n) => parseInt(n) % 2 === 0 && EUROPEAN_NUMBERS[n] !== 'green'
       ).length
       const parityRTP =
-        (evenCount / (totalNumbers - greenCount)) *
-        toNumber(winMultipliers.parity) *
-        100
+        (evenCount / totalNumbers) * toNumber(winMultipliers.parity) * 100
 
       const rangeCount = numbers.filter(
-        (n) => parseInt(n) >= 1 && parseInt(n) <= 9
+        (n) => parseInt(n) >= 1 && parseInt(n) <= 18
       ).length
       const rangeRTP =
-        (rangeCount / (totalNumbers - greenCount)) *
-        toNumber(winMultipliers.range) *
-        100
+        (rangeCount / totalNumbers) * toNumber(winMultipliers.range) * 100
 
       const dozenCount = numbers.filter(
-        (n) => parseInt(n) >= 1 && parseInt(n) <= 6
+        (n) => parseInt(n) >= 1 && parseInt(n) <= 12
       ).length
       const dozenRTP =
-        (dozenCount / (totalNumbers - greenCount)) *
-        toNumber(winMultipliers.dozen) *
-        100
+        (dozenCount / totalNumbers) * toNumber(winMultipliers.dozen) * 100
 
       const columnCount = numbers.filter(
-        (n) => parseInt(n) % 3 === 1 && MINI_NUMBERS[n] !== 'green'
+        (n) => parseInt(n) % 3 === 1 && EUROPEAN_NUMBERS[n] !== 'green'
       ).length
       const columnRTP =
-        (columnCount / (totalNumbers - greenCount)) *
-        toNumber(winMultipliers.column) *
-        100
+        (columnCount / totalNumbers) * toNumber(winMultipliers.column) * 100
 
       return {
         number: numberRTP,

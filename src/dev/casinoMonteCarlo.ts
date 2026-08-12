@@ -7,7 +7,7 @@ import {
   getPlinkoMultiplierAtPathIndex,
   normalizePlinkoBinMultipliers
 } from '../casino/constants/plinkoConfig'
-import { MINI_NUMBERS } from '../casino/constants/rouletteConfig'
+import { EUROPEAN_NUMBERS } from '../casino/constants/rouletteConfig'
 import type { TCasinoSettings } from '../casino/types/casinoSettings'
 import { calculateRTP } from '../casino/utils/calculateRTP'
 import {
@@ -23,7 +23,7 @@ const toNumber = (val: unknown): number => {
   return 0
 }
 
-const ROULETTE_NUMBERS = Object.keys(MINI_NUMBERS)
+const ROULETTE_NUMBERS = Object.keys(EUROPEAN_NUMBERS)
 
 const ROULETTE_BET_TYPES: RouletteBetType[] = [
   'number',

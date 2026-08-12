@@ -164,7 +164,7 @@ export const defaultCasinoSettings = {
   roulette: {
     enabled: true,
     winMultipliers: {
-      number: 18,
+      number: 36,
       color: 2,
       parity: 1.95,
       range: 1.95,
@@ -290,7 +290,7 @@ export const defaultCasinoSettings = {
     goldenJackpotMinMultiplier: 1,
     slotsMinMultiplier: 100,
     lotteryMinMultiplier: 40,
-    rouletteMinMultiplier: 18,
+    rouletteMinMultiplier: 36,
     baccaratMinMultiplier: 9,
     blackjackMinMultiplier: 0,
     minesMinMultiplier: 0,

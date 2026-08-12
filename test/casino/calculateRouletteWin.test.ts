@@ -74,9 +74,19 @@ describe('calculateRouletteWin', () => {
   })
 
   it('pays range on high result', () => {
-    expect(calculateRouletteWin(bet('range', 'high'), '10', payouts)).toBe(
+    expect(calculateRouletteWin(bet('range', 'high'), '19', payouts)).toBe(
       100 * payouts.range
     )
+  })
+
+  it('pays range on low boundary 18', () => {
+    expect(calculateRouletteWin(bet('range', 'low'), '18', payouts)).toBe(
+      100 * payouts.range
+    )
+  })
+
+  it('loses low range on 19', () => {
+    expect(calculateRouletteWin(bet('range', 'low'), '19', payouts)).toBe(0)
   })
 
   it('loses range on zero', () => {
@@ -89,12 +99,36 @@ describe('calculateRouletteWin', () => {
     )
   })
 
+  it('pays second dozen on 13', () => {
+    expect(calculateRouletteWin(bet('dozen', '2'), '13', payouts)).toBe(
+      100 * payouts.dozen
+    )
+  })
+
+  it('pays third dozen on 25', () => {
+    expect(calculateRouletteWin(bet('dozen', '3'), '25', payouts)).toBe(
+      100 * payouts.dozen
+    )
+  })
+
+  it('pays straight on high European number', () => {
+    expect(calculateRouletteWin(bet('number', '32'), '32', payouts)).toBe(
+      100 * payouts.number
+    )
+  })
+
   it('loses dozen on zero', () => {
     expect(calculateRouletteWin(bet('dozen', '1'), '0', payouts)).toBe(0)
   })
 
   it('pays column on non-zero result', () => {
     expect(calculateRouletteWin(bet('column', '2'), '5', payouts)).toBe(
+      100 * payouts.column
+    )
+  })
+
+  it('pays column on high European number', () => {
+    expect(calculateRouletteWin(bet('column', '1'), '34', payouts)).toBe(
       100 * payouts.column
     )
   })
